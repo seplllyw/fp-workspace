@@ -1950,6 +1950,33 @@ body {
 .v19-device-grid { display: grid; grid-template-columns: 200px 1fr; gap: 16px; }
 .v19-flight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
+/* ===== Flight Task / 断点续飞 ===== */
+.ft-module { padding: 20px 24px; height: 100%; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+.ft-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.ft-stat-card { padding: 16px; background: #fff; border: 1px solid var(--panel-border); border-radius: var(--radius-sm); text-align: center; }
+.ft-stat-num { font-size: 28px; font-weight: 700; color: var(--accent); }
+.ft-stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+.ft-section { display: flex; flex-direction: column; gap: 10px; }
+.ft-section-title { font-size: 14px; font-weight: 600; padding-left: 4px; }
+.ft-card { background: #fff; border: 1px solid var(--panel-border); border-radius: var(--radius); overflow: hidden; }
+.ft-card-body { padding: 16px 18px; }
+.ft-detail { font-size: 11px; color: var(--text-secondary); }
+.ft-tag { font-size: 11px; padding: 1px 7px; border-radius: 8px; font-weight: 500; white-space: nowrap; }
+.ft-tag.warn { background: rgba(217,119,6,0.1); color: #d97706; }
+.ft-tag.ok { background: rgba(22,163,74,0.1); color: #16a34a; }
+.ft-tag.sm { font-size: 10px; padding: 0 5px; }
+.ft-progress { height: 6px; background: var(--surface); border-radius: 3px; overflow: hidden; margin-bottom: 4px; width: 80px; }
+.ft-progress-bar { height: 100%; background: #d97706; border-radius: 3px; }
+.ft-job-line { font-size: 12px; padding: 2px 0; display: flex; align-items: center; gap: 8px; }
+.ft-flow { padding: 16px 20px; background: #fff; border: 1px solid var(--panel-border); border-radius: var(--radius); }
+.ft-flow-step { display: flex; gap: 14px; padding: 8px 0; }
+.ft-flow-num { width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 12px; font-weight: 600; display: grid; place-items: center; flex-shrink: 0; }
+.ft-flow-content strong { font-size: 14px; }
+.ft-flow-content p { font-size: 13px; color: var(--text-secondary); margin: 2px 0 0 0; line-height: 1.6; }
+.ft-flow-arrow { text-align: center; color: var(--text-secondary); font-size: 12px; padding: 1px 0 1px 26px; }
+.ft-note { padding: 12px 16px; background: rgba(37,99,235,0.04); border-radius: var(--radius-sm); font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+.ft-note strong { color: var(--text-primary); }
+
 /* Tables */
 .v19-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .v19-table th { text-align: left; padding: 10px 14px; background: var(--surface); font-weight: 500; color: var(--text-secondary); font-size: 12px; border-bottom: 1px solid var(--panel-border); }
@@ -2034,12 +2061,6 @@ body {
 .v19-algo-note { margin-top: 12px; padding: 10px; background: rgba(217,119,6,0.06); border-radius: var(--radius-sm); font-size: 12px; color: var(--text-secondary); display: flex; align-items: flex-start; gap: 6px; }
 
 /* Breakpoint card */
-.v19-breakpoint-card { border-color: rgba(217,119,6,0.3); }
-.v19-breakpoint-desc p { font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.6; }
-.v19-breakpoint-status { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
-.v19-bp-item { padding: 14px; background: var(--surface); border-radius: var(--radius-sm); text-align: center; }
-.v19-bp-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
-.v19-bp-value { font-size: 28px; font-weight: 700; color: var(--accent); }
 
 
 /* ===== Smart Dispatch V1.9 Styles ===== */
@@ -3016,64 +3037,172 @@ body {
 
 <!-- 工作流 · 飞行任务 -->
   <div class="page-panel" id="page-flight-task">
-    <div class="v19-module">
-      <div class="v19-module-header">
-        <div class="v19-module-title">
-          <i data-lucide="plane" style="width:22px;height:22px;color:#2563eb"></i>
-          <div>
-            <h2>飞行任务</h2>
-            <p>无人机飞行任务计划与执行 · 断点续飞 · V1.9 P1</p>
-          </div>
+    <div class="ft-module">
+
+      <!-- 统计 -->
+      <div class="ft-stats">
+        <div class="ft-stat-card">
+          <div class="ft-stat-num">1</div>
+          <div class="ft-stat-label">可续飞</div>
+        </div>
+        <div class="ft-stat-card">
+          <div class="ft-stat-num">2</div>
+          <div class="ft-stat-label">执行中</div>
+        </div>
+        <div class="ft-stat-card">
+          <div class="ft-stat-num">3</div>
+          <div class="ft-stat-label">今日完成</div>
+        </div>
+        <div class="ft-stat-card">
+          <div class="ft-stat-num">12</div>
+          <div class="ft-stat-label">本月累计续飞</div>
         </div>
       </div>
-      <div class="v19-flight-grid">
-        <div class="v19-card v19-breakpoint-card">
-          <div class="v19-card-header">
-            <h3><i data-lucide="pause-circle" style="width:16px;height:16px;color:#d97706"></i> 断点续飞</h3>
-            <span class="v19-badge warning">V1.9 新能力</span>
-          </div>
-          <div class="v19-card-body">
-            <div class="v19-breakpoint-desc">
-              <p>无人机执行航线过程中，因电量不足、信号中断等原因中断飞行后，更换电池或恢复信号后从断点位置继续执行剩余航线，避免重复飞行。</p>
-            </div>
-            <div class="v19-breakpoint-status">
-              <div class="v19-bp-item">
-                <div class="v19-bp-label">可续飞任务</div>
-                <div class="v19-bp-value">1</div>
-              </div>
-              <div class="v19-bp-item">
-                <div class="v19-bp-label">历史断点</div>
-                <div class="v19-bp-value">3</div>
-              </div>
-            </div>
-            <table class="v19-table" style="margin-top:12px">
-              <thead><tr><th>任务名称</th><th>设备</th><th>中断原因</th><th>断点位置</th><th>已飞/剩余</th><th>操作</th></tr></thead>
-              <tbody>
-                <tr><td><strong>望江大桥巡检</strong></td><td>M300 #01</td><td><span class="v19-level warning">低电量</span></td><td>第4航点 · GPS(30.268,120.123)</td><td>65% / 35%</td><td><button class="btn-sm-primary">续飞</button></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="v19-card">
-          <div class="v19-card-header">
-            <h3><i data-lucide="list-checks" style="width:16px;height:16px"></i> 任务列表</h3>
-          </div>
-          <div class="v19-card-body" style="padding:0">
+
+      <!-- 可续飞任务 -->
+      <div class="ft-section">
+        <div class="ft-section-title">可续飞任务</div>
+        <div class="ft-card">
+          <div class="ft-card-body" style="padding:0">
             <table class="v19-table">
-              <thead><tr><th>任务名称</th><th>航线</th><th>设备</th><th>状态</th><th>飞行时长</th></tr></thead>
+              <thead><tr><th>任务</th><th>设备</th><th>航线</th><th>中断原因</th><th>断点位置</th><th>进度</th><th>中断时间</th><th>操作</th></tr></thead>
               <tbody>
-                <tr><td>望江大桥巡检</td><td>望江大桥航线</td><td>M300 #01</td><td><span class="v19-status-dot flying"></span> 飞行中</td><td>32min</td></tr>
-                <tr><td>边坡隐患排查</td><td>边坡巡检航线</td><td>M300 #02</td><td><span class="v19-status-dot flying"></span> 飞行中</td><td>18min</td></tr>
-                <tr><td>城北高架巡检</td><td>城北高架航线</td><td>M300 #03</td><td><span class="v19-status-dot done"></span> 已完成</td><td>45min</td></tr>
+                <tr>
+                  <td><strong>望江大桥巡检</strong></td>
+                  <td>M300 #01</td>
+                  <td>望江大桥航线 · 6航点</td>
+                  <td><span class="ft-tag warn">低电量</span><br><span class="ft-detail">72%→45%，低于返航阈值</span></td>
+                  <td>航点4<br><span class="ft-detail">GPS(30.268,120.123) · 高度80m</span></td>
+                  <td>
+                    <div class="ft-progress"><div class="ft-progress-bar" style="width:67%"></div></div>
+                    <span class="ft-detail">4/6航点 · 67%</span>
+                  </td>
+                  <td>08-05 08:47</td>
+                  <td><button class="btn-sm-primary" onclick="alert('续飞指令已下发至M300 #01。\n\n无人机从航点4(GPS 30.268,120.123)继续执行剩余2个航点。\n预计飞行15分钟。')">续飞</button></td>
+                </tr>
               </tbody>
             </table>
           </div>
         </div>
       </div>
+
+      <!-- 断点续飞流程 -->
+      <div class="ft-section">
+        <div class="ft-section-title">断点续飞流程</div>
+        <div class="ft-flow">
+          <div class="ft-flow-step">
+            <div class="ft-flow-num">1</div>
+            <div class="ft-flow-content">
+              <strong>飞行中断检测</strong>
+              <p>无人机执行航线中，飞控实时监测电量与信号。电量低于返航阈值或遥测信号连续丢失>3秒，触发中断保护，飞控自动悬停。</p>
+            </div>
+          </div>
+          <div class="ft-flow-arrow">|</div>
+          <div class="ft-flow-step">
+            <div class="ft-flow-num">2</div>
+            <div class="ft-flow-content">
+              <strong>自动记录断点</strong>
+              <p>飞控自动记录当前状态快照：GPS坐标、已飞航点序号(4/6)、剩余航线数据、机头朝向、高度(80m)、电量(45%)、时间戳。数据通过飞派云平台 V2.1 断点续飞接口持久化。</p>
+            </div>
+          </div>
+          <div class="ft-flow-arrow">|</div>
+          <div class="ft-flow-step">
+            <div class="ft-flow-num">3</div>
+            <div class="ft-flow-content">
+              <strong>返航</strong>
+              <p>飞手遥控器弹窗提示「电量不足，可断点续飞」，确认后无人机自动返航至起飞点。返航路径避开禁飞区，沿最短安全路径返回。</p>
+            </div>
+          </div>
+          <div class="ft-flow-arrow">|</div>
+          <div class="ft-flow-step">
+            <div class="ft-flow-num">4</div>
+            <div class="ft-flow-content">
+              <strong>恢复准备</strong>
+              <p>更换电池。飞派云平台检测到M300 #01重新上线，自动查询该设备的未完成任务，匹配到望江大桥巡检任务（断点：航点4，剩余2个航点）。</p>
+            </div>
+          </div>
+          <div class="ft-flow-arrow">|</div>
+          <div class="ft-flow-step">
+            <div class="ft-flow-num">5</div>
+            <div class="ft-flow-content">
+              <strong>续飞确认</strong>
+              <p>飞手重新起飞，遥控器弹窗「检测到未完成任务：望江大桥巡检，是否从航点4继续？」，确认后无人机自动导航至断点GPS(30.268,120.123)，恢复至原高度80m、原机头朝向。</p>
+            </div>
+          </div>
+          <div class="ft-flow-arrow">|</div>
+          <div class="ft-flow-step">
+            <div class="ft-flow-num">6</div>
+            <div class="ft-flow-content">
+              <strong>执行剩余航线</strong>
+              <p>从航点4继续执行至航点6(终点)。飞行过程与正常巡检一致：航线跟踪、AI实时识别、照片采集。支持再次中断并再次续飞。</p>
+            </div>
+          </div>
+          <div class="ft-flow-arrow">|</div>
+          <div class="ft-flow-step">
+            <div class="ft-flow-num">7</div>
+            <div class="ft-flow-content">
+              <strong>数据合并上报</strong>
+              <p>续飞完成后，系统将两次飞行数据合并为一次完整巡检记录：飞行时长47min(32+15)、航点数据拼接(1-4 + 5-6)、126张照片汇总、AI识别结果归集。合并后数据同步至资产数字平台。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 续飞记录 -->
+      <div class="ft-section">
+        <div class="ft-section-title">续飞记录</div>
+        <div class="ft-card">
+          <div class="ft-card-body" style="padding:0">
+            <table class="v19-table">
+              <thead><tr><th>任务</th><th>设备</th><th>中断原因</th><th>作业明细</th><th>总耗时</th><th>结果</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>望江大桥巡检</strong><br><span class="ft-detail">2026-08-05</span></td>
+                  <td>M300 #01</td>
+                  <td>低电量</td>
+                  <td>
+                    <div class="ft-job-line">#1 08:15-08:47 32min · 航点1→4 · 65% <span class="ft-tag warn sm">中断</span></div>
+                    <div class="ft-job-line">#2 09:05-09:20 15min · 航点5→6 · 35% <span class="ft-tag ok sm">续飞</span></div>
+                  </td>
+                  <td>47min</td>
+                  <td><span class="ft-tag ok">完成</span><br><span class="ft-detail">126张照片 · 3个事件</span></td>
+                </tr>
+                <tr>
+                  <td><strong>边坡R12隐患排查</strong><br><span class="ft-detail">2026-08-03</span></td>
+                  <td>M300 #02</td>
+                  <td>信号丢失</td>
+                  <td>
+                    <div class="ft-job-line">#1 10:10-10:28 18min · 航点1→3 · 50% <span class="ft-tag warn sm">中断</span></div>
+                    <div class="ft-job-line">#2 10:42-11:05 23min · 航点4→6 · 50% <span class="ft-tag ok sm">续飞</span></div>
+                  </td>
+                  <td>41min</td>
+                  <td><span class="ft-tag ok">完成</span><br><span class="ft-detail">89张照片 · 2个事件</span></td>
+                </tr>
+                <tr>
+                  <td><strong>城北高架桥巡检</strong><br><span class="ft-detail">2026-08-04</span></td>
+                  <td>M300 #03</td>
+                  <td>—</td>
+                  <td>
+                    <div class="ft-job-line">#1 14:10-14:55 45min · 航点1→8 · 100% <span class="ft-tag ok sm">完成</span></div>
+                  </td>
+                  <td>45min</td>
+                  <td><span class="ft-tag ok">完成</span><br><span class="ft-detail">210张照片 · 0个事件</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 数据说明 -->
+      <div class="ft-note">
+        <strong>数据来源</strong>：断点数据由飞派云平台 V2.1 断点续飞接口提供。飞行过程中每秒上报状态快照（GPS/航点/电量/高度/速度），中断时自动生成断点记录持久化。上层应用通过 API 查询断点并下发续飞指令。能力一次建设，智巡、卫瞳、消防多产品线复用。
+      </div>
+
     </div>
   </div>
 
-  <!-- 工作流 · 事件管理 -->
+<!-- 工作流 · 事件管理 -->
   <div class="page-panel" id="page-event-mgr">
     <div class="v19-module">
       <div class="v19-module-header">
