@@ -1,0 +1,3421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>飞派智巡 — 整体态势</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+/* ===== Reset & Tokens ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --topnav-h: 56px;
+  --sidebar-w: 200px;
+  --rightpanel-w: 360px;
+  --bottomtab-h: 52px;
+  --bg: #f3f4f6;
+  --panel: rgba(255,255,255,0.94);
+  --panel-strong: #ffffff;
+  --border: rgba(15,23,42,0.08);
+  --border-strong: rgba(15,23,42,0.12);
+  --text: #0f172a;
+  --text-2: #475569;
+  --text-3: #94a3b8;
+  --primary: #2b7fff;
+  --primary-soft: rgba(43,127,255,0.10);
+  --primary-soft-2: rgba(43,127,255,0.06);
+  --danger: #ef4444;
+  --danger-soft: rgba(239,68,68,0.10);
+  --warning: #f59e0b;
+  --success: #16a34a;
+  --success-soft: rgba(22,163,74,0.10);
+  --offline: #9ca3af;
+  --surface: rgba(0,0,0,0.03);
+  --surface-hover: rgba(0,0,0,0.06);
+  --shadow-sm: 0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.06);
+  --shadow-md: 0 4px 16px rgba(15,23,42,0.08);
+  --shadow-lg: 0 10px 30px rgba(15,23,42,0.10);
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --transition: 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+
+html,body{height:100%;width:100%}
+body{
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+
+button{font-family: inherit; cursor: pointer; border: 0; background: none; color: inherit}
+a{color: inherit; text-decoration: none}
+
+/* ===== App Layout ===== */
+.app{
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  grid-template-rows: var(--topnav-h) 1fr;
+  grid-template-areas:
+    "topnav topnav"
+    "sidebar main";
+  background: #e8eaee;
+}
+
+/* ===== Top Navigation ===== */
+.topnav{
+  grid-area: topnav;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: var(--panel-strong);
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  z-index: 50;
+}
+.brand{display:flex; align-items:center; gap:10px}
+.brand-logo{
+  width: 30px; height: 30px;
+  display:grid; place-items:center;
+}
+.brand-logo img{width:100%; height:100%; object-fit: contain}
+.brand-name{
+  font-size: 16px; font-weight: 600; letter-spacing: 0.5px; color: var(--text);
+}
+.brand-name .sep{color: var(--border-strong); margin: 0 4px; font-weight: 300}
+.brand-name .sub{color: var(--text-2); font-weight: 500}
+
+.topnav-right{display:flex; align-items:center; gap:6px}
+.icon-btn{
+  width: 34px; height: 34px;
+  display:grid; place-items:center;
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  transition: background var(--transition), color var(--transition);
+}
+.icon-btn:hover{ background: var(--primary-soft-2); color: var(--primary) }
+.icon-btn .lucide{width:18px; height:18px}
+
+.user-chip{
+  display:flex; align-items:center; gap:8px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 999px;
+  transition: background var(--transition);
+  margin-left: 4px;
+}
+.user-chip:hover{ background: var(--primary-soft-2) }
+.avatar{
+  width: 28px; height: 28px; border-radius: 999px;
+  background: linear-gradient(135deg, #60a5fa, #a78bfa);
+  display:grid; place-items:center; color: #fff; font-size: 11px; font-weight: 600;
+}
+.user-name{font-size: 13px; color: var(--text)}
+
+.org-select{
+  display:flex; align-items:center; gap:8px;
+  height: 34px; padding: 0 12px;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 13px;
+  min-width: 160px;
+  justify-content: space-between;
+  transition: border-color var(--transition), background var(--transition);
+}
+.org-select:hover{border-color: var(--primary); background: #fff}
+.org-select .lucide{width:14px; height:14px; color: var(--text-3)}
+
+/* ===== Left Sidebar ===== */
+.sidebar{
+  grid-area: sidebar;
+  background: var(--panel-strong);
+  border-right: 1px solid var(--border);
+  padding: 12px 10px;
+  overflow-y: auto;
+  display:flex; flex-direction: column;
+}
+.sidebar::-webkit-scrollbar{width: 4px}
+.sidebar::-webkit-scrollbar-thumb{background: var(--border-strong); border-radius: 2px}
+
+/* Top-level nav: icon + label, larger */
+.nav-group{display:flex; flex-direction: column; gap: 4px}
+.nav-group + .nav-group{margin-top: 6px}
+
+.menu-item{
+  display:flex; flex-direction: column; align-items:center; justify-content:center; gap: 4px;
+  padding: 10px 6px;
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  font-size: 12px;
+  text-align:center;
+  transition: background var(--transition), color var(--transition);
+  position: relative;
+}
+.menu-item:hover{ background: var(--primary-soft-2); color: var(--primary) }
+.menu-item.active{
+  background: var(--primary);
+  color: #fff;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(43,127,255,0.25);
+}
+.menu-item .lucide{ width: 18px; height: 18px; stroke-width: 1.8 }
+/* Only the active menu item shows its icon */
+.menu-item:not(.active) .lucide{ display: none }
+
+/* 工作台 = iteration anchor — slightly larger & bolder */
+.menu-item.anchor{
+  padding: 12px 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.menu-item.anchor .lucide{ width: 20px; height: 20px }
+.menu-item.anchor:hover{ background: var(--primary-soft); color: var(--primary) }
+
+/* ===== Expandable parent (e.g. 地图管理) ===== */
+.menu-item.has-children{
+  position: relative;
+  width: 100%;
+}
+.menu-item .chevron{
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px; height: 14px;
+  color: var(--text-3);
+  transition: transform var(--transition), color var(--transition);
+}
+.menu-item.has-children:hover .chevron{ color: var(--primary) }
+.menu-item.has-children.open .chevron{ transform: translateY(-50%) rotate(180deg); color: var(--primary) }
+
+/* Submenu panel below the parent entry */
+.submenu{
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  padding: 6px 4px 10px 4px;
+  background: #fafbfc;
+  border-radius: var(--radius-sm);
+  margin: 2px 4px 6px 4px;
+}
+.submenu.open{ display: flex }
+.submenu-section{ display: flex; flex-direction: column; gap: 4px }
+.submenu-title{
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: 0.4px;
+  padding: 4px 8px 2px;
+  text-transform: none;
+}
+.submenu-item{
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--text-2);
+  text-align: left;
+  transition: background var(--transition), color var(--transition);
+}
+.submenu-item:hover{ background: var(--primary-soft-2); color: var(--primary) }
+
+/* Inspection group: text-only chip buttons, no icons */
+.inspect-group{
+  display:flex; flex-direction: column; gap: 6px;
+  margin-top: 10px;
+}
+.inspect-item{
+  height: 32px;
+  display:flex; align-items:center; justify-content:center;
+  background: #f1f4f9;
+  border: 1px solid #e3e8ef;
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  font-size: 12px;
+  text-align: center;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+.inspect-item:hover{
+  background: var(--primary-soft-2);
+  color: var(--primary);
+  border-color: var(--primary-soft);
+}
+
+.sidebar-divider{
+  height: 1px;
+  background: var(--border);
+  margin: 10px 4px;
+}
+
+/* Emergency at bottom — icon + label */
+.menu-item.bottom{
+  margin-top: auto;
+  padding: 12px 6px;
+}
+
+.menu-sub{
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+/* ===== Main / Map area ===== */
+.main{
+  grid-area: main;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Real Leaflet map (replaces old .map-bg / .map-roads / .map-placeholder-tag) */
+#map{
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.leaflet-control-zoom{ display: none; }
+.leaflet-control-attribution{ display: none; }
+
+/* Glassy Leaflet marker bubble used on the dashboard */
+.dash-marker{
+  background: rgba(15,23,42,0.78);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  display:flex; align-items:center; gap: 8px;
+  box-shadow: var(--shadow-md);
+  position: relative;
+}
+.dash-marker::after{
+  content:"";
+  position:absolute;
+  left: 50%; bottom: -5px;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid rgba(15,23,42,0.78);
+}
+.dash-marker .thumb{
+  width: 26px; height: 26px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #475569, #64748b);
+  display:grid; place-items:center;
+  color: #cbd5e1;
+  flex-shrink: 0;
+}
+.dash-marker .thumb .lucide{width: 14px; height: 14px}
+.dash-marker .name{ font-weight: 500; line-height: 1.2 }
+.dash-marker .status{ font-size: 11px; opacity: 0.85; display:inline-flex; align-items:center; gap: 4px }
+.dash-marker .status .dot{
+  width: 6px; height: 6px; border-radius: 999px;
+  background: var(--success);
+  box-shadow: 0 0 0 2px rgba(22,163,74,0.25);
+}
+.dash-marker .status.offline .dot{ background: var(--danger); box-shadow: 0 0 0 2px rgba(239,68,68,0.25)}
+
+/* ===== Map overlays: stats, time, bottom tabs ===== */
+
+/* Time / weather bar (top-left) */
+.timebar{
+  position: absolute;
+  left: 16px; top: 16px;
+  display:flex; align-items:center; gap: 14px;
+  background: rgba(15,23,42,0.55);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  z-index: 10;
+  box-shadow: var(--shadow-md);
+}
+.timebar .date{font-weight:500}
+.timebar .sep{color: rgba(255,255,255,0.3)}
+.timebar .stat{display:inline-flex; align-items:center; gap:4px}
+.timebar .stat .lucide{width:14px; height:14px; opacity:0.85}
+
+/* Stats cards (top-left under time) */
+.stats-row{
+  position: absolute;
+  left: 16px; top: 64px;
+  display:flex; gap: 10px;
+  z-index: 10;
+}
+.stat-card{
+  background: rgba(15,23,42,0.55);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  min-width: 200px;
+  box-shadow: var(--shadow-md);
+}
+.stat-card .top{
+  display:flex; align-items:center; gap: 8px;
+  margin-bottom: 4px;
+}
+.stat-card .big{
+  font-size: 22px; font-weight: 600; letter-spacing: 0.5px;
+  display:flex; align-items:baseline; gap: 4px;
+}
+.stat-card .big .unit{font-size: 12px; font-weight: 400; opacity: 0.75}
+.stat-card .icon{
+  width: 22px; height: 22px;
+  display:grid; place-items:center;
+  color: #93c5fd;
+}
+.stat-card .icon .lucide{width:18px; height:18px}
+.stat-card .sub{
+  font-size: 11px; color: rgba(255,255,255,0.75);
+  display:flex; gap: 10px; flex-wrap: wrap;
+  margin-top: 4px;
+}
+.stat-card .sub .num{ color: #fff; font-weight: 500; opacity: 1 }
+
+/* Map markers */
+.map-marker{
+  position: absolute;
+  z-index: 8;
+  display:flex; flex-direction: column; align-items:center;
+  transform: translate(-50%, -100%);
+  cursor: pointer;
+}
+.marker-bubble{
+  background: rgba(15,23,42,0.78);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  display:flex; flex-direction: column; gap: 2px;
+  box-shadow: var(--shadow-md);
+  position: relative;
+}
+.marker-bubble::after{
+  content:"";
+  position:absolute;
+  left: 50%; bottom: -5px;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid rgba(15,23,42,0.78);
+}
+.marker-bubble .status{
+  display:inline-flex; align-items:center; gap: 4px;
+  font-size: 11px;
+}
+.marker-bubble .status .dot{
+  width: 6px; height: 6px; border-radius: 999px;
+  background: var(--success);
+  box-shadow: 0 0 0 2px rgba(22,163,74,0.25);
+}
+.marker-bubble .status.offline .dot{ background: var(--danger); box-shadow: 0 0 0 2px rgba(239,68,68,0.25)}
+.marker-bubble .name{font-weight: 500}
+.marker-bubble.has-icon{ flex-direction: row; align-items:center; gap: 8px; padding: 6px 8px }
+.marker-thumb{
+  width: 32px; height: 32px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #475569, #64748b);
+  display:grid; place-items:center;
+  color: #cbd5e1;
+  flex-shrink: 0;
+}
+.marker-thumb .lucide{width: 16px; height: 16px}
+
+/* Right Map Toolbar (照搬 index.html) */
+#map-toolbar{
+  position: absolute;
+  right: 12px;
+  top: 90px;
+  z-index: 1100;   /* 必须高于 .rightpanel(10) */
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px;
+  box-shadow: var(--shadow-md);
+  user-select: none;
+  width: 42px;
+  pointer-events: auto;
+}
+.tool-btn{
+  display: flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px;
+  border: none; border-radius: var(--radius-sm);
+  background: transparent; color: var(--text-2);
+  font-size: 16px; cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+}
+.tool-btn:hover{ background: var(--primary-soft-2); color: var(--text) }
+.tool-btn.draw-tool.active{
+  background: var(--primary-soft-2);
+  color: var(--primary);
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
+.tool-btn.draw-tool.active::before{
+  content: ""; position: absolute; left: -4px; top: 6px; bottom: 6px;
+  width: 3px; border-radius: 0 3px 3px 0; background: var(--primary);
+}
+.tool-btn.airspace-tool.active{
+  background: rgba(239,68,68,0.08);
+  color: var(--danger);
+  box-shadow: inset 0 0 0 2px var(--danger);
+}
+.tool-btn.airspace-tool.active::before{
+  content: ""; position: absolute; left: -4px; top: 6px; bottom: 6px;
+  width: 3px; border-radius: 0 3px 3px 0; background: var(--danger);
+}
+
+/* Airspace dropdown */
+.airspace-drop-item:hover{ background: var(--surface-hover); }
+.airspace-drop-item.active{ background: var(--primary-soft); color: var(--primary); }
+.tool-btn:active{ transform: scale(0.94) }
+.tool-btn.active{ background: var(--primary-soft-2); color: var(--primary) }
+#zoom-level{
+  height: 22px; display: grid; place-items: center;
+  font-size: 11px; color: var(--text-2); font-weight: 600;
+}
+.tool-divider{
+  width: 22px; height: 1px; background: var(--border); margin: 3px auto;
+}
+.tool-btn[data-tip]:hover::after{
+  content: attr(data-tip);
+  position: absolute; right: 42px; top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.82); color: #fff;
+  font-size: 11px; padding: 5px 10px; border-radius: 4px;
+  white-space: nowrap; pointer-events: none; z-index: 9999;
+}
+
+/* Bottom tab bar */
+.bottom-tabs{
+  position: absolute;
+  left: 16px; right: 16px; bottom: 16px;
+  height: var(--bottomtab-h);
+  background: var(--panel-strong);
+  border-radius: var(--radius);
+  display:flex; align-items:center;
+  padding: 6px;
+  gap: 4px;
+  box-shadow: var(--shadow-md);
+  z-index: 10;
+  overflow-x: auto;
+}
+.bottom-tabs::-webkit-scrollbar{height: 4px}
+.bottom-tabs::-webkit-scrollbar-thumb{background: var(--border-strong); border-radius: 2px}
+.bottom-tab{
+  flex-shrink: 0;
+  height: 100%;
+  display:inline-flex; align-items:center; gap: 6px;
+  padding: 0 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text-2);
+  white-space: nowrap;
+  transition: background var(--transition), color var(--transition);
+}
+.bottom-tab:hover{ background: var(--primary-soft-2); color: var(--primary) }
+.bottom-tab.active{
+  background: var(--primary);
+  color: #fff;
+  font-weight: 500;
+  box-shadow: 0 1px 3px rgba(43,127,255,0.3);
+}
+
+/* ===== Layer Panel Container (工具板 · 左下角) ===== */
+#layer-panel-container{
+  position: absolute;
+  left: 16px;
+  bottom: 80px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  user-select: none;
+}
+
+/* ===== Layer Panel ===== */
+#layer-panel{
+  width: 220px;
+  max-height: 420px;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0;
+  box-shadow: var(--shadow-lg);
+  transition: width 0.25s cubic-bezier(0.4,0,0.2,1),
+              max-height 0.3s cubic-bezier(0.4,0,0.2,1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+#layer-panel.collapsed{
+  width: 40px;
+  max-height: 38px;
+}
+#layer-panel-toggle{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+#layer-panel-toggle:hover{ color: var(--primary); background: var(--primary-soft-2); }
+#layer-panel-toggle:active{ background: var(--primary-soft); }
+#layer-panel-content{
+  padding: 10px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+#layer-panel-content::-webkit-scrollbar{ width: 4px; }
+#layer-panel-content::-webkit-scrollbar-thumb{ background: var(--border-strong); border-radius: 2px; }
+#layer-panel.collapsed #layer-panel-content{ display: none; }
+#layer-panel.collapsed #layer-panel-toggle{
+  border-bottom: none;
+  height: 38px;
+}
+
+.panel-section{ display: flex; flex-direction: column; gap: 6px; }
+.panel-section-title{
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-2);
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.layer-item{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+  color: var(--text-2);
+  position: relative;
+}
+.layer-item:hover{ background: var(--primary-soft-2); color: var(--text); }
+.layer-item:active{ background: var(--primary-soft); }
+.layer-item.active{ color: var(--text); font-weight: 500; }
+.layer-item-left{
+  display: flex; align-items: center; gap: 8px;
+  flex: 1; min-width: 0;
+}
+.layer-dot{
+  width: 8px; height: 8px; border-radius: 50%;
+  flex-shrink: 0;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.layer-item.active .layer-dot{
+  transform: scale(1.25);
+  box-shadow: 0 0 0 3px currentColor;
+}
+.layer-dot.asset{ background: #8e63ce; }
+.layer-dot.device{ background: #ff6d01; }
+.layer-dot.ortho{ background: #34a853; }
+.layer-dot.model{ background: #24c1e0; }
+.layer-dot.restricted{ background: #f59e0b; }
+.layer-dot.nofly{ background: #ef4444; }
+.layer-dot.noland{ background: #f97316; }
+.layer-dot.manual{ background: #ec4899; }
+
+/* Toggle Switch */
+.toggle{
+  position: relative;
+  width: 36px; height: 20px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.toggle input{
+  opacity: 0; width: 0; height: 0;
+  position: absolute;
+}
+.toggle-slider{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.12);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.toggle-slider::before{
+  content: "";
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  transition: transform 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+.toggle input:checked + .toggle-slider{ background: var(--primary); }
+.toggle input:checked + .toggle-slider::before{ transform: translateX(16px); }
+.toggle:hover .toggle-slider{ background: rgba(0,0,0,0.18); }
+.toggle:hover input:checked + .toggle-slider{ background: var(--primary); filter: brightness(1.1); }
+.toggle:active .toggle-slider::before{ transform: scale(0.9); }
+.toggle:active input:checked + .toggle-slider::before{ transform: translateX(16px) scale(0.9); }
+
+/* Opacity Slider */
+.opacity-row{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 4px;
+}
+.opacity-slider{
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(0,0,0,0.10);
+  outline: none;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.opacity-slider:hover{ background: rgba(0,0,0,0.15); }
+.opacity-slider::-webkit-slider-thumb{
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(43,127,255,0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.opacity-slider::-webkit-slider-thumb:hover{ transform: scale(1.15); box-shadow: 0 2px 6px rgba(43,127,255,0.4); }
+.opacity-slider::-webkit-slider-thumb:active{ transform: scale(1.05); }
+.opacity-val{
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--primary);
+  width: 30px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Expandable Panels (Asset / Ortho) */
+.ortho-expandable{ cursor: pointer; }
+.ortho-expand-arrow{
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+  color: var(--text-3);
+}
+.ortho-expandable:hover .ortho-expand-arrow{ color: var(--primary); }
+.ortho-expandable.open .ortho-expand-arrow{
+  transform: rotate(90deg);
+  color: var(--primary);
+}
+
+.ortho-panel{
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1);
+  background: #f8fafc;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  margin: 0 8px;
+}
+.ortho-panel.open{ max-height: 200px; }
+
+.ortho-search-wrap{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px 6px;
+}
+.ortho-search{
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 11px;
+  font-family: inherit;
+  outline: none;
+  cursor: text;
+  background: #fff;
+  color: var(--text);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.ortho-search::placeholder{ color: var(--text-3); font-size: 10px; }
+.ortho-search:focus{
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+.ortho-list{
+  max-height: 140px;
+  overflow-y: auto;
+  padding: 4px 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ortho-list::-webkit-scrollbar{ width: 4px; }
+.ortho-list::-webkit-scrollbar-thumb{ background: var(--border-strong); border-radius: 2px; }
+
+.ortho-list-item{
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  color: var(--text-2);
+  transition: background var(--transition);
+}
+.ortho-list-item:hover{ background: rgba(43,127,255,0.06); color: var(--text); }
+.ortho-list-item:active{ background: rgba(43,127,255,0.10); }
+.ortho-list-item.active{ color: var(--text); }
+.ortho-list-item .toggle{ transform: scale(0.75); transform-origin: right center; }
+.ortho-item-left{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.ortho-item-name{
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ortho-item-meta{
+  font-size: 10px;
+  color: var(--text-2);
+  display: flex;
+  gap: 6px;
+}
+.ortho-item-dot{
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ortho-empty{
+  text-align: center;
+  padding: 16px;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+/* ===== Right Panel: Flight Plans ===== */
+.rightpanel{
+  position: absolute;
+  right: 68px; top: 16px; bottom: 76px;
+  width: var(--rightpanel-w);
+  background: var(--panel-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display:flex; flex-direction: column;
+  z-index: 10;
+  overflow: hidden;
+  transform-origin: bottom right;
+  transition: transform 0.32s cubic-bezier(0.4,0,0.2,1),
+              opacity 0.24s ease,
+              height 0.32s cubic-bezier(0.4,0,0.2,1);
+}
+/* 收起状态：整张卡片从下往上塌缩为顶部一个胶囊。
+   位置仍在屏幕顶部（topnav 下方），保留可点击区域。 */
+.rightpanel.collapsed{
+  top: 72px;            /* topnav(56) + 间距 16，避开顶栏 */
+  bottom: auto;
+  height: 56px;
+  opacity: 1;
+  pointer-events: auto;
+  box-shadow: var(--shadow-md);
+  transform-origin: top right;
+}
+.rightpanel.collapsed .rp-filters,
+.rightpanel.collapsed .rp-list{ display: none; }
+.rightpanel.collapsed .rp-header{
+  border-bottom: 0;
+  padding: 10px 14px;
+}
+/* 收起时：只显示智能调度 banner 当作展开入口 */
+.rightpanel.collapsed .scheduling-banner{
+  margin: 0;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+.rightpanel.collapsed .scheduling-banner .ico{ width: 22px; height: 22px; }
+.rightpanel.collapsed .scheduling-banner .ico .lucide{ width: 12px; height: 12px }
+.rightpanel.collapsed .scheduling-banner .txt{ display: flex; align-items: center; gap: 6px }
+.rightpanel.collapsed .scheduling-banner .txt .t1{ font-size: 12px }
+.rightpanel.collapsed .scheduling-banner .txt .t2{ display: none }
+/* 收起时 rp-title 隐藏（智能调度 banner 自带标题） */
+.rightpanel.collapsed .rp-title{ display: none }
+.rp-header{
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.rp-title{
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.scheduling-banner{
+  background: linear-gradient(135deg, rgba(43,127,255,0.10), rgba(43,127,255,0.04));
+  border: 1px solid rgba(43,127,255,0.18);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  display:flex; gap: 10px; align-items: flex-start;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transition), border-color var(--transition);
+}
+.scheduling-banner:hover{ background: linear-gradient(135deg, rgba(43,127,255,0.14), rgba(43,127,255,0.06)); border-color: rgba(43,127,255,0.30) }
+.scheduling-banner .sb-chevron{
+  margin-left: auto;
+  width: 16px; height: 16px;
+  color: var(--primary);
+  flex-shrink: 0;
+  transition: transform var(--transition);
+  align-self: center;
+}
+.scheduling-banner.collapsed .txt{ display: none; }
+.scheduling-banner.collapsed .sb-chevron{ transform: rotate(180deg); }
+.scheduling-banner .ico{
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  background: var(--primary);
+  color: #fff;
+  display:grid; place-items:center;
+  flex-shrink: 0;
+}
+.scheduling-banner .ico .lucide{width: 16px; height: 16px}
+.scheduling-banner .txt .t1{font-size: 13px; font-weight: 600; color: var(--primary)}
+.scheduling-banner .txt .t2{font-size: 11px; color: var(--text-2); margin-top: 2px; line-height: 1.4}
+
+.rp-filters{
+  display:grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.filter-select{
+  display:flex; align-items:center; justify-content: space-between;
+  height: 32px;
+  padding: 0 10px;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+.filter-select:hover{border-color: var(--primary); background: #fff}
+.filter-select .lucide{width: 12px; height: 12px; opacity: 0.6}
+
+.rp-list{
+  flex: 1; overflow-y: auto;
+  padding: 12px 14px;
+  display:flex; flex-direction: column; gap: 10px;
+}
+.rp-list::-webkit-scrollbar{width: 6px}
+.rp-list::-webkit-scrollbar-thumb{background: var(--border-strong); border-radius: 3px}
+
+.plan-card{
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.plan-card:hover{
+  border-color: var(--primary);
+  box-shadow: var(--shadow-md);
+}
+.plan-card .head{
+  display:flex; align-items:flex-start; gap: 10px;
+  margin-bottom: 8px;
+}
+.plan-icon{
+  width: 32px; height: 32px;
+  border-radius: 999px;
+  display:grid; place-items:center;
+  flex-shrink: 0;
+}
+.plan-icon.cancelled{ background: var(--danger-soft); color: var(--danger) }
+.plan-icon.executed{ background: var(--primary-soft); color: var(--primary) }
+.plan-icon .lucide{width: 16px; height: 16px}
+.plan-meta{ flex: 1; min-width: 0 }
+.plan-title{font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px}
+.plan-sub{font-size: 11px; color: var(--text-2)}
+
+.plan-status{
+  display:inline-flex; align-items:center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.plan-status.cancelled{ background: var(--danger-soft); color: var(--danger) }
+.plan-status.executed{ background: var(--primary-soft); color: var(--primary) }
+
+.plan-actions{
+  display:flex; justify-content:flex-end;
+  margin-top: 6px;
+}
+.report-btn{
+  font-size: 11px;
+  color: var(--primary);
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--primary-soft);
+  background: var(--primary-soft-2);
+  transition: background var(--transition);
+}
+.report-btn:hover{ background: var(--primary-soft) }
+
+.progress-row{
+  display:flex; align-items:center; justify-content:space-between;
+  font-size: 12px;
+  margin-top: 8px;
+  color: var(--text-2);
+}
+.progress-row .pct{ color: var(--text); font-weight: 600; font-size: 13px }
+.progress-row.executed .pct{ color: var(--primary) }
+
+.progress-bar{
+  height: 4px;
+  background: #f1f5f9;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.progress-bar .fill{
+  height: 100%;
+  background: var(--primary);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+.progress-bar.cancelled .fill{ background: var(--danger) }
+
+.plan-footer{
+  display:flex; flex-wrap: wrap; gap: 8px 14px;
+  font-size: 11px;
+  color: var(--text-2);
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}
+.plan-footer .k{ color: var(--text-3) }
+.plan-footer .v{ color: var(--text-2) }
+
+.plan-toggle{
+  display:flex; align-items:center; justify-content:center;
+  gap: 4px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 6px;
+  font-size: 12px;
+  color: var(--text-2);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition), color var(--transition);
+}
+.plan-toggle:hover{ background: var(--primary-soft-2); color: var(--primary) }
+.plan-toggle .lucide{width: 14px; height: 14px}
+
+/* ===== Toast (placeholder interaction) ===== */
+.toast{
+  position: fixed;
+  bottom: 80px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(15,23,42,0.92);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 100;
+  display:flex; align-items:center; gap: 8px;
+}
+.toast.show{ opacity: 1; transform: translateX(-50%) translateY(0) }
+.toast .lucide{width: 16px; height: 16px; color: #93c5fd}
+
+/* view-notice — toolbar / draw / measure feedback (created on demand by JS) */
+#view-notice{
+  position: fixed; left: 50%; top: 80px;
+  transform: translateX(-50%) translateY(-12px);
+  background: rgba(15,23,42,0.92); color: #fff;
+  padding: 8px 16px; border-radius: 6px;
+  font-size: 12px; z-index: 2000;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  box-shadow: var(--shadow-lg);
+}
+#view-notice.show{ opacity: 1; transform: translateX(-50%) translateY(0) }
+
+/* ===== Bottom Device Bar (from index.html) ===== */
+#device-bar{
+  position: absolute;
+  left: var(--sidebar-w);
+  right: 0;
+  bottom: 0;
+  height: 44px;
+  z-index: 2000;
+  background: #fff;
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 8px;
+}
+.device-bar-label{
+  font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  color: var(--text-2); flex-shrink: 0;
+  padding-right: 10px; border-right: 1px solid var(--border);
+}
+#device-bar-list{
+  display: flex; gap: 6px; flex: 1; overflow-x: auto;
+}
+.device-btn{
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 12px;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: #fff; cursor: pointer;
+  font-size: 11px; font-family: inherit; white-space: nowrap;
+  transition: var(--transition);
+}
+.device-btn:hover{ background: var(--primary-soft-2); border-color: var(--primary); }
+.device-btn .dot{ width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.device-btn .dot.flying, .device-btn .dot.online{ background: #16a34a; }
+.device-btn .dot.standby{ background: #f59e0b; }
+.device-btn .dot.offline{ background: #9ca3af; }
+.device-btn .dname{ font-weight: 500; color: var(--text); }
+.device-btn .dinfo{ color: var(--text-2); font-size: 10px; }
+.device-bar-coords{
+  font-size: 10px; color: var(--text-2); flex-shrink: 0;
+  padding-left: 10px; border-left: 1px solid var(--border); white-space: nowrap;
+}
+
+/* ===== Map Compass Rose (from index.html) ===== */
+#map-compass{
+  position: absolute; right: 16px; bottom: 56px;
+  z-index: 1000;
+  width: 44px; height: 44px;
+  cursor: pointer; user-select: none;
+  display: flex; align-items: center; justify-content: center;
+}
+.compass-ring{
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid rgba(0,0,0,0.12);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+.compass-ring:hover{ box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
+.compass-needle{
+  width: 0; height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 16px solid #ef4444;
+  margin-top: -6px;
+}
+.compass-label{
+  position: absolute; top: 3px;
+  font-size: 9px; font-weight: 800;
+  color: #ef4444; letter-spacing: 0.5px; pointer-events: none;
+}
+
+/* ===== Mode indicator badge (from index.html) ===== */
+#mode-indicator{
+  position: absolute; bottom: 80px; left: 50%;
+  transform: translateX(-50%); z-index: 1000;
+  padding: 5px 16px; border-radius: 14px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+  opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none; white-space: nowrap;
+}
+#mode-indicator.show{ opacity: 1; transform: translateX(-50%) translateY(-6px); }
+#mode-indicator.satellite{ background: rgba(37,99,235,0.9); color: #fff; }
+#mode-indicator.ortho{ background: rgba(22,163,74,0.9); color: #fff; }
+
+/* ===== Hover tooltip (from index.html) ===== */
+.hover-tooltip{
+  position: absolute; z-index: 9999;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px; font-size: 11px;
+  pointer-events: none;
+  box-shadow: var(--shadow-md);
+  display: none;
+}
+.hover-tooltip.visible{ display: block; }
+.hover-tooltip-name{ font-weight: 600; color: var(--text); }
+.hover-tooltip-detail{ color: var(--text-2); margin-top: 2px; }
+
+/* ===== Ripple effect (from index.html) ===== */
+.tool-btn .ripple{
+  position: absolute; border-radius: 50%;
+  background: rgba(43,127,255,0.25);
+  transform: scale(0);
+  animation: ripple-anim 0.5s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes ripple-anim{
+  to{ transform: scale(3); opacity: 0; }
+}
+
+/* ===== Zone styles (from index.html) ===== */
+.zone-restricted{ stroke: #f59e0b; stroke-width: 2; stroke-dasharray: 8 4; fill: #f59e0b; fill-opacity: 0.1; }
+.zone-nofly{ stroke: #ef4444; stroke-width: 2.5; fill: #ef4444; fill-opacity: 0.15; }
+.zone-noland{ stroke: #f97316; stroke-width: 2; stroke-dasharray: 3 3; fill: #f97316; fill-opacity: 0.1; }
+
+/* ===== Detail Panel (from index.html) ===== */
+#detail-panel{
+  position: absolute; right: -420px; top: 12px; bottom: 12px;
+  width: 380px; z-index: 1000;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: right 0.35s cubic-bezier(0.4,0,0.2,1);
+  display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+#detail-panel.open{ right: 12px; }
+#detail-header{
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px; border-bottom: 1px solid var(--border);
+}
+#detail-title{ font-size: 15px; font-weight: 600; }
+#detail-close{
+  width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+  border: none; border-radius: var(--radius-sm); background: transparent;
+  color: var(--text-2); font-size: 18px; cursor: pointer; transition: var(--transition);
+}
+#detail-close:hover{ background: var(--surface-hover); color: var(--text); }
+#detail-body{ flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+.detail-card{ background: var(--surface); border-radius: var(--radius-sm); padding: 14px; }
+.detail-card-label{
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px;
+  color: var(--text-2); margin-bottom: 6px;
+}
+.detail-card-value{ font-size: 14px; font-weight: 500; }
+.detail-row{ display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 12px; }
+.detail-row-label{ color: var(--text-2); }
+
+.status-badge{
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 500;
+}
+.status-badge.running{ background: rgba(43,127,255,0.1); color: var(--primary); }
+.status-badge.done{ background: rgba(22,163,74,0.1); color: #16a34a; }
+.status-badge.error{ background: rgba(220,38,38,0.1); color: #dc2626; }
+.status-badge.standby{ background: rgba(0,0,0,0.05); color: #9ca3af; }
+.status-badge.warning{ background: rgba(217,119,6,0.1); color: #d97706; }
+.status-dot{ width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.status-dot.running{ background: #4a90d9; animation: pulse 1.5s infinite; }
+.status-dot.error{ background: #ea4335; animation: blink 0.8s infinite; }
+.status-dot.done{ background: #34a853; }
+
+@keyframes pulse{ 0%,100%{ opacity: 1; transform: scale(1); } 50%{ opacity: 0.5; transform: scale(1.6); } }
+@keyframes blink{ 0%,100%{ opacity: 1; } 50%{ opacity: 0.3; } }
+
+/* ===== Annotation Styles (from index.html) ===== */
+.ann-marker{
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 50%; border: 2.5px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25); cursor: pointer; transition: transform 0.2s;
+}
+.ann-marker:hover{ transform: scale(1.25); z-index: 10000 !important; }
+.ann-marker.selected{
+  transform: scale(1.35);
+  box-shadow: 0 0 18px rgba(43,127,255,0.5), 0 2px 10px rgba(0,0,0,0.35);
+}
+.ann-line{ stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; transition: stroke-width 0.15s; }
+.ann-line:hover{ stroke-width: 5; }
+.ann-line.selected{ stroke-width: 5; }
+.ann-polygon-fill{ transition: fill-opacity 0.2s; }
+.draw-vertex{ stroke: #fff; stroke-width: 2; transition: r 0.15s; }
+.draw-vertex:hover{ r: 7; }
+.circle-radius-label{
+  font-size: 12px; font-weight: 700; color: #fff;
+  background: rgba(0,0,0,0.75); padding: 3px 8px; border-radius: 4px;
+  white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.annotation-label{ background: none !important; border: none !important; }
+.annotation-label-inner{
+  font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 4px;
+  white-space: nowrap; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.18); pointer-events: none;
+}
+.annotation-label-inner.point-label{ background: #fff; color: #1a1a1a; border: 1px solid rgba(0,0,0,0.12); }
+.annotation-label-inner.line-label{ background: #fff; color: #1a1a1a; border: 1px solid rgba(0,0,0,0.12); }
+.annotation-label-inner.polygon-label{ background: rgba(0,0,0,0.75); color: #fff; }
+.annotation-label-inner.circle-label{ background: rgba(0,0,0,0.75); color: #fff; }
+
+/* ===== Draw Hint (from index.html) ===== */
+#draw-hint{
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  z-index: 1001; background: rgba(0,0,0,0.8); color: #fff;
+  padding: 6px 16px; border-radius: 16px; font-size: 12px; font-weight: 500;
+  pointer-events: none; opacity: 0; transition: opacity 0.25s;
+}
+#draw-hint.show{ opacity: 1; }
+
+/* ===== Context Menu (from index.html) ===== */
+#ctx-menu{
+  position: absolute; z-index: 10000;
+  background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 4px; display: none; flex-direction: column; gap: 1px;
+  min-width: 170px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+#ctx-menu.show{ display: flex; }
+.ctx-item{
+  display: flex; align-items: center; gap: 8px; padding: 9px 14px;
+  border: none; border-radius: var(--radius-sm); background: transparent;
+  color: var(--text); font-family: inherit; font-size: 12px;
+  cursor: pointer; transition: var(--transition); text-align: left;
+}
+.ctx-item:hover{ background: var(--surface-hover); }
+.ctx-item.danger{ color: var(--danger); }
+.ctx-divider{ height: 1px; background: var(--border); margin: 3px 6px; }
+
+/* ===== Detail Panel Form Styles (from index.html) ===== */
+.color-swatches{ display: flex; gap: 6px; flex-wrap: wrap; }
+.color-swatch{
+  width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent;
+  cursor: pointer; transition: var(--transition); flex-shrink: 0;
+}
+.color-swatch:hover{ transform: scale(1.15); }
+.color-swatch.selected{ border-color: var(--text); box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--text); }
+
+.icon-picker{ display: flex; gap: 6px; flex-wrap: wrap; }
+.icon-pick{
+  width: 34px; height: 34px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border); background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: var(--transition); font-size: 14px;
+}
+.icon-pick:hover{ background: var(--surface-hover); border-color: var(--primary); }
+.icon-pick.selected{ background: var(--primary-soft); border-color: var(--primary); }
+
+.line-style-picker{ display: flex; gap: 8px; }
+.line-style-opt{
+  flex: 1; height: 28px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border); background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: var(--transition);
+}
+.line-style-opt:hover{ border-color: var(--primary); }
+.line-style-opt.selected{ background: var(--primary-soft); border-color: var(--primary); }
+.line-style-opt svg{ width: 40px; height: 4px; }
+
+.font-size-picker{ display: flex; gap: 4px; }
+.fs-opt{
+  padding: 4px 10px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border); background: var(--surface);
+  font-size: 12px; cursor: pointer; transition: var(--transition);
+}
+.fs-opt:hover{ border-color: var(--primary); }
+.fs-opt.selected{ background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.detail-form-group{ display: flex; flex-direction: column; gap: 4px; }
+.detail-form-label{
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--text-2);
+}
+.detail-form-input{
+  padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 12px; font-family: inherit; outline: none; transition: var(--transition); cursor: text;
+}
+.detail-form-input:focus{ border-color: var(--primary); }
+.detail-form-textarea{
+  padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 12px; font-family: inherit; outline: none; resize: vertical;
+  min-height: 50px; transition: var(--transition); cursor: text;
+}
+.detail-form-textarea:focus{ border-color: var(--primary); }
+
+.detail-action-row{ display: flex; gap: 8px; }
+.detail-btn{
+  flex: 1; padding: 8px 12px; border: none; border-radius: var(--radius-sm);
+  font-size: 12px; font-weight: 500; cursor: pointer; transition: var(--transition); font-family: inherit;
+}
+.detail-btn.primary{ background: var(--primary); color: #fff; }
+.detail-btn.primary:hover{ filter: brightness(1.1); }
+.detail-btn.danger{ background: #fee2e2; color: var(--danger); border: 1px solid #fecaca; }
+.detail-btn.danger:hover{ background: #fecaca; }
+.detail-btn.secondary{ background: var(--surface); color: var(--text-2); border: 1px solid var(--border); }
+.detail-btn.secondary:hover{ background: var(--surface-hover); }
+
+/* Zone labels */
+.zone-label{ background: none; border: none; }
+.zone-label-inner{
+  font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 3px;
+  white-space: nowrap; text-align: center; color: #fff;
+}
+.zone-label-inner.restricted{ background: rgba(245,158,11,0.75); border: 1px solid rgba(245,158,11,0.6); }
+.zone-label-inner.nofly{ background: rgba(239,68,68,0.75); border: 1px solid rgba(239,68,68,0.6); }
+.zone-label-inner.noland{ background: rgba(249,115,22,0.75); border: 1px solid rgba(249,115,22,0.6); }
+.zone-label-inner.manual{ background: rgba(236,72,153,0.75); border: 1px solid rgba(236,72,153,0.6); }
+
+/* Custom marker (for model markers etc.) */
+.custom-marker{
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+  font-size: 12px; transition: transform 0.2s; cursor: pointer;
+}
+.custom-marker:hover{ transform: scale(1.3); z-index: 10000 !important; }
+
+.marker-station{ background: #0891b2; }
+.marker-flying{ background: #2563eb; }
+.marker-standby{ background: #16a34a; }
+.marker-task-pending{ background: #9ca3af; }
+.marker-asset{ background: #6366f1; }
+.marker-task-error{ background: #ef4444; }
+
+/* Flying pulse ring */
+.flying-pulse-ring{
+  position: absolute; inset: -4px; border-radius: 50%;
+  border: 2px solid #2563eb;
+  animation: pulse-ring 1.2s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes pulse-ring{
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* Drone info tag */
+.drone-info-tag{
+  font-size: 10px; font-weight: 600; color: #2563eb;
+  background: #fff; padding: 2px 6px; border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12); white-space: nowrap;
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ===== Top Navigation ===== -->
+  <header class="topnav">
+    <div class="brand">
+      <div class="brand-logo">
+        <img src="飞派智巡logo.jpg" alt="飞派智巡" onerror="this.style.display='none'; this.parentNode.innerHTML='<div style=&quot;width:30px;height:30px;border-radius:6px;background:linear-gradient(135deg,#2b7fff,#60a5fa);display:grid;place-items:center;color:#fff;font-weight:700;font-size:14px&quot;>F</div>'" />
+      </div>
+      <div class="brand-name">FEIPAI<span class="sep">|</span><span class="sub">飞派智巡</span></div>
+    </div>
+    <div class="topnav-right">
+      <button class="icon-btn" data-action="fullscreen" title="全屏"><i data-lucide="monitor"></i></button>
+      <button class="icon-btn" data-action="notifications" title="通知"><i data-lucide="bell"></i></button>
+      <button class="icon-btn" data-action="settings" title="设置"><i data-lucide="settings"></i></button>
+      <button class="user-chip" data-action="profile">
+        <div class="avatar">李</div>
+        <span class="user-name">李亚伟</span>
+      </button>
+      <button class="org-select" data-action="org">
+        <span>呈贡运营中心</span>
+        <i data-lucide="chevron-down"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== Left Sidebar ===== -->
+  <aside class="sidebar">
+    <!-- Group 1: top-level nav with icons -->
+    <div class="nav-group">
+      <button class="menu-item anchor" data-action="工作台">
+        <i data-lucide="layout-grid"></i>
+        <span>工作台</span>
+      </button>
+
+      <button class="menu-item active" data-action="整体态势">
+        <i data-lucide="layout-dashboard"></i>
+        <span>整体态势</span>
+      </button>
+
+      <!-- 地图管理 = sibling menu item; clicking navigates to map-mgr.html -->
+      <button class="menu-item" data-action="地图管理" data-nav="map-mgr" id="btn-map-mgr">
+        <i data-lucide="map"></i>
+        <span>地图管理</span>
+      </button>
+
+      <button class="menu-item" data-action="模型管理" data-nav="model-mgr" id="btn-model-mgr">
+        <i data-lucide="box"></i>
+        <span>模型管理</span>
+      </button>
+
+      <button class="menu-item" data-action="多路直播">
+        <i data-lucide="monitor-play"></i>
+        <span>多路直播</span>
+      </button>
+      <button class="menu-item" data-action="数据管理">
+        <i data-lucide="database"></i>
+        <span>数据管理</span>
+      </button>
+      <button class="menu-item" data-action="报告中心">
+        <i data-lucide="file-text"></i>
+        <span>报告中心</span>
+      </button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- Group 2: inspection types — text-only chips, no icons -->
+    <div class="inspect-group">
+      <button class="inspect-item" data-action="桥梁巡查">桥梁巡查</button>
+      <button class="inspect-item" data-action="边坡巡查">边坡巡查</button>
+      <button class="inspect-item" data-action="交通状况">交通状况</button>
+      <button class="inspect-item" data-action="路基、路面巡查">路基、路面巡查</button>
+      <button class="inspect-item" data-action="交安设施巡查">交安设施巡查</button>
+      <button class="inspect-item" data-action="建设工地">建设工地</button>
+      <button class="inspect-item" data-action="服务区巡查">服务区巡查</button>
+      <button class="inspect-item" data-action="交安巡查">交安巡查</button>
+      <button class="inspect-item" data-action="护栏巡查">护栏巡查</button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- Group 3: bottom action (emergency) -->
+    <button class="menu-item bottom" data-action="应急巡检">
+      <i data-lucide="siren"></i>
+      <span>应急巡检</span>
+    </button>
+  </aside>
+
+  <!-- ===== Main Map Area ===== -->
+  <main class="main">
+    <!-- Real map (Leaflet) — replaced former gradient/SVG placeholder -->
+    <div id="map"></div>
+
+    <!-- Time / weather -->
+    <div class="timebar">
+      <span class="date">2026年07月06日</span>
+      <span class="sep">·</span>
+      <span>星期一</span>
+      <span class="sep">·</span>
+      <span class="stat"><i data-lucide="clock"></i>17:47:58</span>
+      <span class="sep">·</span>
+      <span class="stat"><i data-lucide="cloud"></i>阴</span>
+      <span class="sep">·</span>
+      <span class="stat"><i data-lucide="thermometer"></i>25°</span>
+    </div>
+
+    <!-- Stats cards -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="big">
+          <div class="icon"><i data-lucide="drone"></i></div>
+          <span>1876</span><span class="unit">次</span>
+          <span style="font-size:11px;font-weight:400;opacity:0.7;margin-left:6px;">无人机飞行架次</span>
+        </div>
+        <div class="sub">
+          <span><span class="num">5个</span> 飞机场</span>
+          <span><span class="num">5</span> 在线</span>
+          <span><span class="num">0</span> 离线</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="big">
+          <div class="icon"><i data-lucide="camera"></i></div>
+          <span>25526</span><span class="unit">分钟</span>
+        </div>
+        <div class="sub">
+          <span><span class="num">6个</span> 无人机</span>
+          <span><span class="num">0</span> 在线</span>
+          <span><span class="num">6</span> 离线</span>
+          <span><span class="num">3705个</span> 视频</span>
+          <span><span class="num">90787张</span> 图片</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layer Panel Container (工具板 · 左下角 — from index.html) -->
+    <div id="layer-panel-container">
+      <div id="layer-panel">
+        <button id="layer-panel-toggle" title="收起面板"><i data-lucide="chevrons-up" style="width:14px;height:14px"></i></button>
+        <div id="layer-panel-content">
+          <!-- 业务 -->
+          <div class="panel-section">
+            <div class="panel-section-title"><i data-lucide="layers" style="width:13px;height:13px"></i> 业务</div>
+            <!-- 资产（可展开） -->
+            <div class="layer-item ortho-expandable" id="asset-item">
+              <div class="layer-item-left" id="asset-toggle-btn">
+                <span class="layer-dot asset"></span> 资产
+                <span class="ortho-expand-arrow"><i data-lucide="chevron-right" style="width:12px;height:12px"></i></span>
+              </div>
+            </div>
+            <div class="ortho-panel" id="asset-panel">
+              <div class="ortho-search-wrap">
+                <i data-lucide="search" style="width:12px;height:12px;color:var(--text-3);flex-shrink:0"></i>
+                <input class="ortho-search" id="asset-search" placeholder="搜索资产...">
+              </div>
+              <div class="ortho-list" id="asset-list"></div>
+            </div>
+
+            <div class="layer-item active" data-business="device">
+              <div class="layer-item-left">
+                <span class="layer-dot device"></span> 设备
+              </div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+
+            <!-- 正射影像（可展开） -->
+            <div class="layer-item ortho-expandable" id="ortho-item">
+              <div class="layer-item-left" id="ortho-toggle-btn">
+                <span class="layer-dot ortho"></span> 正射影像
+                <span class="ortho-expand-arrow"><i data-lucide="chevron-right" style="width:12px;height:12px"></i></span>
+              </div>
+            </div>
+            <div class="ortho-panel" id="ortho-panel">
+              <div class="ortho-search-wrap">
+                <i data-lucide="search" style="width:12px;height:12px;color:var(--text-3);flex-shrink:0"></i>
+                <input class="ortho-search" id="ortho-search" placeholder="搜索正射影像...">
+              </div>
+              <div class="ortho-list" id="ortho-list"></div>
+            </div>
+          </div>
+
+          <!-- 空域安全 -->
+          <div class="panel-section">
+            <div class="panel-section-title"><i data-lucide="shield" style="width:13px;height:13px"></i> 空域安全</div>
+            <div class="layer-item active" data-airspace="restricted">
+              <div class="layer-item-left">
+                <span class="layer-dot restricted"></span> 限制区
+              </div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="layer-item active" data-airspace="no-fly">
+              <div class="layer-item-left">
+                <span class="layer-dot nofly"></span> 禁飞区
+              </div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="layer-item active" data-airspace="no-land">
+              <div class="layer-item-left">
+                <span class="layer-dot noland"></span> 禁降区
+              </div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+
+          <!-- 地图标注 -->
+          <div class="panel-section">
+            <div class="panel-section-title"><i data-lucide="map-pin" style="width:13px;height:13px"></i> 标注</div>
+            <div class="layer-item active" data-annotation="all">
+              <div class="layer-item-left">
+                <span class="layer-dot" style="background:#ec4899;"></span> 地图标注
+              </div>
+              <label class="toggle"><input type="checkbox" checked id="toggle-annotations"><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+
+          <!-- 模型 -->
+          <div class="panel-section">
+            <div class="panel-section-title"><i data-lucide="box" style="width:13px;height:13px"></i> 模型</div>
+            <div class="layer-item" data-model="3d-model">
+              <div class="layer-item-left">
+                <span class="layer-dot model"></span> 3D模型
+              </div>
+              <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="layer-item" data-model="oblique">
+              <div class="layer-item-left">
+                <span class="layer-dot model"></span> 倾斜摄影
+              </div>
+              <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="opacity-row">
+              <span style="font-size:10px;color:var(--text-2)">透明度</span>
+              <input class="opacity-slider" type="range" min="0" max="100" value="80" id="model-opacity">
+              <span class="opacity-val" id="opacity-val">80%</span>
+            </div>
+          </div>
+
+          <!-- 视图模式 -->
+          <div class="panel-section">
+            <div class="panel-section-title"><i data-lucide="view" style="width:13px;height:13px"></i> 视图模式</div>
+            <div style="display:flex;gap:6px;padding:2px 0;">
+              <button id="btn-mode-2d" class="view-mode-btn active" data-mode="2d" style="flex:1;height:32px;display:flex;align-items:center;justify-content:center;gap:4px;border:1.5px solid var(--primary);border-radius:6px;background:var(--primary-soft);color:var(--primary);font-size:12px;font-weight:600;cursor:pointer;transition:var(--transition);font-family:inherit;">
+                <i data-lucide="map" style="width:14px;height:14px"></i> 2D
+              </button>
+              <button id="btn-mode-3d" class="view-mode-btn" data-mode="3d" style="flex:1;height:32px;display:flex;align-items:center;justify-content:center;gap:4px;border:1.5px solid var(--border);border-radius:6px;background:#fff;color:var(--text-2);font-size:12px;font-weight:500;cursor:pointer;transition:var(--transition);font-family:inherit;">
+                <i data-lucide="box" style="width:14px;height:14px"></i> 3D
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Map Toolbar — 照搬 index.html 右侧工具栏布局 -->
+    <div id="map-toolbar">
+      <button class="tool-btn" data-tip="放大" id="btn-zoom-in" title="放大"><i data-lucide="zoom-in" style="width:18px;height:18px"></i></button>
+      <div id="zoom-level">14</div>
+      <button class="tool-btn" data-tip="缩小" id="btn-zoom-out" title="缩小"><i data-lucide="zoom-out" style="width:18px;height:18px"></i></button>
+      <div class="tool-divider"></div>
+      <button class="tool-btn" data-tip="复位视野" id="btn-home" title="复位视野"><i data-lucide="house" style="width:18px;height:18px"></i></button>
+      <button class="tool-btn" data-tip="全屏" id="btn-fullscreen" title="全屏"><i data-lucide="maximize" style="width:18px;height:18px"></i></button>
+      <button class="tool-btn" data-tip="测距" id="btn-measure" title="测距"><i data-lucide="ruler" style="width:18px;height:18px"></i></button>
+      <div class="tool-divider"></div>
+      <button class="tool-btn draw-tool" data-tip="点标注" data-draw="point" id="btn-draw-point"><i data-lucide="map-pin" style="width:18px;height:18px"></i></button>
+      <button class="tool-btn draw-tool" data-tip="线标注" data-draw="line" id="btn-draw-line"><i data-lucide="minus" style="width:18px;height:18px"></i></button>
+      <button class="tool-btn draw-tool" data-tip="面标注" data-draw="polygon" id="btn-draw-polygon"><i data-lucide="hexagon" style="width:18px;height:18px"></i></button>
+      <button class="tool-btn draw-tool" data-tip="圆形标注" data-draw="circle" id="btn-draw-circle"><i data-lucide="circle" style="width:18px;height:18px"></i></button>
+      <div class="tool-divider"></div>
+      <button class="tool-btn" data-tip="空域绘制" id="btn-airspace-menu"><i data-lucide="shield-plus" style="width:18px;height:18px"></i></button>
+      <div class="airspace-dropdown" id="airspace-dropdown" style="display:none;position:absolute;right:0;top:100%;margin-top:4px;background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:4px;min-width:175px;box-shadow:var(--shadow-md);z-index:10000;flex-direction:column;gap:1px;">
+        <button class="airspace-drop-item" data-airspace="polygon-nofly" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:12px;color:var(--text);font-family:inherit;text-align:left;transition:background var(--transition);white-space:nowrap;"><span style="color:#ef4444;font-size:14px;width:18px;text-align:center;">⬡</span>多边形限飞区</button>
+        <button class="airspace-drop-item" data-airspace="circle-nofly" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:12px;color:var(--text);font-family:inherit;text-align:left;transition:background var(--transition);white-space:nowrap;"><span style="color:#ef4444;font-size:14px;width:18px;text-align:center;">◯</span>圆形限飞区</button>
+        <button class="airspace-drop-item" data-airspace="polygon-zone" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:12px;color:var(--text);font-family:inherit;text-align:left;transition:background var(--transition);white-space:nowrap;"><span style="color:#2b7fff;font-size:14px;width:18px;text-align:center;">⬡</span>多边形作业区</button>
+        <button class="airspace-drop-item" data-airspace="circle-zone" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:12px;color:var(--text);font-family:inherit;text-align:left;transition:background var(--transition);white-space:nowrap;"><span style="color:#2b7fff;font-size:14px;width:18px;text-align:center;">◯</span>圆形作业区</button>
+        <button class="airspace-drop-item" data-airspace="noland" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-size:12px;color:var(--text);font-family:inherit;text-align:left;transition:background var(--transition);white-space:nowrap;"><span style="color:#f97316;font-size:14px;width:18px;text-align:center;">⬇</span>禁降区</button>
+      </div>
+    </div>
+
+    <!-- Compass Rose on Map -->
+    <div id="map-compass" title="点击复位正北">
+      <div class="compass-ring">
+        <div class="compass-needle"></div>
+      </div>
+      <div class="compass-label">N</div>
+    </div>
+
+    <!-- Mode indicator badge -->
+    <div id="mode-indicator" class="satellite">卫星地图</div>
+
+    <!-- Bottom Device Bar -->
+    <div id="device-bar">
+      <div class="device-bar-label">设备</div>
+      <div id="device-bar-list"></div>
+      <div class="device-bar-coords">
+        <span id="mouse-coords" style="font-family:monospace;">30.263000, 120.123000</span> WGS84
+      </div>
+    </div>
+
+    <div class="hover-tooltip" id="hover-tooltip">
+      <div class="hover-tooltip-name"></div>
+      <div class="hover-tooltip-detail"></div>
+    </div>
+
+    <!-- Detail Panel (slide-in from right, from index.html) -->
+    <div id="detail-panel">
+      <div id="detail-header">
+        <span id="detail-title">选择对象查看详情</span>
+        <button id="detail-close"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+      </div>
+      <div id="detail-body">
+        <div style="text-align:center;color:var(--text-2);padding:40px 0;font-size:13px;">
+          点击地图上的标记<br>或区域查看详情
+        </div>
+      </div>
+    </div>
+
+    <!-- Right-click Context Menu (from index.html) -->
+    <div id="ctx-menu">
+      <div class="ctx-item" data-action="delete">🗑️ 删除标注</div>
+      <div class="ctx-item" data-action="link-asset">🔗 关联资产</div>
+      <div class="ctx-item" data-action="fly-to">🚁 选择设备飞向</div>
+      <div class="ctx-item" data-action="return-all">🏠 全部返航</div>
+      <div class="ctx-item" data-action="convert-survey">📐 转换为测区</div>
+      <div class="ctx-item" data-action="convert-patrol">🛡️ 转换为巡逻区域</div>
+    </div>
+
+    <!-- Asset Picker Modal -->
+    <div id="asset-picker-overlay" style="display:none;position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,0.4);align-items:center;justify-content:center;">
+      <div style="background:#fff;border-radius:12px;width:420px;max-height:520px;display:flex;flex-direction:column;box-shadow:0 16px 48px rgba(0,0,0,0.2);overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);">
+          <span style="font-size:15px;font-weight:600;">关联资产</span>
+          <button id="asset-picker-close" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:none;border-radius:6px;background:transparent;color:var(--text-2);cursor:pointer;font-size:16px;">✕</button>
+        </div>
+        <div style="padding:12px 16px;border-bottom:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:8px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:8px 12px;">
+            <i data-lucide="search" style="width:14px;height:14px;color:var(--text-3);flex-shrink:0"></i>
+            <input id="asset-picker-search" type="text" placeholder="搜索资产名称或ID..." style="flex:1;border:none;outline:none;background:transparent;font-size:13px;color:var(--text);">
+          </div>
+        </div>
+        <div id="asset-picker-list" style="flex:1;overflow-y:auto;padding:8px 12px 16px;max-height:320px;"></div>
+      </div>
+    </div>
+
+    <!-- Draw Hint (from index.html) -->
+    <div id="draw-hint"></div>
+
+    <!-- Bottom tabs -->
+    <div class="bottom-tabs">
+      <button class="bottom-tab active" data-action="tab-飞行计划">
+        <i data-lucide="list-checks"></i>飞行计划
+      </button>
+      <button class="bottom-tab" data-action="tab-告警信息">
+        <i data-lucide="alert-triangle"></i>告警信息
+      </button>
+      <button class="bottom-tab" data-action="tab-草甸收费站">草甸收费站</button>
+      <button class="bottom-tab" data-action="tab-宜良培训中心">宜良培训中心</button>
+      <button class="bottom-tab" data-action="tab-木喳箐机场">木喳箐机场</button>
+      <button class="bottom-tab" data-action="tab-阳宗海服务区">阳宗海服务区</button>
+      <button class="bottom-tab" data-action="tab-龙昇机场">龙昇机场</button>
+    </div>
+  </main>
+</div>
+
+<!-- ===== Right Panel (overlay, positioned via main) ===== -->
+<aside class="rightpanel" id="rightpanel">
+  <div class="rp-header">
+    <div class="rp-title">飞行计划</div>
+    <div class="scheduling-banner">
+      <div class="ico"><i data-lucide="bot"></i></div>
+      <div class="txt">
+        <div class="t1">智能调度运行中</div>
+        <div class="t2">系统将7×24小时自动分解并分配飞行任务</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rp-filters">
+    <button class="filter-select" data-action="filter-任务类型">
+      <span>任务类型筛选</span><i data-lucide="chevron-down"></i>
+    </button>
+    <button class="filter-select" data-action="filter-计划状态">
+      <span>计划状态筛选</span><i data-lucide="chevron-down"></i>
+    </button>
+  </div>
+
+  <div class="rp-list">
+    <!-- Plan 1 -->
+    <div class="plan-card">
+      <div class="head">
+        <div class="plan-icon cancelled"><i data-lucide="briefcase"></i></div>
+        <div class="plan-meta">
+          <div class="plan-title">7月1日交安设施巡查（1）</div>
+          <div class="plan-sub">交安设施巡查</div>
+        </div>
+        <span class="plan-status cancelled">已中止</span>
+      </div>
+      <div class="plan-actions">
+        <button class="report-btn" data-action="report-1">查看报告</button>
+      </div>
+      <div class="progress-row"><span>整体进度（0/8）</span><span class="pct">0%</span></div>
+      <div class="progress-bar cancelled"><div class="fill" style="width:0%"></div></div>
+      <div class="plan-footer">
+        <span><span class="k">开始时间</span> <span class="v">10:11</span></span>
+        <span><span class="k">预计完成</span> <span class="v">12:11</span></span>
+        <span><span class="k">数据传输</span> <span class="v">(0/8)</span></span>
+        <span><span class="k">AI分析</span> <span class="v">(0/8)</span></span>
+      </div>
+      <button class="plan-toggle" data-action="toggle-1">
+        <span>展开</span><i data-lucide="chevron-down"></i>
+      </button>
+    </div>
+
+    <!-- Plan 2 -->
+    <div class="plan-card">
+      <div class="head">
+        <div class="plan-icon executed"><i data-lucide="briefcase"></i></div>
+        <div class="plan-meta">
+          <div class="plan-title">6月25日交安设施巡查（1）</div>
+          <div class="plan-sub">交安设施巡查</div>
+        </div>
+        <span class="plan-status executed">已执行</span>
+      </div>
+      <div class="plan-actions">
+        <button class="report-btn" data-action="report-2">查看报告</button>
+      </div>
+      <div class="progress-row executed"><span>整体进度（7/8）</span><span class="pct">88%</span></div>
+      <div class="progress-bar"><div class="fill" style="width:88%"></div></div>
+      <div class="plan-footer">
+        <span><span class="k">开始时间</span> <span class="v">13:46</span></span>
+        <span><span class="k">预计完成</span> <span class="v">15:46</span></span>
+        <span><span class="k">数据传输</span> <span class="v">(7/8)</span></span>
+        <span><span class="k">AI分析</span> <span class="v">(7/8)</span></span>
+      </div>
+      <button class="plan-toggle" data-action="toggle-2">
+        <span>展开</span><i data-lucide="chevron-down"></i>
+      </button>
+    </div>
+
+    <!-- Plan 3 -->
+    <div class="plan-card">
+      <div class="head">
+        <div class="plan-icon executed"><i data-lucide="briefcase"></i></div>
+        <div class="plan-meta">
+          <div class="plan-title">6月25日路基、路面巡查（1）</div>
+          <div class="plan-sub">路基、路面巡查</div>
+        </div>
+        <span class="plan-status executed">已执行</span>
+      </div>
+      <div class="plan-actions">
+        <button class="report-btn" data-action="report-3">查看报告</button>
+      </div>
+      <div class="progress-row executed"><span>整体进度（6/8）</span><span class="pct">75%</span></div>
+      <div class="progress-bar"><div class="fill" style="width:75%"></div></div>
+      <div class="plan-footer">
+        <span><span class="k">开始时间</span> <span class="v">10:03</span></span>
+        <span><span class="k">预计完成</span> <span class="v">12:03</span></span>
+        <span><span class="k">数据传输</span> <span class="v">(7/8)</span></span>
+        <span><span class="k">AI分析</span> <span class="v">(0/8)</span></span>
+      </div>
+      <button class="plan-toggle" data-action="toggle-3">
+        <span>展开</span><i data-lucide="chevron-down"></i>
+      </button>
+    </div>
+
+    <!-- Plan 4 -->
+    <div class="plan-card">
+      <div class="head">
+        <div class="plan-icon executed"><i data-lucide="briefcase"></i></div>
+        <div class="plan-meta">
+          <div class="plan-title">6月24日交通状况（1）</div>
+          <div class="plan-sub">交通状况</div>
+        </div>
+        <span class="plan-status executed">已执行</span>
+      </div>
+      <div class="plan-actions">
+        <button class="report-btn" data-action="report-4">查看报告</button>
+      </div>
+      <div class="progress-row executed"><span>整体进度（6/8）</span><span class="pct">75%</span></div>
+      <div class="progress-bar"><div class="fill" style="width:75%"></div></div>
+      <div class="plan-footer">
+        <span><span class="k">开始时间</span> <span class="v">09:18</span></span>
+        <span><span class="k">预计完成</span> <span class="v">11:18</span></span>
+        <span><span class="k">数据传输</span> <span class="v">(7/8)</span></span>
+        <span><span class="k">AI分析</span> <span class="v">(6/8)</span></span>
+      </div>
+      <button class="plan-toggle" data-action="toggle-4">
+        <span>展开</span><i data-lucide="chevron-down"></i>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- Toast placeholder -->
+<div class="toast" id="toast"><i data-lucide="mouse-pointer-click"></i><span id="toast-msg"></span></div>
+
+<script>
+// Initialize lucide icons
+if (window.lucide && window.lucide.createIcons) {
+  window.lucide.createIcons();
+}
+
+/* ======================================================
+   Init Real Map (Leaflet) — replaces former CSS placeholder
+   Center: Kunming / Shilin area (24.880°N, 102.929°E), same as map-mgr.html
+   ====================================================== */
+(function initDashboardMap() {
+  if (typeof L === 'undefined') return;
+  const map = L.map('map', {
+    center: [24.880, 102.929],
+    zoom: 14,
+    zoomControl: false,
+    attributionControl: false,
+  });
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19,
+    attribution: 'Esri',
+  }).addTo(map);
+
+  // Expose to outer scope so toolbar handlers can reach it
+  window.__dashMap = map;
+  window.__dashMapInitCenter = [24.880, 102.929];
+  window.__dashMapInitZoom = 14;
+
+  // Approximate Kunming-area waypoints (matches former HTML marker positions)
+  const WAYPOINTS = [
+    { lat: 24.97, lng: 102.65, name: '龙昇机场',     icon: 'plane',    status: '在线' },
+    { lat: 24.92, lng: 103.15, name: '宜良培训中心', icon: 'plane',    status: '在线' },
+    { lat: 24.85, lng: 102.85, name: '草甸收费站',   icon: 'banknote', status: '在线' },
+    { lat: 24.95, lng: 103.00, name: '阳宗海服务区', icon: 'plane',    status: '在线' },
+    { lat: 24.95, lng: 103.25, name: '木喳箐机场',   icon: 'plane',    status: '在线' },
+    { lat: 24.75, lng: 103.30, name: '石林彝族自治县', icon: 'map-pin', status: '' },
+  ];
+
+  function makeBubble(w) {
+    const online = w.status === '在线';
+    const statusHTML = w.status
+      ? `<div class="status ${online ? '' : 'offline'}"><span class="dot"></span>${w.status}</div>`
+      : '';
+    const html = `
+      <div class="dash-marker ${w.icon === 'map-pin' ? '' : 'has-icon'}">
+        <div class="thumb"><i data-lucide="${w.icon}"></i></div>
+        <div>
+          <div class="name">${w.name}</div>
+          ${statusHTML}
+        </div>
+      </div>`;
+    return L.divIcon({ html, className: '', iconSize: null, iconAnchor: [0, 0] });
+  }
+
+  const layer = L.layerGroup().addTo(map);
+  WAYPOINTS.forEach(w => L.marker([w.lat, w.lng], { icon: makeBubble(w), keyboard: false }).addTo(layer));
+  if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+
+  // Update zoom level display on zoom change
+  const zoomLevelEl = document.getElementById('zoom-level');
+  if (zoomLevelEl) {
+    zoomLevelEl.textContent = map.getZoom();
+    map.on('zoomend', () => { zoomLevelEl.textContent = map.getZoom(); });
+  }
+
+  // Fix: Leaflet 经常在容器尺寸为 0 时初始化，导致 zoom 无视觉反馈
+  // 这里强制重测一次容器尺寸；并加 load 兜底
+  map.invalidateSize();
+  setTimeout(() => map.invalidateSize(), 200);
+  window.addEventListener('load', () => map.invalidateSize());
+  // 当右侧面板折叠/展开时，地图区域宽度变化，需要重测
+  const rp = document.getElementById('rightpanel');
+  if (rp) new MutationObserver(() => map.invalidateSize()).observe(rp, { attributes: true, attributeFilter: ['class'] });
+})();
+
+/* ======================================================
+   Annotation System + Toolbar (from index.html, adapted)
+   ====================================================== */
+(function bindDashAnnotationAndToolbar() {
+  const map = window.__dashMap;
+  if (!map) return;
+
+  // ===== Annotation Data & Constants =====
+  const MOCK_annotations = { points:[], lines:[], polygons:[], circles:[] };
+  const annNext = { point:1, line:1, polygon:1, circle:1 };
+  const ANN_C = ['#ec4899','#2b7fff','#16a34a','#f59e0b','#ef4444','#8b5cf6'];
+  const ANN_ICONS = [
+    {id:'pin',e:'📍'},{id:'flag',e:'🚩'},{id:'star',e:'⭐'},
+    {id:'home',e:'🏠'},{id:'warn',e:'⚠️'},{id:'dot',e:'🔴'}
+  ];
+  const ANN_FS = [{id:'s',n:'小',s:12},{id:'m',n:'中',s:14},{id:'l',n:'大',s:18}];
+  const ANN_LS = [{id:'solid',n:'实线',d:null},{id:'dashed',n:'虚线',d:'10,6'},{id:'dotted',n:'点线',d:'3,6'}];
+
+  // ===== State =====
+  let drawTool = null, drawPts = [], drawLG = null, drawPrev = null, drawVtx = [];
+  let circleCtr = null, selAnn = null, ctxTarget = null;
+  let measureActive = false, measureLayer = null, measurePoints = [];
+  let annLG = {};
+  let airspaceType = null; // 'nofly'|'zone'|'noland' — set when drawing airspace zones
+
+  // ===== Helpers =====
+  function toDMS(d) { const dd=Math.abs(d),m=Math.floor((dd-Math.floor(dd))*60); return Math.floor(dd)+'°'+m+'\''+Math.round(((dd-Math.floor(dd))*60-m)*60)+'"'; }
+  function annId(p) { return p[0].toUpperCase()+Date.now()+'-'+Math.floor(Math.random()*999); }
+  function annArtist() { return '当前用户'; }
+  function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  function notice(msg) {
+    let n = document.getElementById('view-notice');
+    if (!n) {
+      n = document.createElement('div'); n.id = 'view-notice';
+      document.body.appendChild(n);
+    }
+    n.textContent = msg; n.classList.add('show');
+    clearTimeout(n._t); n._t = setTimeout(() => n.classList.remove('show'), 2000);
+  }
+
+  // ===== Ripple Effect =====
+  function addRipple(e, btn) {
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    const size = Math.max(btn.offsetWidth, btn.offsetHeight);
+    ripple.style.width = ripple.style.height = size + 'px';
+    const rect = btn.getBoundingClientRect();
+    ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+    ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+    btn.appendChild(ripple);
+    ripple.addEventListener('animationend', () => ripple.remove());
+  }
+
+  // ===== Toolbar: Zoom =====
+  document.getElementById('btn-zoom-in').addEventListener('click', function(e) { addRipple(e, this); map.zoomIn(); updateZoomLabel(); });
+  document.getElementById('btn-zoom-out').addEventListener('click', function(e) { addRipple(e, this); map.zoomOut(); updateZoomLabel(); });
+  function updateZoomLabel() {
+    const el = document.getElementById('zoom-level');
+    if (el) el.textContent = map.getZoom();
+  }
+  map.on('zoomend', updateZoomLabel);
+  updateZoomLabel();
+
+  // ===== Toolbar: Home =====
+  document.getElementById('btn-home').addEventListener('click', function(e) {
+    addRipple(e, this);
+    map.flyTo(window.__dashMapInitCenter || [24.880, 102.929], window.__dashMapInitZoom || 14, { duration: 0.6 });
+    notice('视野已复位');
+  });
+
+  // ===== Toolbar: Fullscreen =====
+  document.getElementById('btn-fullscreen').addEventListener('click', function() {
+    const main = document.querySelector('.main');
+    if (!main) return;
+    if (!document.fullscreenElement) {
+      (main.requestFullscreen || main.webkitRequestFullscreen || (() => {})).call(main);
+      this.classList.add('active');
+    } else {
+      (document.exitFullscreen || document.webkitExitFullscreen || (() => {})).call(document);
+      this.classList.remove('active');
+    }
+  });
+  document.addEventListener('fullscreenchange', () => {
+    const btn = document.getElementById('btn-fullscreen');
+    if (!document.fullscreenElement) btn.classList.remove('active');
+  });
+
+  // ===== Toolbar: Measure =====
+  function cancelMeasure() {
+    measureActive = false;
+    if (measureLayer) measureLayer.clearLayers();
+    measurePoints = [];
+    map.getContainer().style.cursor = '';
+    document.getElementById('btn-measure').classList.remove('active');
+    document.getElementById('btn-measure').setAttribute('data-tip', '测距');
+  }
+  document.getElementById('btn-measure').addEventListener('click', function(e) {
+    addRipple(e, this);
+    if (measureActive) { cancelMeasure(); return; }
+    if (drawTool) cancelDraw();
+    measureActive = true;
+    if (!measureLayer) measureLayer = L.featureGroup().addTo(map);
+    map.getContainer().style.cursor = 'crosshair';
+    this.classList.add('active');
+    notice('测距模式：点击地图添加测量点，双击结束');
+  });
+
+  function handleMeasureClick(e) {
+    if (!measureActive || !measureLayer) return;
+    measurePoints.push(e.latlng);
+    L.circleMarker(e.latlng, { radius: 5, color: '#2b7fff', fillColor: '#fff', fillOpacity: 1, weight: 2 }).addTo(measureLayer);
+    if (measurePoints.length >= 2) {
+      const last = measurePoints[measurePoints.length-1], prev = measurePoints[measurePoints.length-2];
+      L.polyline([prev, last], { color: '#2b7fff', weight: 2, dashArray: '4,4' }).addTo(measureLayer);
+      const dist = map.distance(prev, last).toFixed(1);
+      const mid = L.latLng((prev.lat+last.lat)/2, (prev.lng+last.lng)/2);
+      L.marker(mid, { icon: L.divIcon({ className: '', html: '<div style="background:#fff;color:#2b7fff;font-size:11px;font-weight:600;padding:2px 6px;border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,0.15);white-space:nowrap;">'+dist+'m</div>', iconSize: [0,0], iconAnchor: [20,10] }) }).addTo(measureLayer);
+    }
+    if (measurePoints.length >= 2) {
+      let total = 0;
+      for (let i = 1; i < measurePoints.length; i++) total += map.distance(measurePoints[i-1], measurePoints[i]);
+      document.getElementById('btn-measure').setAttribute('data-tip', '总长: '+total.toFixed(1)+'m');
+    }
+  }
+
+  // ===== Draw Tool Management =====
+  function activateDraw(tool) {
+    if (drawTool === tool) { cancelDraw(); return; }
+    if (measureActive) cancelMeasure();
+    cancelDraw();
+    drawTool = tool;
+    document.getElementById('btn-draw-'+tool).classList.add('active');
+    map.getContainer().style.cursor = 'crosshair';
+    if (!drawLG) drawLG = L.featureGroup().addTo(map);
+    const tips = { point:'点击地图放置标注点 — ESC取消', line:'左键添加节点，双击完成 — ESC取消', polygon:'左键添加顶点，双击闭合 — ESC取消', circle:'点击确定圆心，移动预览半径，再点击确认 — ESC取消' };
+    notice(tips[tool]);
+  }
+  function cancelDraw() {
+    if (drawLG) drawLG.clearLayers();
+    drawPts=[]; drawPrev=null; drawVtx=[]; circleCtr=null; drawTool=null; airspaceType=null;
+    map.getContainer().style.cursor = '';
+    document.querySelectorAll('.draw-tool').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.airspace-drop-item').forEach(b => b.classList.remove('active'));
+    if (typeof btnAirspaceMenu !== 'undefined' && btnAirspaceMenu) btnAirspaceMenu.classList.remove('active');
+  }
+
+  document.querySelectorAll('.draw-tool').forEach(btn => {
+    btn.addEventListener('click', function(e) { addRipple(e, this); activateDraw(this.dataset.draw); });
+  });
+
+  // Airspace drawing tools (dropdown menu)
+  const airspaceTypeMap = {
+    'polygon-nofly': { shape:'polygon', type:'nofly', color:'#ef4444', dash:null, fill:0.15, label:'限飞区' },
+    'circle-nofly':  { shape:'circle',  type:'nofly', color:'#ef4444', dash:null, fill:0.15, label:'限飞区' },
+    'polygon-zone':  { shape:'polygon', type:'zone',  color:'#2b7fff', dash:'8 4', fill:0.1,  label:'作业区' },
+    'circle-zone':   { shape:'circle',  type:'zone',  color:'#2b7fff', dash:'8 4', fill:0.1,  label:'作业区' },
+    'noland':        { shape:'polygon', type:'noland',color:'#f97316', dash:'3 3', fill:0.1,  label:'禁降区' },
+  };
+
+  var airspaceDropdown = document.getElementById('airspace-dropdown');
+  var btnAirspaceMenu = document.getElementById('btn-airspace-menu');
+  var airspaceMenuOpen = false;
+
+  function openAirspaceMenu() {
+    airspaceMenuOpen = true;
+    airspaceDropdown.style.display = 'flex';
+    btnAirspaceMenu.classList.add('active');
+  }
+  function closeAirspaceMenu() {
+    airspaceMenuOpen = false;
+    airspaceDropdown.style.display = 'none';
+    btnAirspaceMenu.classList.remove('active');
+  }
+
+  btnAirspaceMenu.addEventListener('click', function(e) {
+    addRipple(e, this);
+    if (airspaceMenuOpen) { closeAirspaceMenu(); } else { openAirspaceMenu(); }
+  });
+
+  // Dropdown item clicks
+  airspaceDropdown.querySelectorAll('.airspace-drop-item').forEach(function(item) {
+    item.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var key = this.dataset.airspace;
+      var cfg = airspaceTypeMap[key];
+      if (!cfg) return;
+      // Toggle off if same tool already active
+      if (airspaceType && airspaceType.label === cfg.label && drawTool === cfg.shape) {
+        cancelDraw(); closeAirspaceMenu(); return;
+      }
+      cancelDraw();
+      airspaceType = cfg;
+      drawTool = cfg.shape;
+      airspaceDropdown.querySelectorAll('.airspace-drop-item').forEach(function(d) { d.classList.remove('active'); });
+      this.classList.add('active');
+      btnAirspaceMenu.classList.add('active');
+      closeAirspaceMenu();
+      map.getContainer().style.cursor = 'crosshair';
+      if (!drawLG) drawLG = L.featureGroup().addTo(map);
+      var tip = cfg.label + '：' + (cfg.shape === 'circle' ? '点击确定圆心，移动预览半径，再点击确认 — ESC取消' : '左键添加顶点，双击闭合 — ESC取消');
+      notice(tip);
+    });
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    if (airspaceMenuOpen && !btnAirspaceMenu.contains(e.target) && !airspaceDropdown.contains(e.target)) {
+      closeAirspaceMenu();
+    }
+  });
+
+  // ===== Draw Handlers =====
+  function handleDrawClick(e) {
+    if (!drawTool) return;
+    if (drawTool === 'point') {
+      const id = annId('p');
+      const p = { id, name:'标注点-'+annNext.point++, lat:e.latlng.lat, lng:e.latlng.lng, color:ANN_C[0], iconType:'pin', iconEmoji:'📍', fontSize:14, description:'', imageUrl:'', artist:annArtist(), createdAt:new Date().toLocaleString('zh-CN') };
+      MOCK_annotations.points.push(p);
+      renderAnn(); selectAnn('point', p); cancelDraw();
+      notice('点标注已创建：'+p.name); return;
+    }
+    if (drawTool === 'circle') {
+      if (!circleCtr) {
+        circleCtr = e.latlng;
+        drawPrev = L.circle(circleCtr, {radius:0,color:ANN_C[0],weight:2,fillColor:ANN_C[0],fillOpacity:0.15,interactive:false}).addTo(drawLG);
+        notice('移动鼠标设置半径，点击确认');
+      } else {
+        const r = circleCtr.distanceTo(e.latlng);
+        // Airspace zone drawing
+        if (airspaceType) {
+          var cfg = airspaceType;
+          var zoneCircle = L.circle([circleCtr.lat, circleCtr.lng], { radius: r, color: cfg.color, weight: 2.5, dashArray: cfg.dash, fillColor: cfg.color, fillOpacity: cfg.fill }).addTo(airspaceGroup);
+          var zLabel = L.marker([circleCtr.lat, circleCtr.lng], { icon: L.divIcon({ className:'zone-label', html:'<div class="zone-label-inner" style="background:'+cfg.color+';color:#fff;font-size:11px;font-weight:600;padding:3px 8px;border-radius:3px;">自定义'+cfg.label+'</div>', iconSize:[0,0], iconAnchor:[cfg.label.length*5+12, 10] }), interactive:false }).addTo(airspaceGroup);
+          drawLG.clearLayers(); circleCtr=null; drawPrev=null;
+          cancelDraw();
+          notice('自定义'+cfg.label+'已创建 (r='+r.toFixed(1)+'m)');
+        } else {
+          const id = annId('c');
+          const c = { id, name:'圆形-'+annNext.circle++, center:[circleCtr.lat,circleCtr.lng], radius:r, color:ANN_C[0], fontSize:14, transparentFill:false, fillOpacity:0.2, description:'', imageUrl:'', artist:annArtist(), createdAt:new Date().toLocaleString('zh-CN'), area:Math.PI*r*r, circumference:2*Math.PI*r };
+          MOCK_annotations.circles.push(c);
+          drawLG.clearLayers(); circleCtr=null; drawPrev=null;
+          renderAnn(); selectAnn('circle', c); cancelDraw();
+          notice('圆形标注已创建：'+c.name+' (r='+r.toFixed(1)+'m)');
+        }
+      } return;
+    }
+    // line or polygon
+    drawPts.push([e.latlng.lat, e.latlng.lng]);
+    L.circleMarker(e.latlng, {radius:5,color:'#fff',fillColor:ANN_C[0],fillOpacity:1,weight:2.5}).addTo(drawLG);
+    if (drawPts.length>=2) {
+      if (drawPrev && drawLG.hasLayer(drawPrev)) drawLG.removeLayer(drawPrev);
+      drawPrev = drawTool==='line' ? L.polyline(drawPts,{color:ANN_C[0],weight:3,dashArray:'6,4'}) : L.polygon(drawPts,{color:ANN_C[0],weight:2,fillColor:ANN_C[0],fillOpacity:0.15,dashArray:'6,4'});
+      drawPrev.addTo(drawLG);
+    }
+  }
+
+  function handleDrawDblClick(e) {
+    if (!drawTool || (drawTool!=='line'&&drawTool!=='polygon') || drawPts.length<2) return;
+    L.DomEvent.preventDefault(e);
+    if (drawTool==='line') {
+      let h=0; for (let i=1;i<drawPts.length;i++) h+=map.distance(drawPts[i-1],drawPts[i]);
+      const id=annId('l'), l={id,name:'测线-'+annNext.line++,points:drawPts.slice(),color:ANN_C[0],lineStyle:'solid',fontSize:14,description:'',imageUrl:'',artist:annArtist(),createdAt:new Date().toLocaleString('zh-CN'),horizontalDistance:h,linearDistance:map.distance(drawPts[0],drawPts[drawPts.length-1]),elevationDiff:(Math.random()*10).toFixed(1)};
+      MOCK_annotations.lines.push(l);
+      drawLG.clearLayers(); drawPts=[]; drawPrev=null;
+      renderAnn(); selectAnn('line', l); cancelDraw();
+      notice('线标注已创建：'+l.name+' ('+h.toFixed(1)+'m)');
+    } else {
+      // Airspace zone drawing (polygon)
+      if (airspaceType) {
+        var cfg2 = airspaceType;
+        var zonePoly = L.polygon(drawPts, { color: cfg2.color, weight: 2.5, dashArray: cfg2.dash, fillColor: cfg2.color, fillOpacity: cfg2.fill }).addTo(airspaceGroup);
+        var bounds = zonePoly.getBounds();
+        var zLabel2 = L.marker(bounds.getCenter(), { icon: L.divIcon({ className:'zone-label', html:'<div class="zone-label-inner" style="background:'+cfg2.color+';color:#fff;font-size:11px;font-weight:600;padding:3px 8px;border-radius:3px;">自定义'+cfg2.label+'</div>', iconSize:[0,0], iconAnchor:[cfg2.label.length*5+12, 10] }), interactive:false }).addTo(airspaceGroup);
+        drawLG.clearLayers(); drawPts=[]; drawPrev=null;
+        cancelDraw();
+        notice('自定义'+cfg2.label+'已创建');
+      } else {
+        let area=0,R=6371000,n=drawPts.length;
+        for (let i=0;i<n;i++){ const j=(i+1)%n; area+=(drawPts[j][1]-drawPts[i][1])*Math.PI/180*(2+Math.sin(drawPts[i][0]*Math.PI/180)+Math.sin(drawPts[j][0]*Math.PI/180)); }
+        area=Math.abs(area*R*R/2);
+        let perim=0; for (let i=0;i<n;i++) perim+=map.distance(drawPts[i],drawPts[(i+1)%n]);
+        const id=annId('g'), pg={id,name:'测区-'+annNext.polygon++,points:drawPts.slice(),color:ANN_C[0],lineStyle:'solid',fontSize:14,fillOpacity:0.2,description:'',imageUrl:'',artist:annArtist(),createdAt:new Date().toLocaleString('zh-CN'),area:area,perimeter:perim};
+        MOCK_annotations.polygons.push(pg);
+        drawLG.clearLayers(); drawPts=[]; drawPrev=null;
+        renderAnn(); selectAnn('polygon', pg); cancelDraw();
+        notice('面标注已创建：'+pg.name+' ('+area.toFixed(1)+'m²)');
+      }
+    }
+  }
+
+  function handleDrawMouseMove(e) {
+    if (drawTool==='circle' && circleCtr && drawPrev) { drawPrev.setRadius(circleCtr.distanceTo(e.latlng)); }
+  }
+
+  // ===== Render Annotations =====
+  function initAnnLG() {
+    if (!annLG.points) {
+      annLG = { points:L.featureGroup().addTo(map), lines:L.featureGroup().addTo(map), polygons:L.featureGroup().addTo(map), circles:L.featureGroup().addTo(map) };
+    }
+  }
+  function renderAnn() {
+    initAnnLG();
+    annLG.points.clearLayers(); annLG.lines.clearLayers(); annLG.polygons.clearLayers(); annLG.circles.clearLayers();
+    // Points
+    MOCK_annotations.points.forEach(p => {
+      const icon = L.divIcon({ className:'ann-marker', html:'<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:16px;">'+(p.iconEmoji||'📍')+'</div>', iconSize:[32,32], iconAnchor:[16,16], style:'background:'+(p.color||ANN_C[0])+';' });
+      const m = L.marker([p.lat,p.lng], {icon}).addTo(annLG.points);
+      m.on('click',()=>selectAnn('point',p));
+      m.on('contextmenu',ev=>showCtx(ev,'point',p));
+      m.on('mouseover',ev=>showAnnTip(ev,p.name,''));
+      m.on('mouseout',hideAnnTip);
+      if (p.name) L.marker([p.lat,p.lng], { icon: L.divIcon({ className:'', html:'<div style="font-size:'+(p.fontSize||14)+'px;font-weight:600;color:#fff;background:rgba(0,0,0,0.7);padding:2px 8px;border-radius:4px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.15);">'+p.name+'</div>', iconSize:[0,0], iconAnchor:[(p.name.length*4),-22] }), interactive:false }).addTo(annLG.points);
+    });
+    // Lines
+    MOCK_annotations.lines.forEach(l => {
+      const dash = ANN_LS.find(s=>s.id===l.lineStyle); const da = dash?dash.d:null;
+      const poly = L.polyline(l.points, {color:l.color||ANN_C[0],weight:3,dashArray:da}).addTo(annLG.lines);
+      poly.on('click',()=>selectAnn('line',l));
+      poly.on('contextmenu',ev=>showCtx(ev,'line',l));
+      poly.on('mouseover',ev=>showAnnTip(ev,l.name,'水平距离:'+(l.horizontalDistance||0).toFixed(1)+'m'));
+      poly.on('mouseout',hideAnnTip);
+      for (let i=0;i<l.points.length-1;i++) {
+        const mid=L.latLng((l.points[i][0]+l.points[i+1][0])/2,(l.points[i][1]+l.points[i+1][1])/2);
+        L.marker(mid, { icon: L.divIcon({ className:'', html:'<div style="font-size:10px;color:#6b7280;background:#fff;padding:1px 5px;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,0.1);">'+map.distance(l.points[i],l.points[i+1]).toFixed(1)+'m</div>', iconSize:[0,0], iconAnchor:[20,-8] }), interactive:false }).addTo(annLG.lines);
+      }
+      const lats=l.points.map(p=>p[0]), lngs=l.points.map(p=>p[1]);
+      L.marker([(Math.min.apply(null,lats)+Math.max.apply(null,lats))/2,(Math.min.apply(null,lngs)+Math.max.apply(null,lngs))/2], { icon: L.divIcon({ className:'', html:'<div style="font-size:'+(l.fontSize||14)+'px;font-weight:700;color:#fff;background:rgba(0,0,0,0.7);padding:2px 8px;border-radius:4px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.15);">'+l.name+'</div>', iconSize:[0,0], iconAnchor:[l.name.length*4,-20] }), interactive:false }).addTo(annLG.lines);
+    });
+    // Polygons
+    MOCK_annotations.polygons.forEach(pg => {
+      const dash = ANN_LS.find(s=>s.id===pg.lineStyle); const da = dash?dash.d:null;
+      const poly = L.polygon(pg.points, {color:pg.color||ANN_C[0],weight:3,dashArray:da,fillColor:pg.color||ANN_C[0],fillOpacity:pg.fillOpacity||0.2}).addTo(annLG.polygons);
+      poly.on('click',()=>selectAnn('polygon',pg));
+      poly.on('contextmenu',ev=>showCtx(ev,'polygon',pg));
+      poly.on('mouseover',ev=>showAnnTip(ev,pg.name,'面积:'+(pg.area||0).toFixed(1)+'m²'));
+      poly.on('mouseout',hideAnnTip);
+      const c=poly.getBounds().getCenter();
+      L.marker(c, { icon: L.divIcon({ className:'', html:'<div style="font-size:'+(pg.fontSize||14)+'px;font-weight:700;color:#fff;background:rgba(0,0,0,0.7);padding:3px 10px;border-radius:4px;white-space:nowrap;">'+pg.name+'<br><span style="font-size:10px;opacity:0.8;">'+(pg.area||0).toFixed(0)+'m²</span></div>', iconSize:[0,0], iconAnchor:[40,16] }), interactive:false }).addTo(annLG.polygons);
+    });
+    // Circles
+    MOCK_annotations.circles.forEach(c => {
+      const circle = L.circle(c.center, {radius:c.radius,color:c.color||ANN_C[0],weight:3,fillColor:c.transparentFill?'transparent':(c.color||ANN_C[0]),fillOpacity:c.transparentFill?0:(c.fillOpacity||0.2)}).addTo(annLG.circles);
+      circle.on('click',()=>selectAnn('circle',c));
+      circle.on('contextmenu',ev=>showCtx(ev,'circle',c));
+      circle.on('mouseover',ev=>showAnnTip(ev,c.name,'半径:'+(c.radius||0).toFixed(1)+'m'));
+      circle.on('mouseout',hideAnnTip);
+      L.marker(c.center, { icon: L.divIcon({ className:'', html:'<div style="font-size:'+(c.fontSize||14)+'px;font-weight:700;color:#fff;background:rgba(0,0,0,0.7);padding:3px 10px;border-radius:4px;white-space:nowrap;">'+c.name+'<br><span style="font-size:10px;opacity:0.8;">r='+c.radius.toFixed(0)+'m</span></div>', iconSize:[0,0], iconAnchor:[30,14] }), interactive:false }).addTo(annLG.circles);
+    });
+  }
+
+  // ===== Tooltip =====
+  const tooltipEl = document.getElementById('hover-tooltip');
+  function showAnnTip(e, name, detail) {
+    if (!tooltipEl) return;
+    tooltipEl.querySelector('.hover-tooltip-name').textContent = name;
+    tooltipEl.querySelector('.hover-tooltip-detail').textContent = detail||'';
+    tooltipEl.classList.add('visible');
+    tooltipEl.style.left = (e.originalEvent.clientX+14)+'px';
+    tooltipEl.style.top = (e.originalEvent.clientY-10)+'px';
+  }
+  function hideAnnTip() { if (tooltipEl) tooltipEl.classList.remove('visible'); }
+
+  // ===== Select & Detail Panel =====
+  function selectAnn(type, data) {
+    selAnn = {type, data};
+    openDetail(type, data);
+  }
+
+  function findAnn(type, id) { const arr = MOCK_annotations[type+'s']; return arr.find(a => a.id===id); }
+  function updateAnn(type, id, field, val) { const a = findAnn(type, id); if (a) a[field] = val; }
+  function delAnn(type, id) {
+    const arr = MOCK_annotations[type+'s']; const i = arr.findIndex(a => a.id===id);
+    if (i>=0) arr.splice(i,1);
+    document.getElementById('detail-panel').classList.remove('open'); selAnn=null;
+    renderAnn(); notice('标注已删除');
+  }
+
+  function openDetail(type, data) {
+    const panel = document.getElementById('detail-panel');
+    document.getElementById('detail-title').textContent = (data.name||'未命名')+' — ' + ({point:'点标注',line:'线标注',polygon:'面标注',circle:'圆形标注'})[type];
+    let b = '';
+    const F = '<div class="detail-form-group" style="margin-bottom:8px;"><span class="detail-form-label">$1</span>$2</div>';
+
+    // Color swatches HTML
+    let colorHTML = '<div style="font-size:10px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:0.5px;margin-top:8px;">颜色</div><div class="color-swatches">';
+    ANN_C.forEach(c => { colorHTML += '<div style="width:24px;height:24px;border-radius:50%;background:'+c+';cursor:pointer;border:2px solid '+(data.color===c?'var(--text)':'transparent')+';" onclick="window._dashUpdAnn(\''+type+'\',\''+data.id+'\',\'color\',\''+c+'\')"></div>'; });
+    colorHTML += '</div>';
+
+    // Font size HTML
+    function fontSizeHTML() {
+      let h = '<div style="font-size:10px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:0.5px;margin-top:8px;">字体大小</div><div class="font-size-picker">';
+      ANN_FS.forEach(fs => { h += '<div class="fs-opt'+(data.fontSize===fs.s?' selected':'')+'" onclick="window._dashUpdAnn(\''+type+'\',\''+data.id+'\',\'fontSize\','+fs.s+')">'+fs.n+'</div>'; });
+      return h+'</div>';
+    }
+
+    // Image HTML
+    function imageHTML() {
+      let h = '<div style="font-size:10px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:0.5px;margin-top:8px;">图片</div>';
+      if (data.imageUrl) {
+        h += '<div style="border:2px solid var(--primary);border-radius:6px;padding:4px;cursor:pointer;" onclick="var u=prompt(\'输入图片URL:\');if(u){window._dashUpdAnn(\''+type+'\',\''+data.id+'\',\'imageUrl\',u)}"><img src="'+data.imageUrl+'" style="width:100%;max-height:120px;object-fit:cover;border-radius:4px;"><div style="font-size:10px;text-align:center;color:var(--text-2);">点击更换</div></div>';
+      } else {
+        h += '<div style="border:2px dashed var(--border);border-radius:6px;padding:18px;text-align:center;cursor:pointer;font-size:12px;color:var(--text-2);" onclick="var u=prompt(\'输入图片URL:\');if(u){window._dashUpdAnn(\''+type+'\',\''+data.id+'\',\'imageUrl\',u)}">📷 点击添加图片<br><span style="font-size:10px;">jpg/png</span></div>';
+      }
+      return h;
+    }
+
+    if (type === 'point') {
+      b = F.replace('$1','名称').replace('$2','<input class="detail-form-input" value="'+esc(data.name||'')+'" onchange="window._dashUpdAnn(\'point\',\''+data.id+'\',\'name\',this.value)">') +
+        F.replace('$1','坐标').replace('$2','<div style="display:flex;gap:6px;"><input class="detail-form-input" style="flex:1" value="'+data.lat.toFixed(6)+'" onchange="window._dashUpdAnn(\'point\',\''+data.id+'\',\'lat\',parseFloat(this.value))"><input class="detail-form-input" style="flex:1" value="'+data.lng.toFixed(6)+'" onchange="window._dashUpdAnn(\'point\',\''+data.id+'\',\'lng\',parseFloat(this.value))"></div>') +
+        '<div style="font-size:11px;color:var(--primary);margin-bottom:8px;cursor:pointer;">📐 '+toDMS(data.lat)+'  '+toDMS(data.lng)+' (度分秒)</div>' +
+        colorHTML +
+        '<div style="font-size:10px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:0.5px;margin-top:8px;">图标</div><div class="icon-picker">';
+      ANN_ICONS.forEach(ico => { b += '<div class="icon-pick'+(data.iconType===ico.id?' selected':'')+'" onclick="window._dashUpdAnn(\'point\',\''+data.id+'\',\'iconType\',\''+ico.id+'\');window._dashUpdAnn(\'point\',\''+data.id+'\',\'iconEmoji\',\''+ico.e+'\')">'+ico.e+'</div>'; });
+      b += '</div>' + fontSizeHTML() +
+        F.replace('$1','简介（备注）').replace('$2','<textarea class="detail-form-textarea" onchange="window._dashUpdAnn(\'point\',\''+data.id+'\',\'description\',this.value)">'+esc(data.description||'')+'</textarea>') +
+        imageHTML() +
+        F.replace('$1','绘制者').replace('$2','<input class="detail-form-input" style="background:var(--surface)" value="'+esc(data.artist||'')+'" readonly>') +
+        '<div class="detail-action-row" style="margin-top:8px;"><button class="detail-btn danger" onclick="window._dashDelAnn(\'point\',\''+data.id+'\')">🗑️ 删除</button><button class="detail-btn primary" onclick="document.getElementById(\'detail-panel\').classList.remove(\'open\')">✓ 完成</button></div>';
+    } else if (type === 'line') {
+      b = F.replace('$1','名称').replace('$2','<input class="detail-form-input" value="'+esc(data.name||'')+'" onchange="window._dashUpdAnn(\'line\',\''+data.id+'\',\'name\',this.value)">') +
+        '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:12px;"><span>水平距离</span><b>'+(data.horizontalDistance||0).toFixed(2)+' m</b></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:12px;"><span>直线距离</span><b>'+(data.linearDistance||0).toFixed(2)+' m</b></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:8px;font-size:12px;"><span>高度差</span><b>'+(data.elevationDiff||0)+' m</b></div>' +
+        colorHTML +
+        '<div style="font-size:10px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:0.5px;margin-top:8px;">线段形态</div><div class="line-style-picker">';
+      ANN_LS.forEach(ls => { b += '<div class="line-style-opt'+(data.lineStyle===ls.id?' selected':'')+'" onclick="window._dashUpdAnn(\'line\',\''+data.id+'\',\'lineStyle\',\''+ls.id+'\')"><svg width="36" height="4"><line x1="0" y1="2" x2="36" y2="2" stroke="currentColor" stroke-width="2"'+(ls.d?' stroke-dasharray="'+ls.d+'"':'')+'/></svg></div>'; });
+      b += '</div>' + fontSizeHTML() +
+        F.replace('$1','简介（备注）').replace('$2','<textarea class="detail-form-textarea" onchange="window._dashUpdAnn(\'line\',\''+data.id+'\',\'description\',this.value)">'+esc(data.description||'')+'</textarea>') +
+        imageHTML() +
+        F.replace('$1','绘制者').replace('$2','<input class="detail-form-input" style="background:var(--surface)" value="'+esc(data.artist||'')+'" readonly>') +
+        '<div class="detail-action-row" style="margin-top:8px;"><button class="detail-btn danger" onclick="window._dashDelAnn(\'line\',\''+data.id+'\')">🗑️ 删除</button></div>';
+    } else if (type === 'polygon') {
+      b = F.replace('$1','名称').replace('$2','<input class="detail-form-input" value="'+esc(data.name||'')+'" onchange="window._dashUpdAnn(\'polygon\',\''+data.id+'\',\'name\',this.value)">') +
+        '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:12px;"><span>面积</span><b>'+(data.area||0).toFixed(2)+' m²</b></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:8px;font-size:12px;"><span>周长</span><b>'+(data.perimeter||0).toFixed(2)+' m</b></div>' +
+        colorHTML +
+        '<div style="font-size:10px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:0.5px;margin-top:8px;">线段形态</div><div class="line-style-picker">';
+      ANN_LS.forEach(ls => { b += '<div class="line-style-opt'+(data.lineStyle===ls.id?' selected':'')+'" onclick="window._dashUpdAnn(\'polygon\',\''+data.id+'\',\'lineStyle\',\''+ls.id+'\')"><svg width="36" height="4"><line x1="0" y1="2" x2="36" y2="2" stroke="currentColor" stroke-width="2"'+(ls.d?' stroke-dasharray="'+ls.d+'"':'')+'/></svg></div>'; });
+      b += '</div>' + fontSizeHTML() +
+        F.replace('$1','填充透明度').replace('$2','<input type="range" min="0" max="100" value="'+((data.fillOpacity||0.2)*100)+'" style="width:100%" oninput="window._dashUpdAnn(\'polygon\',\''+data.id+'\',\'fillOpacity\',this.value/100)"><span style="font-size:10px;">'+Math.round((data.fillOpacity||0.2)*100)+'%</span>') +
+        F.replace('$1','简介（备注）').replace('$2','<textarea class="detail-form-textarea" onchange="window._dashUpdAnn(\'polygon\',\''+data.id+'\',\'description\',this.value)">'+esc(data.description||'')+'</textarea>') +
+        imageHTML() +
+        F.replace('$1','绘制者').replace('$2','<input class="detail-form-input" style="background:var(--surface)" value="'+esc(data.artist||'')+'" readonly>') +
+        '<button style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;background:#fff;font-size:12px;cursor:pointer;margin-bottom:8px;" onclick="window._dashShareAnn(\''+data.id+'\',\''+esc(data.name||'')+'\')">📱 标记分享（微信扫码）</button>' +
+        '<div class="detail-action-row"><button class="detail-btn danger" onclick="window._dashDelAnn(\'polygon\',\''+data.id+'\')">🗑️ 删除</button></div>';
+    } else if (type === 'circle') {
+      b = F.replace('$1','名称').replace('$2','<input class="detail-form-input" value="'+esc(data.name||'')+'" onchange="window._dashUpdAnn(\'circle\',\''+data.id+'\',\'name\',this.value)">') +
+        F.replace('$1','圆心坐标').replace('$2','<div style="font-size:12px;padding:6px 8px;background:var(--surface);border-radius:6px;">'+(data.center?data.center[0].toFixed(6)+', '+data.center[1].toFixed(6):'—')+'</div>') +
+        F.replace('$1','水平半径').replace('$2','<input class="detail-form-input" type="number" value="'+(data.radius||0)+'" onchange="var v=parseFloat(this.value);window._dashUpdAnn(\'circle\',\''+data.id+'\',\'radius\',v);window._dashUpdAnn(\'circle\',\''+data.id+'\',\'area\',Math.PI*v*v);window._dashUpdAnn(\'circle\',\''+data.id+'\',\'circumference\',2*Math.PI*v)">') +
+        '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:12px;"><span>面积</span><b>'+(data.area||0).toFixed(2)+' m²</b></div>' +
+        '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:8px;font-size:12px;"><span>周长</span><b>'+(data.circumference||0).toFixed(2)+' m</b></div>' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:8px;"><span style="font-size:12px;">透明面开关</span><label class="toggle"><input type="checkbox" '+(data.transparentFill?'checked':'')+' onchange="window._dashUpdAnn(\'circle\',\''+data.id+'\',\'transparentFill\',this.checked)"><span class="toggle-slider"></span></label></div>' +
+        colorHTML + fontSizeHTML() +
+        F.replace('$1','简介（备注）').replace('$2','<textarea class="detail-form-textarea" onchange="window._dashUpdAnn(\'circle\',\''+data.id+'\',\'description\',this.value)">'+esc(data.description||'')+'</textarea>') +
+        imageHTML() +
+        F.replace('$1','绘制者').replace('$2','<input class="detail-form-input" style="background:var(--surface)" value="'+esc(data.artist||'')+'" readonly>') +
+        '<div class="detail-action-row" style="margin-top:8px;"><button class="detail-btn danger" onclick="window._dashDelAnn(\'circle\',\''+data.id+'\')">🗑️ 删除</button><button class="detail-btn primary" onclick="document.getElementById(\'detail-panel\').classList.remove(\'open\')">✓ 完成</button></div>';
+    }
+    document.getElementById('detail-body').innerHTML = b;
+    panel.classList.add('open');
+  }
+
+  // Expose CRUD to window for onclick handlers in detail panel HTML
+  window._dashUpdAnn = function(type, id, field, val) {
+    updateAnn(type, id, field, val);
+    renderAnn();
+    const data = findAnn(type, id);
+    if (data) openDetail(type, data);
+  };
+  window._dashDelAnn = function(type, id) { delAnn(type, id); };
+  window._dashShareAnn = function(id, name) {
+    const o = document.createElement('div'); o.style = 'position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;';
+    o.innerHTML = '<div style="background:#fff;border-radius:10px;padding:24px;text-align:center;"><h3>📱 '+esc(name)+'</h3><div style="width:160px;height:160px;margin:12px auto;background:repeating-linear-gradient(45deg,#f0f0f0,#f0f0f0 8px,#ddd 8px,#ddd 16px);display:flex;align-items:center;justify-content:center;font-size:40px;">📱<br>QR</div><p style="font-size:12px;color:var(--text-2);">微信扫码查看标注位置<br>免登录H5页面</p><button style="margin-top:8px;padding:8px 24px;border:none;border-radius:6px;background:var(--surface);cursor:pointer;" onclick="this.parentNode.parentNode.remove()">关闭</button></div>';
+    o.addEventListener('click', function(e) { if (e.target===o) o.remove(); });
+    document.body.appendChild(o);
+  };
+
+  // ===== Detail Panel Close =====
+  document.getElementById('detail-close').addEventListener('click', () => {
+    document.getElementById('detail-panel').classList.remove('open');
+    selAnn = null;
+  });
+
+  // ===== Context Menu =====
+  function showCtx(e, type, data) {
+    L.DomEvent.preventDefault(e);
+    ctxTarget = {type, data};
+    const menu = document.getElementById('ctx-menu');
+    const items = menu.querySelectorAll('.ctx-item');
+    items.forEach(it => { it.style.display = 'none'; });
+    const acts = [];
+    if (type==='point') acts.push('delete','link-asset','fly-to','return-all');
+    else if (type==='line') acts.push('delete','link-asset','convert-survey');
+    else if (type==='polygon') acts.push('delete','link-asset','convert-survey','convert-patrol');
+    else if (type==='circle') acts.push('delete','link-asset');
+    items.forEach(it => { if (acts.indexOf(it.dataset.action)>=0) it.style.display = 'flex'; });
+    menu.style.display = 'flex'; menu.style.left = e.originalEvent.clientX+'px'; menu.style.top = e.originalEvent.clientY+'px';
+    const r = menu.getBoundingClientRect();
+    if (r.right > window.innerWidth) menu.style.left = (e.originalEvent.clientX - r.width)+'px';
+    if (r.bottom > window.innerHeight) menu.style.top = (e.originalEvent.clientY - r.height)+'px';
+  }
+  function hideCtx() { document.getElementById('ctx-menu').style.display = 'none'; ctxTarget = null; }
+
+  document.getElementById('ctx-menu').addEventListener('click', function(e) {
+    const it = e.target.closest('.ctx-item'); if (!it || !ctxTarget) return;
+    const a = it.dataset.action, d = ctxTarget.data, t = ctxTarget.type;
+    if (a==='delete') delAnn(t, d.id);
+    else if (a==='link-asset') { openAssetPicker(ctxTarget); return; }
+    else if (a==='fly-to') notice('请选择目标设备（演示）');
+    else if (a==='return-all') notice('全部返航指令已发送（演示）');
+    else if (a==='convert-survey') notice('已转换为测区（演示）');
+    else if (a==='convert-patrol') notice('已转换为巡逻区域（演示）');
+    hideCtx();
+  });
+  document.addEventListener('click', function(e) { if (!e.target.closest('#ctx-menu')) hideCtx(); });
+
+  // ===== Asset Picker (关联资产) =====
+  var MOCK_PICKER_ASSETS = [
+    { id:'AST-001', name:'呈贡服务区',       type:'服务区',   status:'normal' },
+    { id:'AST-002', name:'龙昇机场设施',     type:'机场',     status:'normal' },
+    { id:'AST-003', name:'草甸收费站',       type:'收费站',   status:'abnormal' },
+    { id:'AST-004', name:'阳宗海服务区',     type:'服务区',   status:'normal' },
+    { id:'AST-005', name:'宜良培训中心',     type:'培训基地', status:'offline' },
+    { id:'AST-006', name:'木喳箐机场',       type:'机场',     status:'normal' },
+    { id:'AST-007', name:'北大村特大桥',     type:'桥梁',     status:'normal' },
+    { id:'AST-008', name:'阳宗隧道',         type:'隧道',     status:'normal' },
+    { id:'AST-009', name:'K34+200 边坡',     type:'边坡',     status:'abnormal' },
+    { id:'AST-010', name:'K56+100 避险车道', type:'避险车道', status:'normal' },
+  ];
+  var pickerTarget = null;
+
+  function openAssetPicker(ctxTgt) {
+    pickerTarget = ctxTgt;
+    hideCtx();
+    document.getElementById('asset-picker-overlay').style.display = 'flex';
+    document.getElementById('asset-picker-search').value = '';
+    renderAssetPickerList('');
+    setTimeout(function() { document.getElementById('asset-picker-search').focus(); }, 100);
+  }
+  function closeAssetPicker() {
+    document.getElementById('asset-picker-overlay').style.display = 'none';
+    pickerTarget = null;
+  }
+  function renderAssetPickerList(q) {
+    var list = document.getElementById('asset-picker-list');
+    var filtered = MOCK_PICKER_ASSETS.filter(function(a) {
+      if (!q) return true;
+      return a.name.toLowerCase().indexOf(q) >= 0 || a.id.toLowerCase().indexOf(q) >= 0;
+    });
+    var stDot = {normal:'#16a34a',abnormal:'#ef4444',offline:'#9ca3af'};
+    var stLabel = {normal:'正常',abnormal:'异常',offline:'离线'};
+    if (filtered.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-3);font-size:12px;">无匹配资产</div>';
+      return;
+    }
+    list.innerHTML = filtered.map(function(a) {
+      return '<div class="picker-row" data-asset-id="'+a.id+'" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background 0.15s;">' +
+        '<span style="width:8px;height:8px;border-radius:50%;background:'+(stDot[a.status]||'#9ca3af')+';flex-shrink:0"></span>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="font-size:13px;font-weight:500;color:var(--text);">'+a.name+'</div>' +
+          '<div style="font-size:11px;color:var(--text-3);margin-top:2px;">'+a.id+' · '+a.type+' · '+(stLabel[a.status]||a.status)+'</div>' +
+        '</div>' +
+        '<span style="font-size:11px;color:var(--primary);font-weight:500;">关联 →</span>' +
+      '</div>';
+    }).join('');
+    list.querySelectorAll('.picker-row').forEach(function(row) {
+      row.addEventListener('mouseenter', function() { this.style.background = 'var(--primary-soft-2)'; });
+      row.addEventListener('mouseleave', function() { this.style.background = 'transparent'; });
+      row.addEventListener('click', function() {
+        var assetId = this.dataset.assetId;
+        var asset = MOCK_PICKER_ASSETS.find(function(a) { return a.id === assetId; });
+        if (asset && pickerTarget) {
+          var ann = findAnn(pickerTarget.type, pickerTarget.data.id);
+          if (ann) {
+            ann.linkedAssetId = asset.id;
+            ann.linkedAssetName = asset.name;
+            ann.linkedAssetType = asset.type;
+            notice('已关联资产：'+asset.name+' → '+(ann.name||'标注'));
+          }
+        }
+        closeAssetPicker();
+      });
+    });
+  }
+  document.getElementById('asset-picker-search').addEventListener('input', function() {
+    renderAssetPickerList(this.value.toLowerCase());
+  });
+  document.getElementById('asset-picker-close').addEventListener('click', closeAssetPicker);
+  document.getElementById('asset-picker-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeAssetPicker();
+  });
+
+  // ===== Map Events =====
+  map.on('click', e => {
+    if (drawTool) { handleDrawClick(e); return; }
+    if (measureActive) { handleMeasureClick(e); return; }
+  });
+  map.on('dblclick', e => {
+    if (measureActive && measurePoints.length >= 2) {
+      let total = 0; for (let i = 1; i < measurePoints.length; i++) total += map.distance(measurePoints[i-1], measurePoints[i]);
+      notice('测距完成：总长 '+total.toFixed(1)+'m');
+      cancelMeasure(); return;
+    }
+    if (drawTool) handleDrawDblClick(e);
+  });
+  map.on('mousemove', e => { handleDrawMouseMove(e); });
+
+  // ===== Keyboard =====
+  document.addEventListener('keydown', e => {
+    if (e.key==='Escape' && drawTool) { cancelDraw(); notice('已取消绘制'); }
+    else if (e.key==='Escape' && measureActive) { cancelMeasure(); notice('已退出测距'); }
+    if (e.key==='Delete' && selAnn) { delAnn(selAnn.type, selAnn.data.id); }
+  });
+
+  // ===== Annotation Layer Toggle (地图标注 显示/隐藏) =====
+  var toggleAnn = document.getElementById('toggle-annotations');
+  if (toggleAnn) {
+    toggleAnn.addEventListener('change', function() {
+      var item = this.closest('.layer-item');
+      if (this.checked) {
+        item.classList.add('active');
+        if (annLG.points) annLG.points.addTo(map);
+        if (annLG.lines) annLG.lines.addTo(map);
+        if (annLG.polygons) annLG.polygons.addTo(map);
+        if (annLG.circles) annLG.circles.addTo(map);
+      } else {
+        item.classList.remove('active');
+        if (annLG.points) map.removeLayer(annLG.points);
+        if (annLG.lines) map.removeLayer(annLG.lines);
+        if (annLG.polygons) map.removeLayer(annLG.polygons);
+        if (annLG.circles) map.removeLayer(annLG.circles);
+      }
+    });
+  }
+
+  // ===== 2D/3D View Mode Toggle =====
+  document.querySelectorAll('.view-mode-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var mode = this.dataset.mode;
+      // Update button styles
+      document.querySelectorAll('.view-mode-btn').forEach(function(b) {
+        b.classList.remove('active');
+        b.style.borderColor = 'var(--border)';
+        b.style.background = '#fff';
+        b.style.color = 'var(--text-2)';
+        b.style.fontWeight = '500';
+      });
+      this.classList.add('active');
+      this.style.borderColor = 'var(--primary)';
+      this.style.background = 'var(--primary-soft)';
+      this.style.color = 'var(--primary)';
+      this.style.fontWeight = '600';
+      if (mode === '3d') {
+        notice('3D视图模式（示意）— 需加载 Cesium 三维引擎');
+      } else {
+        notice('2D视图模式 — 卫星地图');
+      }
+    });
+  });
+
+  // ===== Seed Demo Annotations (地图标注示意点位) =====
+  function seedDemoAnnotations() {
+    if (MOCK_annotations.points.length || MOCK_annotations.lines.length || MOCK_annotations.polygons.length || MOCK_annotations.circles.length) return;
+    var c = window.__dashMapInitCenter || [24.880, 102.929];
+    var pts = [
+      { name:'呈贡服务区',    lat:c[0]+0.018, lng:c[1]-0.015, color:ANN_C[1], iconType:'pin',  iconEmoji:'📍' },
+      { name:'龙昇机场',      lat:c[0]+0.005, lng:c[1]+0.008, color:ANN_C[2], iconType:'flag', iconEmoji:'🚩' },
+      { name:'阳宗海服务区',  lat:c[0]-0.010, lng:c[1]+0.020, color:ANN_C[3], iconType:'star', iconEmoji:'⭐' },
+      { name:'草甸收费站',    lat:c[0]-0.006, lng:c[1]-0.010, color:ANN_C[4], iconType:'warn', iconEmoji:'⚠️' },
+      { name:'宜良培训中心',  lat:c[0]+0.012, lng:c[1]+0.004, color:ANN_C[5], iconType:'home', iconEmoji:'🏠' },
+      { name:'木喳箐机场',    lat:c[0]-0.014, lng:c[1]-0.018, color:ANN_C[0], iconType:'dot',  iconEmoji:'🔴' },
+    ];
+    pts.forEach(function(pt) {
+      MOCK_annotations.points.push({
+        id: annId('p'), name: pt.name,
+        lat: pt.lat, lng: pt.lng,
+        color: pt.color, iconType: pt.iconType, iconEmoji: pt.iconEmoji,
+        fontSize: 14, description: '', imageUrl: '',
+        artist: annArtist(), createdAt: new Date().toLocaleString('zh-CN'),
+      });
+    });
+    annNext.point = pts.length + 1;
+  }
+  seedDemoAnnotations();
+  renderAnn();
+
+  // ===== Airspace & Model Rendering (from index.html) =====
+  var airspaceGroup = L.featureGroup().addTo(map);
+  var modelMarkerGroup = L.featureGroup().addTo(map);
+
+  // MOCK airspace data (Kunming/Shilin area)
+  var MOCK_AIRSPACE = {
+    restricted: [
+      { id:'R01', name:'呈贡区政府限制区', type:'polygon', coords:[[24.892,102.935],[24.892,102.950],[24.882,102.950],[24.882,102.935]], desc:'政府机关 · 120m以下限制' },
+      { id:'R02', name:'变电站限制区', type:'circle', center:[24.900,102.910], radius:500, desc:'高压变电站 · 200m内限制' },
+    ],
+    nofly: [
+      { id:'NF01', name:'军事管制禁飞区', type:'polygon', coords:[[24.885,102.940],[24.885,102.955],[24.870,102.955],[24.870,102.940]], desc:'军事设施 · 全天禁飞' },
+      { id:'NF02', name:'机场净空禁飞区', type:'circle', center:[24.895,102.900], radius:600, desc:'机场跑道延长线 · 严禁进入' },
+    ],
+    noland: [
+      { id:'NL01', name:'学校禁降区', type:'polygon', coords:[[24.900,102.925],[24.900,102.933],[24.893,102.933],[24.893,102.925]], desc:'校园区域 · 禁止降落' },
+      { id:'NL02', name:'医院禁降区', type:'circle', center:[24.870,102.920], radius:350, desc:'医院屋顶 · 禁止降落' },
+    ],
+  };
+
+  function isAirspaceEnabled(type) {
+    var item = document.querySelector('[data-airspace="' + type + '"]');
+    if (!item) return true;
+    var toggle = item.querySelector('input[type="checkbox"]');
+    return toggle ? toggle.checked : true;
+  }
+
+  function renderAirspace() {
+    airspaceGroup.clearLayers();
+
+    function addZone(z, cls, color, dash, fillOpacity) {
+      var shape, center;
+      if (z.type === 'circle') {
+        shape = L.circle(z.center, {
+          radius: z.radius, className: cls,
+          color: color, weight: dash ? 2 : 2.5, dashArray: dash || null,
+          fillColor: color, fillOpacity: fillOpacity,
+        });
+        center = L.latLng(z.center[0], z.center[1]);
+      } else {
+        shape = L.polygon(z.coords, {
+          className: cls,
+          color: color, weight: dash ? 2 : 2.5, dashArray: dash || null,
+          fillColor: color, fillOpacity: fillOpacity,
+        });
+        center = shape.getBounds().getCenter();
+      }
+      shape.addTo(airspaceGroup);
+      // Zone label
+      L.marker(center, {
+        icon: L.divIcon({
+          className: 'zone-label',
+          html: '<div class="zone-label-inner ' + cls.replace('zone-','') + '">' + z.name + '</div>',
+          iconSize: [0,0], iconAnchor: [z.name.length*5, 10],
+        }),
+        interactive: false,
+      }).addTo(airspaceGroup);
+    }
+
+    if (isAirspaceEnabled('restricted')) {
+      MOCK_AIRSPACE.restricted.forEach(function(z) { addZone(z, 'zone-restricted', '#f59e0b', '8 4', 0.1); });
+    }
+    if (isAirspaceEnabled('no-fly')) {
+      MOCK_AIRSPACE.nofly.forEach(function(z) { addZone(z, 'zone-nofly', '#ef4444', null, 0.15); });
+    }
+    if (isAirspaceEnabled('no-land')) {
+      MOCK_AIRSPACE.noland.forEach(function(z) { addZone(z, 'zone-noland', '#f97316', '3 3', 0.1); });
+    }
+  }
+
+  function renderModelMarkers() {
+    modelMarkerGroup.clearLayers();
+    // Check if 3D model toggle is on
+    var model3dItem = document.querySelector('[data-model="3d-model"]');
+    var model3dOn = model3dItem ? model3dItem.querySelector('input[type="checkbox"]').checked : false;
+    var obliqueItem = document.querySelector('[data-model="oblique"]');
+    var obliqueOn = obliqueItem ? obliqueItem.querySelector('input[type="checkbox"]').checked : false;
+    if (!model3dOn && !obliqueOn) return;
+
+    var c = map.getCenter();
+    var models = [
+      { name:'北大村特大桥BIM', lat:c.lat+0.008, lng:c.lng+0.006, type:'3d', color:'#6366f1' },
+      { name:'阳宗隧道BIM',     lat:c.lat-0.004, lng:c.lng+0.012, type:'3d', color:'#0891b2' },
+      { name:'边坡激光点云',    lat:c.lat+0.005, lng:c.lng-0.008, type:'3d', color:'#f59e0b' },
+      { name:'交安设施倾斜摄影', lat:c.lat-0.006, lng:c.lng-0.005, type:'3d', color:'#ef4444' },
+    ];
+
+    models.forEach(function(m) {
+      var icon = L.divIcon({
+        className: 'custom-marker',
+        html: '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;"><i data-lucide="box" style="width:14px;height:14px;color:#fff"></i></div>',
+        iconSize: [28, 28], iconAnchor: [14, 14],
+        style: 'background:' + m.color + ';'
+      });
+      var mk = L.marker([m.lat, m.lng], { icon: icon }).addTo(modelMarkerGroup);
+      mk.bindTooltip('<b>' + m.name + '</b><br>类型：' + m.type);
+    });
+    if (window.lucide && window.lucide.createIcons) lucide.createIcons();
+  }
+
+  // ===== Device Rendering (from index.html) =====
+  var deviceGroup = L.featureGroup().addTo(map);
+
+  // MOCK device data (Kunming area)
+  var MOCK_DEVICES = [
+    { id:'D001', type:'drone',  name:'M300 #01', lat:24.882, lng:102.928, status:'flying',  battery:'72%', alt:'120m', speed:'8.2m/s', task:'桥梁巡检' },
+    { id:'D002', type:'drone',  name:'M300 #02', lat:24.870, lng:102.915, status:'flying',  battery:'45%', alt:'80m',  speed:'5.1m/s', task:'边坡排查' },
+    { id:'D003', type:'drone',  name:'M300 #03', lat:24.880, lng:102.940, status:'standby', battery:'95%', alt:'—', speed:'—', task:'—' },
+    { id:'D009', type:'drone',  name:'M300 #04', lat:24.892, lng:102.912, status:'standby', battery:'88%', alt:'—', speed:'—', task:'—' },
+    { id:'D005', type:'drone',  name:'Mavic3 #06',lat:24.895, lng:102.938, status:'offline', battery:'0%',  alt:'—', speed:'—', task:'—' },
+  ];
+
+  function renderDevices() {
+    deviceGroup.clearLayers();
+    // Check if device toggle is on
+    var devItem = document.querySelector('[data-business="device"]');
+    var devOn = devItem ? devItem.querySelector('input[type="checkbox"]').checked : true;
+    if (!devOn) return;
+
+    MOCK_DEVICES.forEach(function(d) {
+      var isStation = d.type === 'station';
+      var isFlying = d.status === 'flying';
+
+      var cls = 'custom-marker ';
+      if (isStation) cls += 'marker-station';
+      else if (isFlying) cls += 'marker-flying';
+      else if (d.status === 'standby') cls += 'marker-standby';
+      else cls += 'marker-task-pending';
+
+      var html = '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;position:relative;">';
+      if (isStation) {
+        html += '<i data-lucide="antenna" style="width:15px;height:15px;color:#fff"></i>';
+      } else {
+        html += '<i data-lucide="plane" style="width:15px;height:15px;color:#fff"></i>';
+      }
+      if (isFlying) {
+        html += '<div class="flying-pulse-ring"></div>';
+      }
+      html += '</div>';
+
+      var icon = L.divIcon({
+        className: cls, html: html, iconSize: [32, 32], iconAnchor: [16, 16],
+      });
+      var mk = L.marker([d.lat, d.lng], { icon: icon }).addTo(deviceGroup);
+
+      // Info tag for flying drones
+      if (isFlying) {
+        L.marker([d.lat, d.lng], {
+          icon: L.divIcon({
+            className: '', html: '<div class="drone-info-tag">' + d.alt + ' · ' + d.speed + '</div>',
+            iconSize: [0,0], iconAnchor: [28, -16],
+          }), interactive: false,
+        }).addTo(deviceGroup);
+      }
+
+      mk.bindTooltip('<b>' + d.name + '</b><br>' + (d.desc || '') + (d.battery ? '<br>电量：' + d.battery : ''));
+    });
+    if (window.lucide && window.lucide.createIcons) lucide.createIcons();
+  }
+
+  // ===== Asset Markers Rendering =====
+  var assetMarkerGroup = L.featureGroup().addTo(map);
+  var MOCK_ASSET_MARKERS = [
+    { id:'AST-001', name:'呈贡服务区',   lat:24.885, lng:102.905, status:'normal',   type:'服务区' },
+    { id:'AST-002', name:'龙昇机场设施', lat:24.900, lng:102.895, status:'normal',   type:'机场' },
+    { id:'AST-003', name:'草甸收费站',   lat:24.870, lng:102.915, status:'abnormal', type:'收费站' },
+    { id:'AST-004', name:'阳宗海服务区', lat:24.875, lng:102.940, status:'normal',   type:'服务区' },
+    { id:'AST-005', name:'宜良培训中心', lat:24.895, lng:102.935, status:'offline',  type:'培训基地' },
+    { id:'AST-006', name:'木喳箐机场',   lat:24.910, lng:102.920, status:'normal',   type:'机场' },
+  ];
+  window._dashAssetMarkers = MOCK_ASSET_MARKERS;
+
+  function renderAssetMarkers() {
+    assetMarkerGroup.clearLayers();
+    MOCK_ASSET_MARKERS.forEach(function(a) {
+      var enabled = a._enabled !== false;
+      if (!enabled) return;
+      var statusCls = a.status === 'abnormal' ? 'marker-task-error' : a.status === 'offline' ? 'marker-task-pending' : '';
+      var icon = L.divIcon({
+        className: 'custom-marker marker-asset ' + statusCls,
+        html: '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;"><i data-lucide="landmark" style="width:14px;height:14px;color:#fff"></i></div>',
+        iconSize: [28, 28], iconAnchor: [14, 14],
+      });
+      var mk = L.marker([a.lat, a.lng], { icon: icon }).addTo(assetMarkerGroup);
+      mk.bindTooltip('<b>' + a.name + '</b><br>' + a.type + ' · ' + (a.status === 'normal' ? '正常' : a.status === 'abnormal' ? '异常' : '离线'));
+    });
+    if (window.lucide && window.lucide.createIcons) lucide.createIcons();
+  }
+
+  // ===== Orthophoto Overlays Rendering =====
+  var orthoOverlayGroup = L.featureGroup().addTo(map);
+  var MOCK_ORTHO_OVERLAYS = [
+    { id:'ORT-001', name:'呈贡区正射影像', lat:24.885, lng:102.905, color:'#4a90d9', coverage:'12.5 km²' },
+    { id:'ORT-002', name:'阳宗海区域影像', lat:24.875, lng:102.935, color:'#34a853', coverage:'28.3 km²' },
+    { id:'ORT-003', name:'石林地形测绘',   lat:24.895, lng:102.920, color:'#f59e0b', coverage:'45.0 km²' },
+  ];
+  window._dashOrthoOverlays = MOCK_ORTHO_OVERLAYS;
+
+  function renderOrthoOverlays() {
+    orthoOverlayGroup.clearLayers();
+    MOCK_ORTHO_OVERLAYS.forEach(function(op) {
+      if (op._enabled === false) return;
+      var bounds = [[op.lat - 0.008, op.lng - 0.012], [op.lat + 0.008, op.lng + 0.012]];
+      var rect = L.rectangle(bounds, {
+        color: op.color, weight: 2, fillColor: op.color, fillOpacity: 0.15,
+        dashArray: '6 4',
+      }).addTo(orthoOverlayGroup);
+      rect.bindTooltip('<b>' + op.name + '</b><br>覆盖：' + op.coverage);
+      var c = [(bounds[0][0] + bounds[1][0]) / 2, (bounds[0][1] + bounds[1][1]) / 2];
+      L.marker(c, {
+        icon: L.divIcon({ className:'', html:'<div style="font-size:10px;font-weight:600;color:#fff;background:rgba(0,0,0,0.6);padding:2px 6px;border-radius:3px;white-space:nowrap;">' + op.name + '</div>', iconSize:[0,0], iconAnchor:[op.name.length*3, 8] }),
+        interactive: false,
+      }).addTo(orthoOverlayGroup);
+    });
+  }
+
+  // Expose for layer panel toggle access
+  window._dashRenderAirspace = renderAirspace;
+  window._dashRenderModels = renderModelMarkers;
+  window._dashRenderDevices = renderDevices;
+  window._dashRenderAssetMarkers = renderAssetMarkers;
+  window._dashRenderOrthoOverlays = renderOrthoOverlays;
+
+  // Initial render
+  renderAirspace();
+  renderModelMarkers();
+  renderDevices();
+  renderAssetMarkers();
+  renderOrthoOverlays();
+
+})();
+
+/* ======================================================
+   智能调度 banner — 点击收起 / 展开整个右侧竖条卡片
+   收起方向：从下往上（卡片塌缩为顶部胶囊）；展开：从上往下展开
+   收起时只显示一个小的"智能调度"胶囊，胶囊本身仍可点击 → 展开
+   ====================================================== */
+(function bindSchedulingBanner() {
+  const banner = document.querySelector('.scheduling-banner');
+  const panel = document.getElementById('rightpanel');
+  if (!banner || !panel) return;
+
+  // Inject chevron at end
+  const chev = document.createElement('i');
+  chev.setAttribute('data-lucide', 'chevron-down');
+  chev.className = 'sb-chevron';
+  banner.appendChild(chev);
+  if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+
+  banner.addEventListener('click', () => {
+    const collapsed = panel.classList.toggle('collapsed');
+    const chevron = banner.querySelector('.sb-chevron');
+    if (chevron) {
+      // 展开时显示 ↓（向下展开），收起时显示 ↑（向上展开）
+      chev.setAttribute('data-lucide', collapsed ? 'chevron-up' : 'chevron-down');
+      if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+    }
+    // 收起/展开时，让地图重新测量尺寸（侧栏宽度变化）
+    setTimeout(() => { try { window.__dashMap && window.__dashMap.invalidateSize(); } catch(e) {} }, 340);
+  });
+})();
+
+/* ======================================================
+   Layer Panel (工具板 · 左下角) — from index.html
+   资产 / 正射影像 / 空域安全 / 模型层管理
+   交互严谨：点击外侧关闭展开面板、键盘 Escape 关闭、
+   搜索防抖、焦点管理、开关状态互斥
+   ====================================================== */
+(function bindLayerPanel() {
+  // Mock data
+  var MOCK_ASSETS = [
+    { id: 'AST-001', name: '呈贡服务区',   status: 'normal',   desc: '服务区资产数据' },
+    { id: 'AST-002', name: '龙昇机场设施', status: 'normal',   desc: '机场基础设施' },
+    { id: 'AST-003', name: '草甸收费站',   status: 'abnormal', desc: '收费站资产' },
+    { id: 'AST-004', name: '阳宗海服务区', status: 'normal',   desc: '服务区资产' },
+    { id: 'AST-005', name: '宜良培训中心', status: 'offline',  desc: '培训设施资产' },
+    { id: 'AST-006', name: '木喳箐机场',   status: 'normal',   desc: '机场设施资产' },
+  ];
+  var MOCK_ORTHOS = [
+    { id: 'ORT-001', name: '呈贡区正射影像', date: '2026-06-15', coverage: '12.5 km²', color: '#4a90d9' },
+    { id: 'ORT-002', name: '阳宗海区域影像', date: '2026-05-20', coverage: '28.3 km²', color: '#34a853' },
+    { id: 'ORT-003', name: '石林地形测绘',   date: '2026-04-10', coverage: '45.0 km²', color: '#f59e0b' },
+  ];
+
+  var layerPanel = document.getElementById('layer-panel');
+  var layerContainer = document.getElementById('layer-panel-container');
+  var assetOpen = false, orthoOpen = false;
+
+  // ---- Helpers ----
+
+  /** Close BOTH expandable panels; returns true if any was open */
+  function closeExpandablePanels() {
+    var changed = false;
+    if (assetOpen) {
+      assetOpen = false;
+      var ai = document.getElementById('asset-item');
+      var ap = document.getElementById('asset-panel');
+      if (ai) ai.classList.remove('open');
+      if (ap) ap.classList.remove('open');
+      changed = true;
+    }
+    if (orthoOpen) {
+      orthoOpen = false;
+      var oi = document.getElementById('ortho-item');
+      var op = document.getElementById('ortho-panel');
+      if (oi) oi.classList.remove('open');
+      if (op) op.classList.remove('open');
+      changed = true;
+    }
+    return changed;
+  }
+
+  function togglePanel(which) {
+    if (which === 'asset') {
+      // Close ortho first if open
+      if (orthoOpen) {
+        orthoOpen = false;
+        var oi = document.getElementById('ortho-item');
+        var op = document.getElementById('ortho-panel');
+        if (oi) oi.classList.remove('open');
+        if (op) op.classList.remove('open');
+      }
+      assetOpen = !assetOpen;
+      var item = document.getElementById('asset-item');
+      var panel = document.getElementById('asset-panel');
+      if (item) item.classList.toggle('open', assetOpen);
+      if (panel) panel.classList.toggle('open', assetOpen);
+      if (assetOpen) {
+        renderAssetList();
+        // Focus search input
+        setTimeout(function() {
+          var inp = document.getElementById('asset-search');
+          if (inp) inp.focus();
+        }, 350);
+      }
+    } else {
+      // Close asset first if open
+      if (assetOpen) {
+        assetOpen = false;
+        var ai = document.getElementById('asset-item');
+        var ap = document.getElementById('asset-panel');
+        if (ai) ai.classList.remove('open');
+        if (ap) ap.classList.remove('open');
+      }
+      orthoOpen = !orthoOpen;
+      var item = document.getElementById('ortho-item');
+      var panel = document.getElementById('ortho-panel');
+      if (item) item.classList.toggle('open', orthoOpen);
+      if (panel) panel.classList.toggle('open', orthoOpen);
+      if (orthoOpen) {
+        renderOrthoList();
+        setTimeout(function() {
+          var inp = document.getElementById('ortho-search');
+          if (inp) inp.focus();
+        }, 350);
+      }
+    }
+  }
+
+  // ---- Layer Panel collapse toggle ----
+  var layerToggle = document.getElementById('layer-panel-toggle');
+  if (layerToggle && layerPanel) {
+    layerToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      closeExpandablePanels();
+      layerPanel.classList.toggle('collapsed');
+      var icon = layerToggle.querySelector('[data-lucide]');
+      if (icon) {
+        icon.setAttribute('data-lucide', layerPanel.classList.contains('collapsed') ? 'chevrons-down' : 'chevrons-up');
+        if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
+      }
+      setTimeout(function() {
+        try { window.__dashMap && window.__dashMap.invalidateSize(); } catch(e) {}
+      }, 350);
+    });
+  }
+
+  // ---- Expandable panels (互斥展开) ----
+  var assetToggleBtn = document.getElementById('asset-toggle-btn');
+  if (assetToggleBtn) {
+    assetToggleBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      // Don't toggle if panel is collapsed
+      if (layerPanel && layerPanel.classList.contains('collapsed')) return;
+      togglePanel('asset');
+    });
+  }
+
+  var orthoToggleBtn = document.getElementById('ortho-toggle-btn');
+  if (orthoToggleBtn) {
+    orthoToggleBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (layerPanel && layerPanel.classList.contains('collapsed')) return;
+      togglePanel('ortho');
+    });
+  }
+
+  // ---- Click-outside to close expandable panels ----
+  document.addEventListener('click', function(e) {
+    if (!assetOpen && !orthoOpen) return;
+    // If click is inside the layer panel, don't close
+    if (layerContainer && layerContainer.contains(e.target)) return;
+    closeExpandablePanels();
+  });
+
+  // ---- Keyboard: Escape closes expandable panels ----
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (assetOpen || orthoOpen) {
+        e.preventDefault();
+        closeExpandablePanels();
+      }
+    }
+  });
+
+  // ---- Search inputs: Escape to clear & close ----
+  ['asset-search', 'ortho-search'].forEach(function(id) {
+    var inp = document.getElementById(id);
+    if (!inp) return;
+    inp.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        if (this.value) {
+          this.value = '';
+          if (id === 'asset-search') renderAssetList('');
+          else renderOrthoList('');
+        } else {
+          closeExpandablePanels();
+        }
+      }
+    });
+  });
+
+  // ---- List rendering ----
+  function renderAssetList(filterText) {
+    var list = document.getElementById('asset-list');
+    if (!list) return;
+    var q = (filterText || '').trim().toLowerCase();
+    var filtered = MOCK_ASSETS.filter(function(a) {
+      if (!q) return true;
+      return a.name.toLowerCase().indexOf(q) >= 0 ||
+             a.id.toLowerCase().indexOf(q) >= 0 ||
+             (a.desc || '').toLowerCase().indexOf(q) >= 0;
+    });
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="ortho-empty">无匹配结果</div>';
+    } else {
+      list.innerHTML = filtered.map(function(a) {
+        var stColor = a.status === 'normal' ? '#16a34a' : a.status === 'abnormal' ? '#ef4444' : '#9ca3af';
+        var stLabel = a.status === 'normal' ? '正常' : a.status === 'abnormal' ? '异常' : '离线';
+        var isOn = a._enabled !== false;
+        return '<div class="ortho-list-item' + (isOn ? ' active' : '') + '" data-asset-id="' + a.id + '">' +
+          '<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">' +
+            '<span class="ortho-item-dot" style="background:' + stColor + ';"></span>' +
+            '<div class="ortho-item-left">' +
+              '<span class="ortho-item-name">' + a.name + '</span>' +
+              '<div class="ortho-item-meta"><span>' + a.id + '</span><span>' + stLabel + '</span></div>' +
+            '</div>' +
+          '</div>' +
+          '<label class="toggle" style="transform:scale(0.75);transform-origin:right center;" onclick="event.stopPropagation()">' +
+            '<input type="checkbox"' + (isOn ? ' checked' : '') + ' data-asset-toggle="' + a.id + '">' +
+            '<span class="toggle-slider"></span>' +
+          '</label>' +
+        '</div>';
+      }).join('');
+    }
+  }
+
+  function renderOrthoList(filterText) {
+    var list = document.getElementById('ortho-list');
+    if (!list) return;
+    var q = (filterText || '').trim().toLowerCase();
+    var filtered = MOCK_ORTHOS.filter(function(op) {
+      if (!q) return true;
+      return op.name.toLowerCase().indexOf(q) >= 0 ||
+             op.date.indexOf(q) >= 0 ||
+             op.coverage.toLowerCase().indexOf(q) >= 0;
+    });
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="ortho-empty">无匹配结果</div>';
+    } else {
+      list.innerHTML = filtered.map(function(op) {
+        var isOn = op._enabled !== false;
+        return '<div class="ortho-list-item' + (isOn ? ' active' : '') + '" data-ortho-id="' + op.id + '">' +
+          '<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">' +
+            '<span class="ortho-item-dot" style="background:' + op.color + ';"></span>' +
+            '<div class="ortho-item-left">' +
+              '<span class="ortho-item-name">' + op.name + '</span>' +
+              '<div class="ortho-item-meta"><span>' + op.date + '</span><span>' + op.coverage + '</span></div>' +
+            '</div>' +
+          '</div>' +
+          '<label class="toggle" style="transform:scale(0.75);transform-origin:right center;" onclick="event.stopPropagation()">' +
+            '<input type="checkbox"' + (isOn ? ' checked' : '') + ' data-ortho-toggle="' + op.id + '">' +
+            '<span class="toggle-slider"></span>' +
+          '</label>' +
+        '</div>';
+      }).join('');
+    }
+  }
+
+  // ---- Search input (防抖 150ms) ----
+  var searchTimers = {};
+
+  var assetSearch = document.getElementById('asset-search');
+  if (assetSearch) {
+    assetSearch.addEventListener('input', function() {
+      clearTimeout(searchTimers.asset);
+      var val = this.value;
+      searchTimers.asset = setTimeout(function() { renderAssetList(val); }, 150);
+    });
+    // Prevent click on input from bubbling to document (which would close panels)
+    assetSearch.addEventListener('click', function(e) { e.stopPropagation(); });
+  }
+
+  var orthoSearch = document.getElementById('ortho-search');
+  if (orthoSearch) {
+    orthoSearch.addEventListener('input', function() {
+      clearTimeout(searchTimers.ortho);
+      var val = this.value;
+      searchTimers.ortho = setTimeout(function() { renderOrthoList(val); }, 150);
+    });
+    orthoSearch.addEventListener('click', function(e) { e.stopPropagation(); });
+  }
+
+  // ---- List item click → fly-to on map ----
+  document.getElementById('layer-panel-content').addEventListener('click', function(e) {
+    var item = e.target.closest('[data-asset-id]');
+    if (item) {
+      e.stopPropagation();
+      var assetId = item.dataset.assetId;
+      var asset = MOCK_ASSETS.find(function(a) { return a.id === assetId; });
+      if (asset && window.__dashMap) {
+        // Highlight selection
+        document.querySelectorAll('#asset-list .ortho-list-item').forEach(function(el) { el.classList.remove('active'); });
+        item.classList.add('active');
+        showToast('已选中资产：' + asset.name);
+      }
+      return;
+    }
+    var orthoItem = e.target.closest('[data-ortho-id]');
+    if (orthoItem) {
+      e.stopPropagation();
+      var orthoId = orthoItem.dataset.orthoId;
+      var ortho = MOCK_ORTHOS.find(function(o) { return o.id === orthoId; });
+      if (ortho && window.__dashMap) {
+        document.querySelectorAll('#ortho-list .ortho-list-item').forEach(function(el) { el.classList.remove('active'); });
+        orthoItem.classList.add('active');
+        showToast('已选中正射影像：' + ortho.name + ' · ' + ortho.coverage);
+      }
+      return;
+    }
+  });
+
+  // ---- Asset & Ortho item toggle change (delegated) ----
+  document.getElementById('layer-panel-content').addEventListener('change', function(e) {
+    var assetToggle = e.target.closest('[data-asset-toggle]');
+    if (assetToggle) {
+      var id = assetToggle.dataset.assetToggle;
+      var a = MOCK_ASSETS.find(function(x) { return x.id === id; });
+      if (a) { a._enabled = assetToggle.checked; renderAssetList((document.getElementById('asset-search')||{}).value || ''); }
+      // Also update map marker
+      if (window._dashRenderAssetMarkers && window._dashAssetMarkers) {
+        var ma = window._dashAssetMarkers.find(function(x) { return x.id === id; });
+        if (ma) { ma._enabled = assetToggle.checked; window._dashRenderAssetMarkers(); }
+      }
+      return;
+    }
+    var orthoToggle = e.target.closest('[data-ortho-toggle]');
+    if (orthoToggle) {
+      var oid = orthoToggle.dataset.orthoToggle;
+      var o = MOCK_ORTHOS.find(function(x) { return x.id === oid; });
+      if (o) { o._enabled = orthoToggle.checked; renderOrthoList((document.getElementById('ortho-search')||{}).value || ''); }
+      // Also update map overlay
+      if (window._dashRenderOrthoOverlays && window._dashOrthoOverlays) {
+        var mo = window._dashOrthoOverlays.find(function(x) { return x.id === oid; });
+        if (mo) { mo._enabled = orthoToggle.checked; window._dashRenderOrthoOverlays(); }
+      }
+      return;
+    }
+  });
+
+  // ---- Utility toast (reuse existing) ----
+  function showToast(msg) {
+    var toast = document.getElementById('toast');
+    var msgEl = document.getElementById('toast-msg');
+    if (!toast || !msgEl) return;
+    msgEl.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toast._hide);
+    toast._hide = setTimeout(function() { toast.classList.remove('show'); }, 1600);
+  }
+
+  // ---- Layer toggles: prevent row click from toggling checkbox twice ----
+  function bindToggleRow(selector) {
+    document.querySelectorAll(selector).forEach(function(item) {
+      var toggle = item.querySelector('input[type="checkbox"]');
+      if (!toggle) return;
+      // Click on the row toggles the checkbox
+      item.addEventListener('click', function(e) {
+        // Don't intercept if clicking the toggle itself (native handles it)
+        if (e.target.closest('.toggle')) return;
+        // Don't intercept if clicking an expandable arrow
+        if (e.target.closest('.ortho-expand-arrow')) return;
+        e.stopPropagation();
+        toggle.checked = !toggle.checked;
+        toggle.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      toggle.addEventListener('change', function(e) {
+        e.stopPropagation();
+        if (this.checked) item.classList.add('active');
+        else item.classList.remove('active');
+        // Call render functions for business / airspace / model toggles
+        if (item.dataset.business && window._dashRenderDevices) window._dashRenderDevices();
+        if (item.dataset.airspace && window._dashRenderAirspace) window._dashRenderAirspace();
+        if (item.dataset.model && window._dashRenderModels) window._dashRenderModels();
+      });
+    });
+  }
+
+  bindToggleRow('#layer-panel [data-business]');
+  bindToggleRow('#layer-panel [data-airspace]');
+  bindToggleRow('#layer-panel [data-model]');
+
+  // ---- Model opacity slider ----
+  var opacitySlider = document.getElementById('model-opacity');
+  var opacityVal = document.getElementById('opacity-val');
+  if (opacitySlider && opacityVal) {
+    opacitySlider.addEventListener('input', function() {
+      opacityVal.textContent = this.value + '%';
+    });
+    opacitySlider.addEventListener('change', function() {
+      showToast('模型透明度：' + this.value + '%');
+    });
+  }
+
+  // ---- Prevent clicks inside layer panel from reaching map ----
+  if (layerContainer) {
+    layerContainer.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+    // Prevent mousedown from starting map drag
+    layerContainer.addEventListener('mousedown', function(e) {
+      e.stopPropagation();
+    });
+    // Prevent dblclick from zooming map
+    layerContainer.addEventListener('dblclick', function(e) {
+      e.stopPropagation();
+    });
+  }
+
+  // ---- Initialize ----
+  renderAssetList();
+  renderOrthoList();
+})();
+
+// Generic placeholder click handler — replace with real handlers as you iterate
+(function () {
+  const toast = document.getElementById('toast');
+  const msg = document.getElementById('toast-msg');
+  let hideTimer = null;
+
+  function showPlaceholder(action) {
+    msg.textContent = `占位：${action}`;
+    toast.classList.add('show');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => toast.classList.remove('show'), 1600);
+  }
+
+  // Navigate to map-mgr.html with optional context (search tab / tool)
+  function navToMapMgr(params) {
+    var qs = '';
+    if (params) {
+      var search = new URLSearchParams(params).toString();
+      if (search) qs = '?' + search;
+    }
+    window.location.href = 'map-mgr.html' + qs;
+  }
+  function navToModelMgr() {
+    window.location.href = 'model-mgr.html';
+  }
+
+  document.addEventListener('click', function (e) {
+    // 1. Navigation items
+    const nav = e.target.closest('[data-nav]');
+    if (nav) {
+      e.preventDefault();
+      if (nav.dataset.nav === 'map-mgr') {
+        const params = {};
+        if (nav.dataset.search) params.search = nav.dataset.search;
+        if (nav.dataset.tool) params.tool = nav.dataset.tool;
+        if (nav.dataset.tab) params.tab = nav.dataset.tab;
+        navToMapMgr(params);
+      } else if (nav.dataset.nav === 'model-mgr') {
+        navToModelMgr();
+      } else if (nav.dataset.nav === 'dashboard') {
+        window.location.href = 'dashboard.html';
+      }
+      return;
+    }
+
+    // 2. Action items (placeholder)
+    const el = e.target.closest('[data-action]');
+    if (!el) return;
+    e.preventDefault();
+    showPlaceholder(el.dataset.action);
+  });
+})();
+
+// Keep right panel within main area on resize
+(function () {
+  const panel = document.getElementById('rightpanel');
+  function adjust() {
+    // Panel uses absolute positioning relative to viewport — fine for now.
+    // If you want it clipped to .main, change parent.
+  }
+  window.addEventListener('resize', adjust);
+})();
+</script>
+</body>
+</html>

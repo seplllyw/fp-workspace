@@ -1,0 +1,212 @@
+<mxfile host="app.diagrams.net" modified="2025-06-18T00:00:00.000Z" agent="Claude" version="21.0.0">
+  <diagram name="页面导航与模块关系" id="page-nav">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="页面导航与模块关系总览 · 数据资产配置原型" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontColor=#1a2332;" vertex="1" parent="1">
+          <mxGeometry x="300" y="15" width="800" height="36" as="geometry" />
+        </mxCell>
+
+        <!-- ====== SIDEBAR ====== -->
+        <mxCell id="sidebar-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A2332;strokeColor=#0D6E6E;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="70" width="280" height="880" as="geometry" />
+        </mxCell>
+        <mxCell id="sidebar-brand" value="&lt;b style=&quot;font-size:16px&quot;&gt;资产管理&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;color:#5eb8b8;font-size:11px&quot;&gt;数据资产配置原型&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="60" y="85" width="240" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Nav Sections -->
+        <mxCell id="nav-sec1" value="资产管理" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#a8b4c4;fontStyle=1;opacity=50;" vertex="1" parent="1">
+          <mxGeometry x="60" y="140" width="100" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Nav items -->
+        <mxCell id="nav-tpl" value="📋  资产模版" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0D6E6E;strokeColor=#0A5858;fontSize=12;fontColor=#ffffff;fontStyle=1;align=left;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="56" y="170" width="248" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="nav-inst" value="🏗️  在管资产" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0D6E6E;strokeColor=#0A5858;fontSize=12;fontColor=#ffffff;fontStyle=1;align=left;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="56" y="220" width="248" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="nav-anno" value="🎯  资产标注" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#152535;strokeColor=transparent;fontSize=12;fontColor=#a8b4c4;align=left;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="56" y="270" width="248" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="nav-stake" value="📍  桩号管理" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#152535;strokeColor=transparent;fontSize=12;fontColor=#a8b4c4;align=left;spacingLeft=12;" vertex="1" parent="1">
+          <mxGeometry x="56" y="315" width="248" height="35" as="geometry" />
+        </mxCell>
+
+        <mxCell id="nav-sec2" value="高级配置" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#a8b4c4;fontStyle=1;opacity=50;" vertex="1" parent="1">
+          <mxGeometry x="60" y="370" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="nav-defect" value="🩺  病害资产" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#152535;strokeColor=transparent;fontSize=12;fontColor=#a8b4c4;align=left;spacingLeft=12;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="56" y="400" width="248" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="nav-encoding" value="🔢  编码配置" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#152535;strokeColor=transparent;fontSize=12;fontColor=#a8b4c4;align=left;spacingLeft=12;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="56" y="445" width="248" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- ShowPage entry -->
+        <mxCell id="showpage" value="&lt;b&gt;showPage(name)&lt;/b&gt;&lt;br&gt;URL hash 路由" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C45C26;strokeColor=#A0401C;fontSize=10;fontColor=#ffffff;align=center;" vertex="1" parent="1">
+          <mxGeometry x="70" y="510" width="220" height="45" as="geometry" />
+        </mxCell>
+
+        <!-- ====== RIGHT SIDE: PAGES & RELATIONS ====== -->
+        <mxCell id="main-area" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#E0E0E0;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="360" y="70" width="1000" height="880" as="geometry" />
+        </mxCell>
+        <mxCell id="main-label" value="主内容区 (Main Content)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#666;" vertex="1" parent="1">
+          <mxGeometry x="380" y="78" width="200" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- ====== PAGE 1: TEMPLATES ====== -->
+        <mxCell id="p1-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4CAF50;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="390" y="115" width="440" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-title" value="&lt;b&gt;资产模版 page-templates&lt;/b&gt; · 核心页面" style="text;html=1;strokeColor=none;fillColor=#E8F5E9;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#2E7D32;" vertex="1" parent="1">
+          <mxGeometry x="390" y="115" width="440" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-detail" value="&lt;b&gt;功能：&lt;/b&gt;&lt;br&gt;• 模板列表表格 (renderTemplateTable)&lt;br&gt;• 新建/编辑/删除模板&lt;br&gt;• 跳转 → page-template-edit (两个Tab)&lt;br&gt;  - Tab1: 基础信息 (名称/类型/台账字段/编码规则)&lt;br&gt;  - Tab2: 树形结构 (左右分栏编辑)&lt;br&gt;    · 统一模式: +下级/平级 → 选择节点类型&lt;br&gt;    · 经典模式: +下级/+平级/删除按钮&lt;br&gt;• 复制/粘贴分支" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=none;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="396" y="147" width="428" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-vars" value="&lt;b&gt;关联变量：&lt;/b&gt;templates[], editingTemplateId, selectedTreeNodeId, templateTreeCollapsed, isNewTemplateFlow" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F1F8E9;strokeColor=none;fontSize=8;align=left;spacingLeft=6;fontColor=#558B2F;" vertex="1" parent="1">
+          <mxGeometry x="396" y="265" width="428" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- ====== PAGE 2: INSTANCES ====== -->
+        <mxCell id="p2-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1976D2;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="870" y="115" width="460" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-title" value="&lt;b&gt;在管资产 page-instances&lt;/b&gt; · 核心页面" style="text;html=1;strokeColor=none;fillColor=#E3F2FD;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#0D47A1;" vertex="1" parent="1">
+          <mxGeometry x="870" y="115" width="460" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-detail" value="&lt;b&gt;功能：&lt;/b&gt;&lt;br&gt;• 按模板类型Tab筛选实例列表&lt;br&gt;• 新建资产向导 (选择模板→台账→结构树→确认)&lt;br&gt;• 查看/编辑实例 → page-instance-edit (两个Tab)&lt;br&gt;  - Tab1: 数字档案 (实例树+Unit管理+巡检子视图)&lt;br&gt;  - Tab2: 基本信息 (台账字段+桩号条)&lt;br&gt;• 删除实例" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=none;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="876" y="147" width="448" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-vars" value="&lt;b&gt;关联变量：&lt;/b&gt;instances[], editingInstanceId, selectedInstanceNodeId, instanceTreeCollapsed, isNewInstanceFlow, instanceTemplateFilter, instanceStructureSubview" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=none;fontSize=8;align=left;spacingLeft=6;fontColor=#1565C0;" vertex="1" parent="1">
+          <mxGeometry x="876" y="265" width="448" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- ====== CONNECTION: Template → Instance ====== -->
+        <mxCell id="rel-tpl-inst" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#C45C26;strokeWidth=3;fontSize=11;fontStyle=1;fontColor=#C45C26;dashed=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="610" y="335" as="sourcePoint" />
+            <mxPoint x="870" y="335" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="740" y="335" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel-tpl-inst-label" value="模板实例化&lt;br&gt;新建资产时选择模板&lt;br&gt;深度复制模板树" style="text;html=1;strokeColor=none;fillColor=#FFF3E0;align=center;fontSize=9;fontColor=#E65100;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="720" y="310" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ====== PAGE 3: ANNOTATION ====== -->
+        <mxCell id="p3-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9C27B0;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="390" y="370" width="440" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-title" value="&lt;b&gt;资产标注 page-annotation&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=#F3E5F5;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#6A1B9A;" vertex="1" parent="1">
+          <mxGeometry x="390" y="370" width="440" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-detail" value="&lt;b&gt;功能：&lt;/b&gt;&lt;br&gt;• initAnnotationMissions() 初始化场景数据&lt;br&gt;• renderAnnotationPage() 渲染标注页&lt;br&gt;• 巡检场景视频标注&lt;br&gt;• 资产与航点绑定可视化&lt;br&gt;• 飞行架次管理" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=none;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="396" y="402" width="428" height="85" as="geometry" />
+        </mxCell>
+
+        <!-- ====== PAGE 4: STAKES ====== -->
+        <mxCell id="p4-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9800;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="870" y="370" width="460" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-title" value="&lt;b&gt;桩号管理 page-stakes&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=#FFF3E0;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#E65100;" vertex="1" parent="1">
+          <mxGeometry x="870" y="370" width="460" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p4-detail" value="&lt;b&gt;功能：&lt;/b&gt;&lt;br&gt;• renderStakePage() / renderStakeTree()&lt;br&gt;• 路段管理 (新建/编辑/删除)&lt;br&gt;• 桩号管理 (百米桩/公里桩)&lt;br&gt;• Excel 导入导出 (triggerImport / confirmImport / downloadStakeTemplate)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=none;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="876" y="402" width="448" height="85" as="geometry" />
+        </mxCell>
+
+        <!-- ====== CONNECTION: Instance → Annotation ====== -->
+        <mxCell id="rel-inst-anno" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9C27B0;strokeWidth=1.5;fontSize=9;fontColor=#6A1B9A;dashed=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1100" y="335" as="sourcePoint" />
+            <mxPoint x="1100" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel-inst-anno-label" value="巡检数据 → 航点绑定" style="text;html=1;strokeColor=none;fillColor=#F3E5F5;align=center;fontSize=8;fontColor=#6A1B9A;" vertex="1" parent="1">
+          <mxGeometry x="1115" y="342" width="110" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- ====== HIDDEN PAGES ====== -->
+        <mxCell id="p5-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E91E63;strokeWidth=1.5;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="390" y="555" width="440" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-title" value="&lt;b&gt;病害资产 page-defects&lt;/b&gt; · 默认隐藏" style="text;html=1;strokeColor=none;fillColor=#FCE4EC;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#880E4F;" vertex="1" parent="1">
+          <mxGeometry x="390" y="555" width="440" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p5-detail" value="&lt;b&gt;功能：&lt;/b&gt;病害库管理 · DEFECT_POOL[] 的增删改查 · 病害名称/编码/等级维护" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=none;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="396" y="587" width="428" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="p6-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3F51B5;strokeWidth=1.5;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="870" y="555" width="460" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="p6-title" value="&lt;b&gt;编码配置 page-encoding&lt;/b&gt; · 默认隐藏" style="text;html=1;strokeColor=none;fillColor=#E8EAF6;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#283593;" vertex="1" parent="1">
+          <mxGeometry x="870" y="555" width="460" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="p6-detail" value="&lt;b&gt;功能：&lt;/b&gt;所有资产类型的编码规则独立展示 · 实体编码/构件编码规则预览" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=none;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="876" y="587" width="448" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ====== DATA LAYER OVERVIEW ====== -->
+        <mxCell id="data-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECEFF1;strokeColor=#607D8B;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="390" y="700" width="940" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="data-title" value="&lt;b&gt;数据层 (浏览器内存)&lt;/b&gt; · 刷新页面即重置" style="text;html=1;strokeColor=none;fillColor=#CFD8DC;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#37474F;" vertex="1" parent="1">
+          <mxGeometry x="390" y="700" width="940" height="26" as="geometry" />
+        </mxCell>
+
+        <mxCell id="data-tpl" value="&lt;b&gt;templates[]&lt;/b&gt;&lt;br&gt;模板数组&lt;br&gt;7种资产类型&lt;br&gt;初始化: ASSET_DATA.templates" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90CAF9;strokeColor=#1565C0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="410" y="740" width="200" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="data-inst" value="&lt;b&gt;instances[]&lt;/b&gt;&lt;br&gt;实例数组&lt;br&gt;台账+结构树+巡检&lt;br&gt;初始化: ASSET_DATA.instances" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90CAF9;strokeColor=#1565C0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="640" y="740" width="200" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="data-defect" value="&lt;b&gt;DEFECT_POOL[]&lt;/b&gt;&lt;br&gt;病害类型库&lt;br&gt;d1-d8 + br-d001+&lt;br&gt;硬编码在 index.html" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90CAF9;strokeColor=#1565C0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="870" y="740" width="210" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="data-stake" value="&lt;b&gt;STAKE_DATA&lt;/b&gt;&lt;br&gt;路段/桩号数据&lt;br&gt;硬编码" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90CAF9;strokeColor=#1565C0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="740" width="210" height="85" as="geometry" />
+        </mxCell>
+
+        <!-- Source -->
+        <mxCell id="data-source" value="&lt;b&gt;数据源：&lt;/b&gt;asset-data.js (Python从Excel生成) + kunshi-data.js + index.html 硬编码" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CFD8DC;strokeColor=#90A4AE;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="410" y="845" width="900" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- note about future -->
+        <mxCell id="future-note" value="&lt;b&gt;⚠️ 当前限制：&lt;/b&gt;无后端持久化，saveTemplate()/saveInstance() 仅更新内存数组，刷新后丢失。未来需对接后端API。" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;fontSize=10;align=left;spacingLeft=6;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="410" y="885" width="900" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Sidebar → Page Arrows -->
+        <mxCell id="sarr1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0D6E6E;strokeWidth=1.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="nav-tpl" target="p1-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sarr2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0D6E6E;strokeWidth=1.5;" edge="1" parent="1" source="nav-inst" target="p2-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sarr3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0D6E6E;strokeWidth=1.5;" edge="1" parent="1" source="nav-anno" target="p3-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sarr4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0D6E6E;strokeWidth=1.5;" edge="1" parent="1" source="nav-stake" target="p4-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sarr5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0D6E6E;strokeWidth=1;dashed=1;" edge="1" parent="1" source="nav-defect" target="p5-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sarr6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0D6E6E;strokeWidth=1;dashed=1;" edge="1" parent="1" source="nav-encoding" target="p6-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

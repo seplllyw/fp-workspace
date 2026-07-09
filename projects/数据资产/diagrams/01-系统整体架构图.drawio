@@ -1,0 +1,209 @@
+<mxfile host="app.diagrams.net" modified="2025-06-18T00:00:00.000Z" agent="Claude" version="21.0.0">
+  <diagram name="系统整体架构" id="sys-arch">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="高速公路数据资产配置原型 · 系统整体架构" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontColor=#1a2332;" vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="800" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ====== DATA SOURCE LAYER ====== -->
+        <mxCell id="layer-src-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;strokeWidth=2;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="1320" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="layer-src-label" value="数据源层 (Data Sources)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#2E7D32;" vertex="1" parent="1">
+          <mxGeometry x="60" y="88" width="200" height="24" as="geometry" />
+        </mxCell>
+
+        <!-- Excel files -->
+        <mxCell id="excel1" value="&lt;b&gt;桥梁主表.xlsx&lt;/b&gt;&lt;br&gt;桥梁构件分解表&lt;br&gt;空间几何表" style="shape=document;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#FFF9C4;strokeColor=#F9A825;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="80" y="130" width="180" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="excel2" value="&lt;b&gt;边坡主表.xlsx&lt;/b&gt;&lt;br&gt;边坡构件分解表" style="shape=document;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#FFF9C4;strokeColor=#F9A825;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="290" y="130" width="180" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="excel3" value="&lt;b&gt;交安设施主表.xlsx&lt;/b&gt;&lt;br&gt;交安设施构件分级表" style="shape=document;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#FFF9C4;strokeColor=#F9A825;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="500" y="130" width="180" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="excel4" value="&lt;b&gt;隧道.xlsx&lt;/b&gt;&lt;br&gt;地质灾害点清单&lt;br&gt;服务区/避险车道" style="shape=document;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#FFF9C4;strokeColor=#F9A825;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="710" y="130" width="200" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="docx1" value="&lt;b&gt;桥梁经常化巡检.docx&lt;/b&gt;&lt;br&gt;四类桥梁病害-构件映射" style="shape=document;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#E1BEE7;strokeColor=#8E24AA;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="950" y="130" width="210" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="kunshi-src" value="&lt;b&gt;kunshi-data.js&lt;/b&gt;&lt;br&gt;原始桥梁数据&lt;br&gt;(L1-L8 树+实例)" style="shape=document;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="130" width="150" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- ====== PROCESSING LAYER ====== -->
+        <mxCell id="layer-proc-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;strokeWidth=2;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="280" width="1320" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="layer-proc-label" value="处理层 (Processing)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#E65100;" vertex="1" parent="1">
+          <mxGeometry x="60" y="288" width="180" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="py1" value="&lt;b&gt;generate-asset-data.py&lt;/b&gt;&lt;br&gt;读取 Excel → 生成模板+实例&lt;br&gt;• read_bridge_template()&lt;br&gt;• restructure_bridge_tree()&lt;br&gt;• enrich_instance_units()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCC80;strokeColor=#E65100;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="80" y="320" width="380" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="py2" value="&lt;b&gt;build-bridge-routine-template.py&lt;/b&gt;&lt;br&gt;读取 DOCX → 提取病害-构件映射&lt;br&gt;• 四类桥型病害结构&lt;br&gt;• 生成 DEFECT_POOL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCC80;strokeColor=#E65100;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="520" y="320" width="380" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- ====== DATA LAYER ====== -->
+        <mxCell id="layer-data-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;strokeWidth=2;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="440" width="1320" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="layer-data-label" value="数据层 (Runtime Data)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#0D47A1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="448" width="200" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="var-tpl" value="&lt;b&gt;templates[]&lt;/b&gt;&lt;br&gt;模板数组&lt;br&gt;7种资产类型" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90CAF9;strokeColor=#1565C0;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="485" width="200" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="var-inst" value="&lt;b&gt;instances[]&lt;/b&gt;&lt;br&gt;实例数组&lt;br&gt;含台账+结构树+巡检" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90CAF9;strokeColor=#1565C0;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="485" width="210" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="var-defect" value="&lt;b&gt;DEFECT_POOL[]&lt;/b&gt;&lt;br&gt;病害库 (d1-d8 / br-d001+)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90CAF9;strokeColor=#1565C0;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="570" y="485" width="230" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="var-stake" value="&lt;b&gt;STAKE_DATA&lt;/b&gt;&lt;br&gt;桩号/路段数据" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90CAF9;strokeColor=#1565C0;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="840" y="485" width="230" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="var-kunshi" value="&lt;b&gt;KUNSHI_DATA&lt;/b&gt;&lt;br&gt;原始桥梁数据" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="485" width="200" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- ====== UI LAYER ====== -->
+        <mxCell id="layer-ui-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#E91E63;strokeWidth=2;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="580" width="1320" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="layer-ui-label" value="表现层 (UI · index.html SPA)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#880E4F;" vertex="1" parent="1">
+          <mxGeometry x="60" y="588" width="280" height="24" as="geometry" />
+        </mxCell>
+
+        <!-- Sidebar -->
+        <mxCell id="sidebar-ui" value="&lt;b&gt;侧边栏导航&lt;/b&gt;&lt;br&gt;showPage() 路由" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A2332;strokeColor=#0D6E6E;fontSize=11;fontColor=#ffffff;align=center;" vertex="1" parent="1">
+          <mxGeometry x="80" y="625" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Pages -->
+        <mxCell id="page-tpl" value="&lt;b&gt;资产模版&lt;/b&gt;&lt;br&gt;page-templates&lt;br&gt;模板CRUD + 树形结构编辑" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#C2185B;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="300" y="620" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="page-inst" value="&lt;b&gt;在管资产&lt;/b&gt;&lt;br&gt;page-instances&lt;br&gt;实例CRUD + 数字档案" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#C2185B;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="550" y="620" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="page-anno" value="&lt;b&gt;资产标注&lt;/b&gt;&lt;br&gt;page-annotation&lt;br&gt;巡检航点绑定" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#C2185B;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="800" y="620" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="page-stake" value="&lt;b&gt;桩号管理&lt;/b&gt;&lt;br&gt;page-stakes&lt;br&gt;路段/百米桩/公里桩" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#C2185B;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="620" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="page-defect" value="&lt;b&gt;病害资产&lt;/b&gt;&lt;br&gt;page-defects&lt;br&gt;病害库管理 (隐藏)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#8E24AA;fontSize=10;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="700" width="220" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="page-encode" value="&lt;b&gt;编码配置&lt;/b&gt;&lt;br&gt;page-encoding&lt;br&gt;编码规则展示 (隐藏)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#8E24AA;fontSize=10;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="550" y="700" width="220" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Template Edit Sub-pages -->
+        <mxCell id="tpl-edit" value="&lt;b&gt;模板编辑页&lt;/b&gt; page-template-edit&lt;br&gt;└─ 基础信息 Tab (台账字段+编码规则)&lt;br&gt;└─ 树形结构 Tab (左右分栏:树+详情)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#AD1457;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="80" y="775" width="440" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- Instance Edit Sub-pages -->
+        <mxCell id="inst-edit" value="&lt;b&gt;实例编辑页&lt;/b&gt; page-instance-edit&lt;br&gt;└─ 数字档案 Tab (实例树+unit管理+巡检)&lt;br&gt;└─ 基本信息 Tab (台账字段表单+桩号条)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#AD1457;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="560" y="775" width="440" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- ====== FLOW ARROWS ====== -->
+        <!-- Excel → Python -->
+        <mxCell id="arr1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FF9800;strokeWidth=2;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="excel1" target="py1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FF9800;strokeWidth=2;" edge="1" parent="1" source="excel2" target="py1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FF9800;strokeWidth=2;" edge="1" parent="1" source="excel3" target="py1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FF9800;strokeWidth=2;" edge="1" parent="1" source="excel4" target="py1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9C27B0;strokeWidth=2;" edge="1" parent="1" source="docx1" target="py2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976D2;strokeWidth=1.5;dashed=1;" edge="1" parent="1" source="kunshi-src" target="py1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Python → Data -->
+        <mxCell id="arr7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976D2;strokeWidth=2;" edge="1" parent="1" source="py1" target="var-tpl">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976D2;strokeWidth=2;" edge="1" parent="1" source="py1" target="var-inst">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9C27B0;strokeWidth=2;" edge="1" parent="1" source="py2" target="var-defect">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Data → UI -->
+        <mxCell id="arr10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E91E63;strokeWidth=2;" edge="1" parent="1" source="var-tpl" target="page-tpl">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E91E63;strokeWidth=2;" edge="1" parent="1" source="var-inst" target="page-inst">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ====== LEGEND ====== -->
+        <mxCell id="legend-bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#BDBDBD;" vertex="1" parent="1">
+          <mxGeometry x="40" y="890" width="1320" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-title" value="图例" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="895" width="50" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="60" y="922" width="20" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1-t" value="Excel 素材" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="86" y="920" width="70" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#8E24AA;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="160" y="922" width="20" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2-t" value="DOCX 文档" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="186" y="920" width="80" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCC80;strokeColor=#E65100;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="270" y="922" width="20" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3-t" value="Python 脚本" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="296" y="920" width="80" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90CAF9;strokeColor=#1565C0;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="380" y="922" width="20" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4-t" value="JS 运行时数据" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="406" y="920" width="90" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="leg5" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8BBD0;strokeColor=#C2185B;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="500" y="922" width="20" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="leg5-t" value="UI 页面" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="526" y="920" width="60" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="leg6" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A2332;strokeColor=#0D6E6E;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="590" y="922" width="20" height="14" as="geometry" />
+        </mxCell>
+        <mxCell id="leg6-t" value="导航/路由" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="616" y="920" width="70" height="18" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,186 @@
+<mxfile host="app.diagrams.net" modified="2025-06-18T00:00:00.000Z" agent="Claude" version="21.0.0">
+  <diagram name="在管资产管理流程" id="inst-flow">
+    <mxGraphModel dx="1200" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="1300" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="在管资产管理流程" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontColor=#1a2332;" vertex="1" parent="1">
+          <mxGeometry x="450" y="15" width="600" height="36" as="geometry" />
+        </mxCell>
+
+        <!-- ====== INSTANCE LIST PAGE ====== -->
+        <mxCell id="inst-list-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="80" y="70" width="1340" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="inst-list-label" value="页面：在管资产列表 (page-instances) · 按模板类型Tab筛选" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#2E7D32;" vertex="1" parent="1">
+          <mxGeometry x="100" y="78" width="550" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- Filter Tabs -->
+        <mxCell id="filter-tabs" value="&lt;b&gt;类型筛选 Tab&lt;/b&gt;&lt;br&gt;全部 | 桥梁 | 边坡 | 交安设施 | 隧道 | 地灾 | 服务设施 | 避险车道&lt;br&gt;instanceTemplateFilter 变量控制" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="110" y="110" width="700" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Instance Table -->
+        <mxCell id="inst-table" value="&lt;b&gt;实例列表表格&lt;/b&gt;&lt;br&gt;renderInstanceTable()&lt;br&gt;显示: 编码 | 名称 | 桩号 | 模板类型 | 状态 | 操作" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=10;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="110" y="175" width="380" height="45" as="geometry" />
+        </mxCell>
+
+        <!-- Action Buttons -->
+        <mxCell id="inst-new-btn" value="&lt;b&gt;新建资产&lt;/b&gt;&lt;br&gt;openAddInstanceWizard()&lt;br&gt;选择模板 → 填写台账 → 生成结构树" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#A5D6A7;strokeColor=#2E7D32;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="560" y="170" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="inst-edit-btn" value="&lt;b&gt;查看/编辑实例&lt;/b&gt;&lt;br&gt;数字档案 + 台账信息" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90CAF9;strokeColor=#1565C0;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="870" y="170" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="inst-del-btn" value="&lt;b&gt;删除实例&lt;/b&gt;&lt;br&gt;从 instances[] 移除" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#C62828;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="175" width="180" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ====== ADD INSTANCE WIZARD ====== -->
+        <mxCell id="wizard-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FF9800;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="80" y="270" width="1340" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="wizard-label" value="新建资产向导 (openAddInstanceWizard)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#E65100;" vertex="1" parent="1">
+          <mxGeometry x="100" y="278" width="400" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- Step 1 -->
+        <mxCell id="wiz-s1" value="&lt;b&gt;Step 1&lt;/b&gt;&lt;br&gt;选择资产模版&lt;br&gt;从 templates[] 列表选择" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFECB3;strokeColor=#FFA000;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="110" y="315" width="200" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="wiz-arr1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FF9800;strokeWidth=1.5;" edge="1" parent="1" source="wiz-s1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="340" y="347" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <!-- Step 2 -->
+        <mxCell id="wiz-s2" value="&lt;b&gt;Step 2&lt;/b&gt;&lt;br&gt;填写台账信息&lt;br&gt;基础字段+模板自定义字段" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFECB3;strokeColor=#FFA000;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="350" y="315" width="210" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="wiz-arr2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FF9800;strokeWidth=1.5;" edge="1" parent="1" source="wiz-s2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="590" y="347" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <!-- Step 3 -->
+        <mxCell id="wiz-s3" value="&lt;b&gt;Step 3&lt;/b&gt;&lt;br&gt;生成数字档案&lt;br&gt;基于模板树创建实例树&lt;br&gt;叶子节点可创建 unit" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFECB3;strokeColor=#FFA000;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="600" y="315" width="210" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="wiz-arr3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FF9800;strokeWidth=1.5;" edge="1" parent="1" source="wiz-s3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="840" y="347" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <!-- Step 4 -->
+        <mxCell id="wiz-s4" value="&lt;b&gt;Step 4&lt;/b&gt;&lt;br&gt;确认创建&lt;br&gt;saveInstance() → instances[]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9800;strokeColor=#E65100;fontSize=10;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="850" y="315" width="200" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- Wizard note -->
+        <mxCell id="wiz-note" value="&lt;b&gt;编码规则&lt;/b&gt;：新建时自动按模板 encodingRule 生成实体编码 (entityCode)&lt;br&gt;&lt;b&gt;结构树&lt;/b&gt;：实例树深度复制模板树结构，unitGroup 节点下可创建 unit" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#FFB300;fontSize=10;dashed=1;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="110" y="405" width="1100" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ====== INSTANCE EDIT PAGE ====== -->
+        <mxCell id="inst-edit-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="80" y="510" width="1340" height="530" as="geometry" />
+        </mxCell>
+        <mxCell id="inst-edit-label" value="页面：实例编辑 (page-instance-edit) · switchInstanceTab()" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#0D47A1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="518" width="500" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- Tab 1: Digital Archive (Structure) -->
+        <mxCell id="inst-tab-struct-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="110" y="555" width="620" height="460" as="geometry" />
+        </mxCell>
+        <mxCell id="inst-tab-struct-label" value="Tab 1: 数字档案 (结构) · renderInstanceStructureTree()" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#1565C0;" vertex="1" parent="1">
+          <mxGeometry x="126" y="563" width="450" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- Instance Tree -->
+        <mxCell id="inst-tree" value="&lt;b&gt;实例结构树 (左右分栏)&lt;/b&gt;&lt;br&gt;• 基于模板树实例化&lt;br&gt;• 显示 unitGroup 节点&lt;br&gt;• 点击节点查看详情&lt;br&gt;• addInstanceTreeNode() 创建unit&lt;br&gt;• copyTemplateBranch / pasteTemplateBranchAsChild" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="130" y="592" width="280" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Unit Management -->
+        <mxCell id="unit-mgmt" value="&lt;b&gt;最小维护单元 (Unit) 管理&lt;/b&gt;&lt;br&gt;unitGroup 节点下通过 "+" 创建&lt;br&gt;• unitCounts: 单元计数&lt;br&gt;• unitData: 位置描述/状态/备注&lt;br&gt;• unitDefects: 病害绑定&lt;br&gt;• unitFlightArchives: 飞行巡检档案&lt;br&gt;例: "左幅 1#墩", "2#墩"..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90CAF9;strokeColor=#1565C0;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="130" y="730" width="280" height="130" as="geometry" />
+        </mxCell>
+
+        <!-- Inspection Sub-view -->
+        <mxCell id="inspection-sub" value="&lt;b&gt;巡检记录子视图&lt;/b&gt;&lt;br&gt;instanceStructureSubview = 'inspection'&lt;br&gt;• hasInspectionData() 判断有无数据&lt;br&gt;• renderInspectionOverviewPanel()&lt;br&gt;• renderStructureInspectionHub()&lt;br&gt;  - 结构树中标记巡检状态&lt;br&gt;• jumpToInspectionUnit() 跳转定位" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#8E24AA;fontSize=9;align=left;spacingLeft=6;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="130" y="880" width="280" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Right: Node Detail -->
+        <mxCell id="inst-node-detail" value="&lt;b&gt;节点详情面板&lt;/b&gt;&lt;br&gt;renderInstanceNodeDetail()&lt;br&gt;• 节点基本信息&lt;br&gt;• Unit 列表 (含操作按钮)&lt;br&gt;• Unit 详情编辑&lt;br&gt;• 病害记录展示&lt;br&gt;• 飞行档案展示" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1976D2;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="450" y="592" width="260" height="140" as="geometry" />
+        </mxCell>
+
+        <!-- Tab 2: Ledger Info -->
+        <mxCell id="inst-tab-ledger-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#FFA000;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="760" y="555" width="630" height="460" as="geometry" />
+        </mxCell>
+        <mxCell id="inst-tab-ledger-label" value="Tab 2: 基本信息 (台账)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1;fontColor=#E65100;" vertex="1" parent="1">
+          <mxGeometry x="776" y="563" width="230" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- Ledger Fields -->
+        <mxCell id="ledger-basic" value="&lt;b&gt;基础字段&lt;/b&gt;&lt;br&gt;• 资产编码 (自动生成)&lt;br&gt;• 资产名称&lt;br&gt;• 桩号范围 (Kxxx+xxx ~ Kxxx+xxx)&lt;br&gt;• 管理单位&lt;br&gt;• 创建时间" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFECB3;strokeColor=#FFA000;fontSize=10;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="780" y="592" width="260" height="125" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ledger-custom" value="&lt;b&gt;自定义台账字段&lt;/b&gt;&lt;br&gt;renderInstanceLedgerFields()&lt;br&gt;继承模板 ledgerFields 定义&lt;br&gt;• 文本/数字/单选/多选&lt;br&gt;• 按模板配置动态渲染表单" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFECB3;strokeColor=#FFA000;fontSize=10;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="592" width="280" height="125" as="geometry" />
+        </mxCell>
+
+        <!-- Priority Strip -->
+        <mxCell id="ledger-priority" value="&lt;b&gt;桩号范围优先条&lt;/b&gt;&lt;br&gt;renderLedgerPriorityStrip()&lt;br&gt;在桩号图下方显示核心字段概览&lt;br&gt;编码 | 名称 | 桩号 | 类型 | 状态" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCC80;strokeColor=#E65100;fontSize=10;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="780" y="745" width="300" height="85" as="geometry" />
+        </mxCell>
+
+        <!-- Edit Mode -->
+        <mxCell id="ledger-edit-mode" value="&lt;b&gt;查看/编辑模式切换&lt;/b&gt;&lt;br&gt;switchToInstanceEditMode()&lt;br&gt;默认查看模式 → 点击编辑切换" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#2E7D32;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="745" width="260" height="85" as="geometry" />
+        </mxCell>
+
+        <!-- Save -->
+        <mxCell id="inst-save" value="&lt;b&gt;saveInstance()&lt;/b&gt;&lt;br&gt;更新 instances[] 数组" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1976D2;strokeColor=#0D47A1;fontSize=11;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="880" y="870" width="260" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows: List → Wizard/Edit -->
+        <mxCell id="arr-i1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FF9800;strokeWidth=2;" edge="1" parent="1" source="inst-new-btn" target="wizard-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr-i2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976D2;strokeWidth=2;" edge="1" parent="1" source="inst-edit-btn" target="inst-edit-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: Wizard → Instance Edit -->
+        <mxCell id="arr-i3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1976D2;strokeWidth=2;entryX=0.3;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="wiz-s4" target="inst-edit-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ====== OUTPUT ====== -->
+        <mxCell id="output-box2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#4CAF50;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1080" width="1340" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="output-label2" value="输出：instances[] 数组中的 Instance 对象" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1;fontColor=#2E7D32;" vertex="1" parent="1">
+          <mxGeometry x="100" y="1088" width="400" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="output-struct2" value="&lt;b&gt;Instance 对象&lt;/b&gt; = { id, templateId, entityCode, ledgerData{}, tree[], units: {unitCounts, unitDefects, unitData, unitFlightArchives}, inspectionRecords[], createdAt }" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#388E3C;fontSize=10;align=left;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="110" y="1115" width="1040" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ====== CONNECT TO OTHER DIAGRAMS ====== -->
+        <mxCell id="cross-ref" value="&lt;b&gt;关联&lt;/b&gt;&lt;br&gt;← 来自模板&lt;br&gt;→ 去往资产标注/巡检" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C45C26;strokeColor=#A0401C;fontSize=10;fontColor=#ffffff;fontStyle=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="1085" width="180" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
