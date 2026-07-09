@@ -2157,6 +2157,21 @@ body {
 .sd-bottom-fill.warn { background: #d97706; }
 .sd-bottom-hint { font-size: 10px; color: var(--text-secondary); white-space: nowrap; }
 
+
+/* ===== Create Plan Panel ===== */
+.sd-create-panel { background: #fff; border: 1px solid var(--panel-border); border-radius: var(--radius); overflow: hidden; flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.sd-create-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--panel-border); }
+.sd-create-header h3 { font-size: 15px; font-weight: 600; margin: 0; }
+.sd-create-body { flex: 1; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 16px; }
+.sd-create-step { border: 1px solid var(--panel-border); border-radius: var(--radius-sm); overflow: hidden; }
+.sd-step-label { padding: 10px 14px; background: var(--surface); font-size: 13px; font-weight: 600; border-bottom: 1px solid var(--panel-border); }
+.sd-step-content { padding: 12px 14px; }
+.sd-step-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.sd-asset-select-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sd-asset-check { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; padding: 6px 8px; border-radius: 4px; }
+.sd-asset-check:hover { background: var(--surface-hover); }
+.sd-asset-check span { font-size: 11px; color: var(--text-secondary); }
+.sd-create-actions { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--panel-border); }
 </style>
 </head>
 <body>
@@ -2628,9 +2643,8 @@ body {
           <p>基于资产巡检周期自动编排任务，匹配航线与设备，调度员审核后批量下发</p>
         </div>
         <div class="sd-header-right">
-          <button class="btn-primary" id="btn-auto-schedule">自动编排</button>
-          <button class="btn-secondary" id="btn-create-plan">创建计划</button>
-          <button class="btn-secondary" id="btn-batch-dispatch" style="display:none">批量下发</button>
+          <button class="btn-primary" id="btn-create-plan" onclick="toggleCreatePlan()">创建计划</button>
+          <button class="btn-secondary" id="btn-batch-dispatch" onclick="batchDispatch()">批量下发</button>
         </div>
       </div>
 
@@ -2879,6 +2893,97 @@ body {
             </div>
 
             <div style="text-align:center;padding:10px;color:var(--text-secondary);font-size:12px">共12个任务，以上为部分示例</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 创建计划面板（默认隐藏） -->
+      <div class="sd-create-panel" id="create-plan-panel" style="display:none">
+        <div class="sd-create-header">
+          <h3>创建巡检计划</h3>
+          <button class="btn-sm-text" onclick="toggleCreatePlan()">取消</button>
+        </div>
+        <div class="sd-create-body">
+          <!-- Step 1: 选择路段与周期 -->
+          <div class="sd-create-step">
+            <div class="sd-step-label">1. 选择路段与周期</div>
+            <div class="sd-step-content">
+              <div class="sd-step-row">
+                <select class="v19-select" style="flex:1">
+                  <option>G50高速 K118-K125（滨江段）</option>
+                  <option>G50高速 K125-K132（萧山段）</option>
+                  <option>G50高速 K132-K140（钱塘段）</option>
+                </select>
+                <select class="v19-select">
+                  <option>每周</option>
+                  <option>每两周</option>
+                  <option>每月</option>
+                </select>
+                <input type="date" class="v19-input" value="2026-08-03" style="width:130px">
+                <span style="color:var(--text-secondary);font-size:13px">至</span>
+                <input type="date" class="v19-input" value="2026-08-09" style="width:130px">
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: 选择资产（从资产数字平台读取） -->
+          <div class="sd-create-step">
+            <div class="sd-step-label">2. 选择资产 <span style="font-size:11px;color:var(--text-secondary);font-weight:400">数据来源：资产数字平台</span></div>
+            <div class="sd-step-content">
+              <div class="sd-asset-select-grid">
+                <label class="sd-asset-check"><input type="checkbox" checked> 望江大桥 <span>G50-BR-K120-001 · 钢索桥 · 巡检周期：每周</span></label>
+                <label class="sd-asset-check"><input type="checkbox" checked> 城北高架桥 <span>G50-BR-K118-001 · 预应力桥 · 巡检周期：每两周</span></label>
+                <label class="sd-asset-check"><input type="checkbox" checked> 滨江立交桥 <span>G50-BR-K122-001 · 钢结构 · 巡检周期：每月</span></label>
+                <label class="sd-asset-check"><input type="checkbox" checked> 边坡R12 <span>G50-SL-K120-012 · 巡检周期：每周</span></label>
+                <label class="sd-asset-check"><input type="checkbox"> K120交安设施 <span>G50-TS-K120-001 · 护栏/标志牌 · 巡检周期：每月</span></label>
+                <label class="sd-asset-check"><input type="checkbox"> K122路面 <span>G50-RD-K122-001 · 巡检周期：每月</span></label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: 系统自动匹配航线与设备 -->
+          <div class="sd-create-step">
+            <div class="sd-step-label">3. 匹配航线与设备 <span style="font-size:11px;color:var(--text-secondary);font-weight:400">系统自动匹配，可手动调整</span></div>
+            <div class="sd-step-content">
+              <table class="v19-table">
+                <thead><tr><th>资产</th><th>匹配航线（航线管理）</th><th>匹配设备（设备管理）</th><th>推荐时间窗口</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td>望江大桥</td>
+                    <td><select class="v19-select" style="width:100%"><option>望江大桥巡检航线</option></select></td>
+                    <td><select class="v19-select" style="width:100%"><option>M300 #01（待命中·95%电量·覆盖半径内）</option><option>M300 #03（待命中·88%电量）</option></select></td>
+                    <td>周三 08:00-10:00</td>
+                  </tr>
+                  <tr>
+                    <td>城北高架桥</td>
+                    <td><select class="v19-select" style="width:100%"><option>城北高架巡检航线</option></select></td>
+                    <td><select class="v19-select" style="width:100%"><option>M300 #03（待命中·88%电量·覆盖半径内）</option><option>M300 #04（待命中·60%电量）</option></select></td>
+                    <td>周四 14:00-16:00</td>
+                  </tr>
+                  <tr>
+                    <td>滨江立交桥</td>
+                    <td><select class="v19-select" style="width:100%"><option>滨江立交巡检航线</option></select></td>
+                    <td><select class="v19-select" style="width:100%"><option>M300 #04（待命中·60%电量·覆盖半径内）</option></select></td>
+                    <td>周五 09:00-11:00</td>
+                  </tr>
+                  <tr>
+                    <td>边坡R12</td>
+                    <td><select class="v19-select" style="width:100%"><option>边坡巡检航线</option></select></td>
+                    <td><select class="v19-select" style="width:100%"><option>M300 #01（待命中·95%电量）</option><option>M300 #03（待命中·88%电量·覆盖半径内）</option></select></td>
+                    <td>周四 08:00-10:00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 操作按钮 -->
+          <div class="sd-create-actions">
+            <span style="font-size:12px;color:var(--text-secondary)">确认后将生成巡检计划，包含4个飞行任务，状态为"待确认"</span>
+            <div style="display:flex;gap:8px">
+              <button class="btn-secondary" onclick="toggleCreatePlan()">取消</button>
+              <button class="btn-primary" onclick="createPlan()">确认创建</button>
+            </div>
           </div>
         </div>
       </div>
@@ -5110,23 +5215,40 @@ console.log('  — 整体态势 = 地图页，包含5层结构 + 3种模式');
 
 // ===== Smart Dispatch Interactions =====
 function selectPlan(planId) {
-  // Update active state
   document.querySelectorAll('.sd-plan-card').forEach(c => c.classList.remove('active'));
   const card = document.querySelector('.sd-plan-card[data-plan="' + planId + '"]');
   if (card) card.classList.add('active');
-  // In production, this would load plan-specific tasks
 }
 function toggleTaskJobs(header) {
   const jobList = header.nextElementSibling;
+  if (!jobList || !jobList.classList.contains('sd-job-list')) return;
   const expand = header.querySelector('.sd-task-expand i');
   if (jobList.style.display === 'none') {
     jobList.style.display = 'flex';
-    expand.setAttribute('data-lucide', 'chevron-down');
+    if (expand) expand.setAttribute('data-lucide', 'chevron-down');
   } else {
     jobList.style.display = 'none';
-    expand.setAttribute('data-lucide', 'chevron-right');
+    if (expand) expand.setAttribute('data-lucide', 'chevron-right');
   }
   if (window.lucide) lucide.createIcons();
+}
+function toggleCreatePlan() {
+  var panel = document.getElementById('create-plan-panel');
+  var main = document.querySelector('.sd-main');
+  if (panel.style.display === 'none') {
+    panel.style.display = 'block';
+    main.style.display = 'none';
+  } else {
+    panel.style.display = 'none';
+    main.style.display = 'grid';
+  }
+}
+function createPlan() {
+  toggleCreatePlan();
+  alert('计划已创建：G50滨江段 8月第1周，4个任务，状态"待确认"。\n\n调度员可进入计划查看详情，确认后批量下发至飞手。');
+}
+function batchDispatch() {
+  alert('批量下发：已选任务将通过飞派云平台推送至对应飞手APP。\n\n飞行任务→飞行作业：飞手接收后执行，每次飞行生成一条作业记录。');
 }
 
 </script>
