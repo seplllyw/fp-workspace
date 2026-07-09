@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>飞派智巡 — 导入模型</title>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --topnav-h: 56px;
+  --sidebar-w: 200px;
+  --bg: #f3f4f6;
+  --panel-strong: #ffffff;
+  --border: rgba(15,23,42,0.08);
+  --border-strong: rgba(15,23,42,0.12);
+  --text: #0f172a;
+  --text-2: #475569;
+  --text-3: #94a3b8;
+  --primary: #2b7fff;
+  --primary-soft: rgba(43,127,255,0.10);
+  --primary-soft-2: rgba(43,127,255,0.06);
+  --danger: #ef4444;
+  --shadow-sm: 0 1px 2px rgba(15,23,42,0.04), 0 1px 3px rgba(15,23,42,0.06);
+  --shadow-md: 0 4px 16px rgba(15,23,42,0.08);
+  --shadow-lg: 0 10px 30px rgba(15,23,42,0.10);
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --transition: 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+
+html,body{height:100%;width:100%}
+body{
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+
+button{font-family: inherit; cursor: pointer; border: 0; background: none; color: inherit}
+input,textarea{font-family: inherit; color: inherit; cursor: text}
+
+.app{
+  position: relative;
+  width: 100vw; height: 100vh;
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  grid-template-rows: var(--topnav-h) 1fr;
+  grid-template-areas: "topnav topnav" "sidebar main";
+}
+
+.topnav{
+  grid-area: topnav;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px;
+  background: var(--panel-strong);
+  border-bottom: 1px solid var(--border);
+  position: relative; z-index: 50;
+}
+.brand{display:flex; align-items:center; gap:10px}
+.brand-logo{width:30px;height:30px;display:grid;place-items:center}
+.brand-logo img{width:100%;height:100%;object-fit:contain}
+.brand-name{font-size:16px;font-weight:600;letter-spacing:0.5px}
+.brand-name .sep{color:var(--border-strong);margin:0 4px;font-weight:300}
+.brand-name .sub{color:var(--text-2);font-weight:500}
+.topnav-right{display:flex;align-items:center;gap:6px}
+.icon-btn{width:34px;height:34px;display:grid;place-items:center;border-radius:var(--radius-sm);color:var(--text-2);transition:background var(--transition),color var(--transition)}
+.icon-btn:hover{background:var(--primary-soft-2);color:var(--primary)}
+.icon-btn .lucide{width:18px;height:18px}
+.user-chip{display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;border-radius:999px;transition:background var(--transition);margin-left:4px}
+.user-chip:hover{background:var(--primary-soft-2)}
+.avatar{width:28px;height:28px;border-radius:999px;background:linear-gradient(135deg,#60a5fa,#a78bfa);display:grid;place-items:center;color:#fff;font-size:11px;font-weight:600}
+.user-name{font-size:13px}
+.org-select{display:flex;align-items:center;gap:8px;height:34px;padding:0 12px;background:#f8fafc;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;min-width:160px;justify-content:space-between;transition:border-color var(--transition),background var(--transition)}
+.org-select:hover{border-color:var(--primary);background:#fff}
+.org-select .lucide{width:14px;height:14px;color:var(--text-3)}
+
+.sidebar{
+  grid-area: sidebar;
+  background: var(--panel-strong);
+  border-right: 1px solid var(--border);
+  padding: 12px 10px;
+  overflow-y: auto;
+  display:flex; flex-direction: column;
+}
+.nav-group{display:flex; flex-direction: column; gap: 4px}
+.menu-item{
+  display:flex; flex-direction: column; align-items:center; justify-content:center; gap: 4px;
+  padding: 10px 6px;
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  font-size: 12px;
+  text-align:center;
+  transition: background var(--transition), color var(--transition);
+  position: relative;
+  cursor: pointer;
+}
+.menu-item:hover{ background: var(--primary-soft-2); color: var(--primary) }
+.menu-item.active{
+  background: var(--primary);
+  color: #fff;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(43,127,255,0.25);
+}
+.menu-item .lucide{ width: 18px; height: 18px; stroke-width: 1.8 }
+.menu-item:not(.active) .lucide{ display: none }
+.menu-item.anchor{ padding: 12px 6px; font-size: 13px; font-weight: 600; color: var(--text) }
+.menu-item.anchor .lucide{ width: 20px; height: 20px }
+.menu-item.anchor:hover{ background: var(--primary-soft); color: var(--primary) }
+.sidebar-divider{ height: 1px; background: var(--border); margin: 10px 4px }
+.inspect-group{ display:flex; flex-direction: column; gap: 6px; margin-top: 10px }
+.inspect-item{
+  height: 32px; display:flex; align-items:center; justify-content:center;
+  background: #f1f4f9; border: 1px solid #e3e8ef; border-radius: var(--radius-sm);
+  color: var(--text-2); font-size: 12px;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+  cursor: pointer;
+}
+.inspect-item:hover{ background: var(--primary-soft-2); color: var(--primary); border-color: var(--primary-soft) }
+.menu-item.bottom{ margin-top: auto; padding: 12px 6px }
+
+.main{
+  grid-area: main;
+  display: flex;
+  background: var(--bg);
+  overflow: auto;
+  min-width: 0;
+}
+
+.import-page{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 40px 40px;
+  min-width: 0;
+}
+.import-title{
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 24px;
+}
+.import-card{
+  background: var(--panel-strong);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  box-shadow: var(--shadow-sm);
+}
+.import-path{
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.import-desc{
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.7;
+  margin-bottom: 18px;
+}
+.import-table{
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+.import-table th,
+.import-table td{
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  text-align: center;
+  color: var(--text);
+}
+.import-table th{
+  background: #f8fafc;
+  font-weight: 600;
+}
+.import-table td:first-child{
+  text-align: center;
+  background: #f8fafc;
+  font-weight: 600;
+  width: 80px;
+}
+.info-icon{
+  display: inline-grid;
+  place-items: center;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 700;
+  font-style: normal;
+  cursor: pointer;
+  margin-left: 4px;
+  vertical-align: middle;
+  line-height: 1;
+}
+.import-notes{
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.9;
+  margin-bottom: 22px;
+}
+.import-notes .note-num{
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--text);
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.import-notes p{
+  margin: 4px 0;
+}
+.import-actions{
+  margin-bottom: 14px;
+}
+.import-btn{
+  height: 38px;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #2b7fff, #5a8eff);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(43,127,255,0.25);
+  transition: background var(--transition);
+}
+.import-btn:hover{ background: linear-gradient(135deg, #1e6ce6, #4a7eef); }
+.import-btn .lucide{ width: 14px; height: 14px; }
+.import-checkbox{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+.import-checkbox input[type=checkbox]{
+  width: 16px; height: 16px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.info-wrap{
+  position: relative;
+  display: inline-block;
+}
+.info-icon{
+  display: inline-grid;
+  place-items: center;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 700;
+  font-style: normal;
+  cursor: pointer;
+  margin-left: 4px;
+  vertical-align: middle;
+  line-height: 1;
+}
+.info-popover{
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 10px);
+  transform: translateY(-50%);
+  min-width: 200px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  padding: 12px 14px;
+  z-index: 30;
+  display: none;
+  text-align: left;
+  font-weight: 400;
+  color: var(--text);
+}
+.info-popover.show{ display: block; }
+.info-popover-title{
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.info-popover-section{ margin-bottom: 10px; }
+.info-popover-section:last-child{ margin-bottom: 0; }
+.info-popover-label{
+  font-size: 12px;
+  color: var(--text-2);
+  margin-bottom: 4px;
+}
+.info-popover-box{
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 10px;
+  background: #f8fafc;
+}
+.info-popover-list{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.9;
+}
+.info-popover-list li{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.info-popover-list li .file-ico{
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: #fbbf24;
+  display: inline-grid;
+  place-items: center;
+}
+.info-popover-list li .file-ico.json{ color: #16a34a; }
+.info-popover-list li .file-ico .lucide{ width: 14px; height: 14px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topnav">
+    <div class="brand">
+      <div class="brand-logo">
+        <img src="飞派智巡logo.jpg" alt="飞派智巡"
+          onerror="this.style.display='none'; this.parentNode.innerHTML='<div style=&quot;width:30px;height:30px;border-radius:6px;background:linear-gradient(135deg,#2b7fff,#60a5fa);display:grid;place-items:center;color:#fff;font-weight:700;font-size:14px&quot;>F</div>'" />
+      </div>
+      <div class="brand-name">FEIPAI<span class="sep">|</span><span class="sub">飞派智巡</span></div>
+    </div>
+    <div class="topnav-right">
+      <button class="icon-btn" data-action="全屏"><i data-lucide="monitor"></i></button>
+      <button class="icon-btn" data-action="通知"><i data-lucide="bell"></i></button>
+      <button class="icon-btn" data-action="设置"><i data-lucide="settings"></i></button>
+      <button class="user-chip" data-action="profile">
+        <div class="avatar">李</div>
+        <span class="user-name">李亚伟</span>
+      </button>
+      <button class="org-select" data-action="org">
+        <span>呈贡运营中心</span>
+        <i data-lucide="chevron-down"></i>
+      </button>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <div class="nav-group">
+      <button class="menu-item anchor" onclick="window.location.href='dashboard.html'">
+        <i data-lucide="layout-grid"></i>
+        <span>工作台</span>
+      </button>
+      <button class="menu-item" onclick="window.location.href='dashboard.html'">
+        <i data-lucide="layout-dashboard"></i>
+        <span>整体态势</span>
+      </button>
+      <button class="menu-item" onclick="window.location.href='map-mgr.html'">
+        <i data-lucide="map"></i>
+        <span>地图管理</span>
+      </button>
+      <button class="menu-item active" onclick="window.location.href='model-mgr.html'">
+        <i data-lucide="box"></i>
+        <span>地图模型</span>
+      </button>
+      <button class="menu-item" data-action="多路直播">
+        <i data-lucide="monitor-play"></i>
+        <span>多路直播</span>
+      </button>
+      <button class="menu-item" data-action="数据管理">
+        <i data-lucide="database"></i>
+        <span>数据管理</span>
+      </button>
+      <button class="menu-item" data-action="报告中心">
+        <i data-lucide="file-text"></i>
+        <span>报告中心</span>
+      </button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="inspect-group">
+      <button class="inspect-item" data-action="桥梁巡查">桥梁巡查</button>
+      <button class="inspect-item" data-action="边坡巡查">边坡巡查</button>
+      <button class="inspect-item" data-action="交通状况">交通状况</button>
+      <button class="inspect-item" data-action="路基、路面巡查">路基、路面巡查</button>
+      <button class="inspect-item" data-action="交安设施巡查">交安设施巡查</button>
+      <button class="inspect-item" data-action="建设工地">建设工地</button>
+      <button class="inspect-item" data-action="服务区巡查">服务区巡查</button>
+      <button class="inspect-item" data-action="交安巡查">交安巡查</button>
+      <button class="inspect-item" data-action="护栏巡查">护栏巡查</button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <button class="menu-item bottom" data-action="应急巡检">
+      <i data-lucide="siren"></i>
+      <span>应急巡检</span>
+    </button>
+  </aside>
+
+  <main class="main">
+    <div class="import-page">
+      <div class="import-title">导入模型</div>
+
+      <div class="import-card">
+        <div class="import-path">上传目标路径: 全部文件</div>
+
+        <div class="import-desc">支持以下类型和格式的模型导入，若导入 DJI Terra 生成数据请选择 WGS84（EPSG:4326）坐标系</div>
+
+        <table class="import-table">
+          <tr>
+            <th>类型</th>
+            <td>2D</td>
+            <td colspan="2"></td>
+            <td>点云</td>
+            <td colspan="2"></td>
+            <td>Mesh</td>
+            <td colspan="2"></td>
+          </tr>
+          <tr>
+            <th>格式</th>
+            <td>
+              <span class="info-wrap" data-popover="png">
+                png<i class="info-icon">i</i>
+                <div class="info-popover" data-popover-panel="png">
+                  <div class="info-popover-title">格式文件示例</div>
+                  <div class="info-popover-section">
+                    <div class="info-popover-label">根目录</div>
+                    <div class="info-popover-box"></div>
+                  </div>
+                  <div class="info-popover-section">
+                    <div class="info-popover-label">格式内容</div>
+                    <ul class="info-popover-list">
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>12</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>13</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>14</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>15</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>16</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>17</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>18</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>19</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>20</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>21</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>22</li>
+                    </ul>
+                  </div>
+                </div>
+              </span>
+            </td>
+            <td>tiff</td>
+            <td>
+              <span class="info-wrap" data-popover="pngtiff">
+                png+tiff<i class="info-icon">i</i>
+                <div class="info-popover" data-popover-panel="pngtiff">
+                  <div class="info-popover-title">格式文件示例</div>
+                  <div class="info-popover-section">
+                    <div class="info-popover-label">根目录</div>
+                    <div class="info-popover-box"></div>
+                  </div>
+                  <div class="info-popover-section">
+                    <div class="info-popover-label">格式内容</div>
+                    <ul class="info-popover-list">
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>12</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>13</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>14</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>15</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>16</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>17</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>18</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>19</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>20</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>21</li>
+                      <li><span class="file-ico"><i data-lucide="file"></i></span>22</li>
+                      <li><span class="file-ico"><i data-lucide="image"></i></span>dsm.tif</li>
+                    </ul>
+                  </div>
+                </div>
+              </span>
+            </td>
+            <td>
+              <span class="info-wrap" data-popover="pnts">
+                pnts<i class="info-icon">i</i>
+                <div class="info-popover" data-popover-panel="pnts">
+                  <div class="info-popover-title">格式文件示例</div>
+                  <div class="info-popover-section">
+                    <div class="info-popover-label">根目录</div>
+                    <div class="info-popover-box"></div>
+                  </div>
+                  <div class="info-popover-section">
+                    <div class="info-popover-label">格式内容</div>
+                    <ul class="info-popover-list">
+                      <li><span class="file-ico"><i data-lucide="folder"></i></span>Block</li>
+                      <li><span class="file-ico json"><i data-lucide="file-json"></i></span>tileset.json</li>
+                    </ul>
+                  </div>
+                </div>
+              </span>
+            </td>
+            <td>las</td>
+            <td></td>
+            <td>
+              <span class="info-wrap" data-popover="b3dm">
+                b3dm<i class="info-icon">i</i>
+                <div class="info-popover" data-popover-panel="b3dm">
+                  <div class="info-popover-title">格式文件示例</div>
+                  <div class="info-popover-section">
+                    <div class="info-popover-label">根目录</div>
+                    <div class="info-popover-box"></div>
+                  </div>
+                  <div class="info-popover-section">
+                    <div class="info-popover-label">格式内容</div>
+                    <ul class="info-popover-list">
+                      <li><span class="file-ico"><i data-lucide="folder"></i></span>BlockA</li>
+                      <li><span class="file-ico"><i data-lucide="folder"></i></span>BlockX</li>
+                      <li><span class="file-ico json"><i data-lucide="file-json"></i></span>tileset.json</li>
+                    </ul>
+                  </div>
+                </div>
+              </span>
+            </td>
+            <td></td>
+            <td></td>
+          </tr>
+        </table>
+
+        <div class="import-notes">
+          <p><span class="note-num">1.</span>除 tiff（小于 3GB）和 las 文件（小于 8GB）能直接上传外，其余格式的模型文件请将单个模型按照对应格式的文件结构压缩成为 zip 包（小于 100GB）后，再进行上传。</p>
+          <p><span class="note-num">2.</span>飞派仅支持导入 .tif 或 .tiff 的【模型】文件，请勿导入相应格式的【影像】文件。</p>
+          <p><span class="note-num">3.</span>若导入由 DJI Terra 生成的高程数据文件请上传 dsm.tif 文件。</p>
+          <p><span class="note-num">4.</span>点云数据建议上传 pnts 格式。</p>
+        </div>
+
+        <div class="import-actions">
+          <button class="import-btn" onclick="window.location.href='model-mgr.html?import=1'">
+            <i data-lucide="monitor-down"></i>
+            <span>导入模型</span>
+          </button>
+        </div>
+
+        <label class="import-checkbox">
+          <input type="checkbox" checked />
+          <span>导入的模型立即加载至地图</span>
+        </label>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+if (window.lucide && window.lucide.createIcons) lucide.createIcons();
+
+(function bindPopovers() {
+  var wraps = document.querySelectorAll('[data-popover]');
+  wraps.forEach(function(wrap) {
+    var key = wrap.dataset.popover;
+    var panel = wrap.querySelector('[data-popover-panel="' + key + '"]');
+    if (!panel) return;
+    var showTimer = null, hideTimer = null;
+    function show() {
+      clearTimeout(hideTimer);
+      clearTimeout(showTimer);
+      showTimer = setTimeout(function() {
+        document.querySelectorAll('.info-popover.show').forEach(function(p){ p.classList.remove('show'); });
+        panel.classList.add('show');
+      }, 80);
+    }
+    function hide() {
+      clearTimeout(showTimer);
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(function(){ panel.classList.remove('show'); }, 120);
+    }
+    wrap.addEventListener('mouseenter', show);
+    wrap.addEventListener('mouseleave', hide);
+    panel.addEventListener('mouseenter', function(){ clearTimeout(hideTimer); });
+    panel.addEventListener('mouseleave', hide);
+  });
+})();
+
+document.addEventListener('click', function(e) {
+  var a = e.target.closest('[data-action]');
+  if (!a) return;
+  // 占位:所有按钮点击均为占位
+});
+</script>
+</body>
+</html>
