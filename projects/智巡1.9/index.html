@@ -2208,7 +2208,7 @@ body {
 .road-segment.selected.xiaoshan .seg-body { border-color: #22c55e; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); box-shadow: 0 0 0 3px rgba(34,197,94,0.25); }
 .road-segment.selected.qiantang .seg-body { border-color: #eab308; background: linear-gradient(135deg, #fef9c3 0%, #fde68a 100%); box-shadow: 0 0 0 3px rgba(234,179,8,0.25); }
 .road-segment .seg-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: rgba(0,0,0,0.08); border-radius: 2px; transform: translateX(-50%); }
-.road-segment .seg-icon { font-size: 22px; position: relative; z-index: 1; line-height: 1; }
+.road-segment .seg-icon { width: 22px; height: 22px; position: relative; z-index: 1; color: var(--text-primary); }
 .road-segment .seg-name { font-size: 13px; font-weight: 600; color: var(--text-primary); position: relative; z-index: 1; }
 .road-segment .seg-range { font-size: 11px; color: var(--text-secondary); position: relative; z-index: 1; }
 .road-segment .seg-asset-count { font-size: 10px; color: var(--text-secondary); background: rgba(255,255,255,0.7); padding: 1px 7px; border-radius: 8px; position: relative; z-index: 1; }
@@ -2229,7 +2229,8 @@ body {
 .asset-card .ac-check { position: absolute; top: 8px; right: 8px; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff; display: none; align-items: center; justify-content: center; font-size: 11px; }
 .asset-card.selected .ac-check { display: flex; }
 .asset-card .ac-icon-row { display: flex; align-items: center; gap: 8px; }
-.asset-card .ac-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.asset-card .ac-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.asset-card .ac-icon i, .asset-card .ac-icon svg { width: 18px; height: 18px; }
 .asset-card .ac-icon.bridge { background: #ede9fe; }
 .asset-card .ac-icon.slope { background: #fef3c7; }
 .asset-card .ac-icon.road { background: #dbeafe; }
@@ -2283,7 +2284,8 @@ body {
 .match-device-card { flex: 1; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--panel-border); border-radius: var(--radius-sm); background: #fff; }
 .match-device-card.busy { opacity: 0.6; }
 .match-device-card.assigned { border-color: var(--accent); background: var(--accent-subtle); }
-.match-device-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.match-device-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.match-device-icon i, .match-device-icon svg { width: 18px; height: 18px; }
 .match-device-icon.ready { background: #dcfce7; }
 .match-device-icon.warn { background: #fef3c7; }
 .match-device-icon.off { background: #fee2e2; }
@@ -2291,7 +2293,7 @@ body {
 .match-device-name { font-size: 13px; font-weight: 600; }
 .match-device-detail { font-size: 10px; color: var(--text-secondary); }
 .match-device-battery { margin-left: auto; display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
-.match-device-battery .battery-icon { font-size: 14px; }
+.match-device-battery .battery-icon { width: 16px; height: 16px; }
 .match-device-battery .battery-pct { font-size: 12px; font-weight: 600; }
 .match-device-battery .battery-pct.high { color: #16a34a; }
 .match-device-battery .battery-pct.mid { color: #d97706; }
@@ -2571,11 +2573,11 @@ body {
 
     <!-- Right-click Context Menu -->
     <div id="ctx-menu" style="display:none;position:absolute;z-index:10000;background:#fff;border:1px solid var(--panel-border);border-radius:8px;padding:4px;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,0.15);flex-direction:column;gap:1px;">
-      <div class="ctx-item" data-action="delete" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;font-size:12px;cursor:pointer;">🗑️ 删除标注</div>
-      <div class="ctx-item" data-action="fly-to" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;font-size:12px;cursor:pointer;">🚁 选择设备飞向</div>
-      <div class="ctx-item" data-action="return-all" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;font-size:12px;cursor:pointer;">🏠 全部返航</div>
-      <div class="ctx-item" data-action="convert-survey" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;font-size:12px;cursor:pointer;">📐 转换为测区</div>
-      <div class="ctx-item" data-action="convert-patrol" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;font-size:12px;cursor:pointer;">🛡️ 转换为巡逻区域</div>
+      <div class="ctx-item" data-action="delete" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;font-size:12px;cursor:pointer;"><i data-lucide="trash-2" style="width:14px;height:14px"></i> 删除标注</div>
+      <div class="ctx-item" data-action="fly-to" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;font-size:12px;cursor:pointer;"><i data-lucide="plane" style="width:14px;height:14px"></i> 选择设备飞向</div>
+      <div class="ctx-item" data-action="return-all" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;font-size:12px;cursor:pointer;"><i data-lucide="home" style="width:14px;height:14px"></i> 全部返航</div>
+      <div class="ctx-item" data-action="convert-survey" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;font-size:12px;cursor:pointer;"><i data-lucide="ruler" style="width:14px;height:14px"></i> 转换为测区</div>
+      <div class="ctx-item" data-action="convert-patrol" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;font-size:12px;cursor:pointer;"><i data-lucide="shield" style="width:14px;height:14px"></i> 转换为巡逻区域</div>
     </div>
 
 
@@ -3051,31 +3053,31 @@ body {
                   <div class="road-segment binjiang selected" data-seg="binjiang" onclick="selectRoadSegment('binjiang')">
                     <div class="seg-body">
                       <span class="seg-line"></span>
-                      <span class="seg-icon">🌉</span>
+                      <span class="seg-icon"><i data-lucide="landmark"></i></span>
                       <span class="seg-name">滨江段</span>
                       <span class="seg-range">K118 — K125</span>
                       <span class="seg-asset-count">6 个资产</span>
-                      <span class="seg-check">✓</span>
+                      <span class="seg-check"><i data-lucide="check"></i></span>
                     </div>
                   </div>
                   <div class="road-segment xiaoshan" data-seg="xiaoshan" onclick="selectRoadSegment('xiaoshan')">
                     <div class="seg-body">
                       <span class="seg-line"></span>
-                      <span class="seg-icon">🌁</span>
+                      <span class="seg-icon"><i data-lucide="building-2"></i></span>
                       <span class="seg-name">萧山段</span>
                       <span class="seg-range">K125 — K132</span>
                       <span class="seg-asset-count">4 个资产</span>
-                      <span class="seg-check">✓</span>
+                      <span class="seg-check"><i data-lucide="check"></i></span>
                     </div>
                   </div>
                   <div class="road-segment qiantang" data-seg="qiantang" onclick="selectRoadSegment('qiantang')">
                     <div class="seg-body">
                       <span class="seg-line"></span>
-                      <span class="seg-icon">🏗️</span>
+                      <span class="seg-icon"><i data-lucide="building"></i></span>
                       <span class="seg-name">钱塘段</span>
                       <span class="seg-range">K132 — K140</span>
                       <span class="seg-asset-count">3 个资产</span>
-                      <span class="seg-check">✓</span>
+                      <span class="seg-check"><i data-lucide="check"></i></span>
                     </div>
                   </div>
                 </div>
@@ -3083,7 +3085,7 @@ body {
                   <span>K118</span><span>K122</span><span>K125</span><span>K128</span><span>K132</span><span>K136</span><span>K140</span>
                 </div>
                 <div class="road-segment-info" id="seg-info">
-                  <span>📍 <strong>G50高速 滨江段</strong></span>
+                  <span><i data-lucide="map-pin"></i> <strong>G50高速 滨江段</strong></span>
                   <span>里程 7km</span>
                   <span>6 个巡检资产</span>
                   <span>上次巡检：2026-07-27</span>
@@ -3108,9 +3110,9 @@ body {
             <div class="sd-step-content">
               <div class="asset-cards-grid" id="asset-cards-grid">
                 <div class="asset-card selected" data-asset="BR-K120" onclick="toggleAssetCard(this)">
-                  <span class="ac-check">✓</span>
+                  <span class="ac-check"><i data-lucide="check"></i></span>
                   <div class="ac-icon-row">
-                    <div class="ac-icon bridge">🌉</div>
+                    <div class="ac-icon bridge"><i data-lucide="landmark"></i></div>
                     <div>
                       <div class="ac-name">望江大桥</div>
                       <div class="ac-id">G50-BR-K120-001</div>
@@ -3129,9 +3131,9 @@ body {
                 </div>
 
                 <div class="asset-card selected" data-asset="BR-K118" onclick="toggleAssetCard(this)">
-                  <span class="ac-check">✓</span>
+                  <span class="ac-check"><i data-lucide="check"></i></span>
                   <div class="ac-icon-row">
-                    <div class="ac-icon bridge">🌁</div>
+                    <div class="ac-icon bridge"><i data-lucide="building-2"></i></div>
                     <div>
                       <div class="ac-name">城北高架桥</div>
                       <div class="ac-id">G50-BR-K118-001</div>
@@ -3150,9 +3152,9 @@ body {
                 </div>
 
                 <div class="asset-card selected" data-asset="BR-K122" onclick="toggleAssetCard(this)">
-                  <span class="ac-check">✓</span>
+                  <span class="ac-check"><i data-lucide="check"></i></span>
                   <div class="ac-icon-row">
-                    <div class="ac-icon bridge">🏗️</div>
+                    <div class="ac-icon bridge"><i data-lucide="building"></i></div>
                     <div>
                       <div class="ac-name">滨江立交桥</div>
                       <div class="ac-id">G50-BR-K122-001</div>
@@ -3171,9 +3173,9 @@ body {
                 </div>
 
                 <div class="asset-card selected" data-asset="SL-K120" onclick="toggleAssetCard(this)">
-                  <span class="ac-check">✓</span>
+                  <span class="ac-check"><i data-lucide="check"></i></span>
                   <div class="ac-icon-row">
-                    <div class="ac-icon slope">⛰️</div>
+                    <div class="ac-icon slope"><i data-lucide="mountain"></i></div>
                     <div>
                       <div class="ac-name">边坡 R12</div>
                       <div class="ac-id">G50-SL-K120-012</div>
@@ -3192,9 +3194,9 @@ body {
                 </div>
 
                 <div class="asset-card selected" data-asset="TS-K120" onclick="toggleAssetCard(this)">
-                  <span class="ac-check">✓</span>
+                  <span class="ac-check"><i data-lucide="check"></i></span>
                   <div class="ac-icon-row">
-                    <div class="ac-icon safety">🛡️</div>
+                    <div class="ac-icon safety"><i data-lucide="shield"></i></div>
                     <div>
                       <div class="ac-name">K120 交安设施</div>
                       <div class="ac-id">G50-TS-K120-001</div>
@@ -3213,9 +3215,9 @@ body {
                 </div>
 
                 <div class="asset-card selected" data-asset="RD-K122" onclick="toggleAssetCard(this)">
-                  <span class="ac-check">✓</span>
+                  <span class="ac-check"><i data-lucide="check"></i></span>
                   <div class="ac-icon-row">
-                    <div class="ac-icon road">🛣️</div>
+                    <div class="ac-icon road"><i data-lucide="route"></i></div>
                     <div>
                       <div class="ac-name">K122 路面</div>
                       <div class="ac-id">G50-RD-K122-001</div>
@@ -3248,7 +3250,7 @@ body {
               <div class="match-layout">
 
                 <!-- 周时间线可视化 -->
-                <div style="font-size:12px;font-weight:600;color:var(--text-primary)">📅 本周任务排布</div>
+                <div style="font-size:12px;font-weight:600;color:var(--text-primary)"><i data-lucide="calendar-days"></i> 本周任务排布</div>
                 <div class="match-timeline" id="match-timeline">
                   <div class="match-day-col">
                     <div class="match-day-label">周一 08/03</div>
@@ -3262,12 +3264,12 @@ body {
                     <div class="match-day-label active">周三 08/05</div>
                     <div class="match-day-slot">
                       <div class="match-task-block bridge-block">
-                        <div class="tb-asset">🌉 望江大桥</div>
+                        <div class="tb-asset"><i data-lucide="landmark"></i> 望江大桥</div>
                         <div class="tb-time">08:00-10:00</div>
                         <div class="tb-device">M300 #01 · 望江大桥航线</div>
                       </div>
                       <div class="match-task-block safety-block">
-                        <div class="tb-asset">🛡️ K120交安设施</div>
+                        <div class="tb-asset"><i data-lucide="shield"></i> K120交安设施</div>
                         <div class="tb-time">10:30-11:30</div>
                         <div class="tb-device">M300 #01 · 交安巡检航线B</div>
                       </div>
@@ -3277,17 +3279,17 @@ body {
                     <div class="match-day-label active">周四 08/06</div>
                     <div class="match-day-slot">
                       <div class="match-task-block slope-block">
-                        <div class="tb-asset">⛰️ 边坡R12</div>
+                        <div class="tb-asset"><i data-lucide="mountain"></i> 边坡R12</div>
                         <div class="tb-time">08:00-10:00</div>
                         <div class="tb-device">M300 #03 · 边坡巡检航线</div>
                       </div>
                       <div class="match-task-block road-block">
-                        <div class="tb-asset">🛣️ K122路面</div>
+                        <div class="tb-asset"><i data-lucide="route"></i> K122路面</div>
                         <div class="tb-time">09:00-10:00</div>
                         <div class="tb-device">M300 #02 · 路面巡检航线C</div>
                       </div>
                       <div class="match-task-block bridge-block">
-                        <div class="tb-asset">🌁 城北高架桥</div>
+                        <div class="tb-asset"><i data-lucide="building-2"></i> 城北高架桥</div>
                         <div class="tb-time">14:00-16:00</div>
                         <div class="tb-device">M300 #03 · 城北高架航线</div>
                       </div>
@@ -3297,7 +3299,7 @@ body {
                     <div class="match-day-label active">周五 08/07</div>
                     <div class="match-day-slot">
                       <div class="match-task-block bridge-block">
-                        <div class="tb-asset">🏗️ 滨江立交桥</div>
+                        <div class="tb-asset"><i data-lucide="building"></i> 滨江立交桥</div>
                         <div class="tb-time">09:00-11:00</div>
                         <div class="tb-device">M300 #04 · 滨江立交航线</div>
                       </div>
@@ -3315,118 +3317,118 @@ body {
 
                 <!-- 冲突提示 -->
                 <div class="match-conflict">
-                  ⚠️ <strong>周四上午时间重叠：</strong>边坡R12（08:00-10:00）与 K122路面（09:00-10:00）存在1小时重叠，但分配到不同设备（M300 #03、M300 #02），可并行执行。
+                  <i data-lucide="alert-triangle" style="width:14px;height:14px"></i> <strong>周四上午时间重叠：</strong>边坡R12（08:00-10:00）与 K122路面（09:00-10:00）存在1小时重叠，但分配到不同设备（M300 #03、M300 #02），可并行执行。
                 </div>
 
                 <!-- 设备状态卡片 -->
-                <div style="font-size:12px;font-weight:600;color:var(--text-primary)">🔋 匹配设备状态</div>
+                <div style="font-size:12px;font-weight:600;color:var(--text-primary)"><i data-lucide="battery-full"></i> 匹配设备状态</div>
                 <div class="match-devices" id="match-devices">
                   <div class="match-device-card assigned">
-                    <div class="match-device-icon ready">🚁</div>
+                    <div class="match-device-icon ready"><i data-lucide="plane"></i></div>
                     <div class="match-device-info">
                       <div class="match-device-name">M300 #01</div>
                       <div class="match-device-detail">待命中 · 覆盖半径内</div>
                     </div>
                     <span class="match-device-tasks">2 个任务</span>
                     <div class="match-device-battery">
-                      <span class="battery-icon">🔋</span>
+                      <span class="battery-icon"><i data-lucide="battery-full"></i></span>
                       <span class="battery-pct high">95%</span>
                     </div>
                   </div>
                   <div class="match-device-card assigned">
-                    <div class="match-device-icon ready">🚁</div>
+                    <div class="match-device-icon ready"><i data-lucide="plane"></i></div>
                     <div class="match-device-info">
                       <div class="match-device-name">M300 #03</div>
                       <div class="match-device-detail">待命中 · 覆盖半径内</div>
                     </div>
                     <span class="match-device-tasks">2 个任务</span>
                     <div class="match-device-battery">
-                      <span class="battery-icon">🔋</span>
+                      <span class="battery-icon"><i data-lucide="battery-full"></i></span>
                       <span class="battery-pct mid">88%</span>
                     </div>
                   </div>
                   <div class="match-device-card assigned">
-                    <div class="match-device-icon ready">🚁</div>
+                    <div class="match-device-icon ready"><i data-lucide="plane"></i></div>
                     <div class="match-device-info">
                       <div class="match-device-name">M300 #02</div>
                       <div class="match-device-detail">待命中 · 覆盖半径内</div>
                     </div>
                     <span class="match-device-tasks">1 个任务</span>
                     <div class="match-device-battery">
-                      <span class="battery-icon">🔋</span>
+                      <span class="battery-icon"><i data-lucide="battery-full"></i></span>
                       <span class="battery-pct high">92%</span>
                     </div>
                   </div>
                   <div class="match-device-card assigned">
-                    <div class="match-device-icon warn">🚁</div>
+                    <div class="match-device-icon warn"><i data-lucide="plane"></i></div>
                     <div class="match-device-info">
                       <div class="match-device-name">M300 #04</div>
                       <div class="match-device-detail">待命中 · 覆盖半径内</div>
                     </div>
                     <span class="match-device-tasks">1 个任务</span>
                     <div class="match-device-battery">
-                      <span class="battery-icon">🪫</span>
+                      <span class="battery-icon"><i data-lucide="battery-warning"></i></span>
                       <span class="battery-pct mid">60%</span>
                     </div>
                   </div>
                 </div>
 
                 <!-- 详细匹配列表（可手动调整） -->
-                <div style="font-size:12px;font-weight:600;color:var(--text-primary)">🔗 匹配明细（可调整）</div>
+                <div style="font-size:12px;font-weight:600;color:var(--text-primary)"><i data-lucide="link"></i> 匹配明细（可调整）</div>
                 <div class="match-detail-cards">
                   <div class="match-detail-row">
-                    <span class="md-asset">🌉 望江大桥</span>
+                    <span class="md-asset"><i data-lucide="landmark"></i> 望江大桥</span>
                     <span class="md-arrow">→</span>
                     <span class="md-select"><select class="v19-select"><option>望江大桥巡检航线</option></select></span>
                     <span class="md-arrow">→</span>
                     <span class="md-select"><select class="v19-select"><option>M300 #01（95%电量·半径内）</option><option>M300 #03（88%电量）</option></select></span>
                     <span class="md-time">周三 08:00-10:00</span>
-                    <span class="md-ok">✓ 匹配成功</span>
+                    <span class="md-ok"><i data-lucide="check"></i> 匹配成功</span>
                   </div>
                   <div class="match-detail-row">
-                    <span class="md-asset">🛡️ K120交安设施</span>
+                    <span class="md-asset"><i data-lucide="shield"></i> K120交安设施</span>
                     <span class="md-arrow">→</span>
                     <span class="md-select"><select class="v19-select"><option>交安巡检航线B</option></select></span>
                     <span class="md-arrow">→</span>
                     <span class="md-select"><select class="v19-select"><option>M300 #01（95%电量·半径内）</option></select></span>
                     <span class="md-time">周三 10:30-11:30</span>
-                    <span class="md-ok">✓ 匹配成功</span>
+                    <span class="md-ok"><i data-lucide="check"></i> 匹配成功</span>
                   </div>
                   <div class="match-detail-row">
-                    <span class="md-asset">⛰️ 边坡R12</span>
+                    <span class="md-asset"><i data-lucide="mountain"></i> 边坡R12</span>
                     <span class="md-arrow">→</span>
                     <span class="md-select"><select class="v19-select"><option>边坡巡检航线</option></select></span>
                     <span class="md-arrow">→</span>
                     <span class="md-select"><select class="v19-select"><option>M300 #03（88%电量·半径内）</option><option>M300 #01（95%电量）</option></select></span>
                     <span class="md-time">周四 08:00-10:00</span>
-                    <span class="md-ok">✓ 匹配成功</span>
+                    <span class="md-ok"><i data-lucide="check"></i> 匹配成功</span>
                   </div>
                   <div class="match-detail-row">
-                    <span class="md-asset">🛣️ K122路面</span>
+                    <span class="md-asset"><i data-lucide="route"></i> K122路面</span>
                     <span class="md-arrow">→</span>
                     <span class="md-select"><select class="v19-select"><option>路面巡检航线C</option></select></span>
                     <span class="md-arrow">→</span>
                     <span class="md-select"><select class="v19-select"><option>M300 #02（92%电量·半径内）</option></select></span>
                     <span class="md-time">周四 09:00-10:00</span>
-                    <span class="md-ok">✓ 匹配成功</span>
+                    <span class="md-ok"><i data-lucide="check"></i> 匹配成功</span>
                   </div>
                   <div class="match-detail-row">
-                    <span class="md-asset">🌁 城北高架桥</span>
+                    <span class="md-asset"><i data-lucide="building-2"></i> 城北高架桥</span>
                     <span class="md-arrow">→</span>
                     <span class="md-select"><select class="v19-select"><option>城北高架巡检航线</option></select></span>
                     <span class="md-arrow">→</span>
                     <span class="md-select"><select class="v19-select"><option>M300 #03（88%电量·半径内）</option><option>M300 #04（60%电量）</option></select></span>
                     <span class="md-time">周四 14:00-16:00</span>
-                    <span class="md-ok">✓ 匹配成功</span>
+                    <span class="md-ok"><i data-lucide="check"></i> 匹配成功</span>
                   </div>
                   <div class="match-detail-row">
-                    <span class="md-asset">🏗️ 滨江立交桥</span>
+                    <span class="md-asset"><i data-lucide="building"></i> 滨江立交桥</span>
                     <span class="md-arrow">→</span>
                     <span class="md-select"><select class="v19-select"><option>滨江立交巡检航线</option></select></span>
                     <span class="md-arrow">→</span>
                     <span class="md-select"><select class="v19-select"><option>M300 #04（60%电量·半径内）</option></select></span>
                     <span class="md-time">周五 09:00-11:00</span>
-                    <span class="md-ok">⚠ 电量偏低</span>
+                    <span class="md-ok"><i data-lucide="alert-triangle" style="width:14px;height:14px"></i> 电量偏低</span>
                   </div>
                 </div>
               </div>
@@ -4685,7 +4687,7 @@ function selectObject(data, layer) {
       <div class="detail-row"><span class="detail-row-label">坐标</span><span>${data.lat.toFixed(4)}, ${data.lng.toFixed(4)}</span></div>
       <div class="detail-row"><span class="detail-row-label">备注</span><span>${data.note||'无'}</span></div></div>
       <div class="detail-card"><div class="detail-card-label">操作</div>
-      <button onclick="deleteManualMarker('${data.id}')" style="padding:6px 12px;border:1px solid #ef4444;border-radius:4px;background:#fef2f2;color:#dc2626;cursor:pointer;font-size:12px;">🗑️ 删除此标记</button></div>`;
+      <button onclick="deleteManualMarker('${data.id}')" style="padding:6px 12px;border:1px solid #ef4444;border-radius:4px;background:#fef2f2;color:#dc2626;cursor:pointer;font-size:12px;"><i data-lucide="trash-2" style="width:14px;height:14px"></i> 删除此标记</button></div>`;
   }
 
   panel.classList.add('open');
@@ -5433,7 +5435,7 @@ function openDetail(type,data){
   if (type==='point') {
     b=F.replace('$1','名称').replace('$2','<input class="detail-form-input" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;" value="'+esc(data.name||'')+'" onchange="updateAnn(\'point\',\''+data.id+'\',\'name\',this.value);renderAnn()">')+
       F.replace('$1','坐标').replace('$2','<div style="display:flex;gap:6px;"><input class="detail-form-input" style="flex:1;padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;" value="'+data.lat.toFixed(6)+'" onchange="updateAnn(\'point\',\''+data.id+'\',\'lat\',parseFloat(this.value));renderAnn()"><input class="detail-form-input" style="flex:1;padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;" value="'+data.lng.toFixed(6)+'" onchange="updateAnn(\'point\',\''+data.id+'\',\'lng\',parseFloat(this.value));renderAnn()"></div>')+
-      '<div style="font-size:11px;color:var(--accent);margin-bottom:8px;cursor:pointer;">📐 '+toDMS(data.lat)+'  '+toDMS(data.lng)+' (度分秒)</div>'+
+      '<div style="font-size:11px;color:var(--accent);margin-bottom:8px;cursor:pointer;"><i data-lucide="map-pin" style="width:12px;height:12px"></i> '+toDMS(data.lat)+'  '+toDMS(data.lng)+' (度分秒)</div>'+
       colorHTML+
       '<div class="detail-form-label" style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-top:8px;">图标</div><div class="icon-picker" style="display:flex;gap:6px;flex-wrap:wrap;">';
     ANN_ICONS.forEach(function(ico){b+='<div style="width:32px;height:32px;border-radius:6px;border:1.5px solid '+(data.iconType===ico.id?'var(--accent)':'var(--panel-border)')+';display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;" onclick="updateAnn(\'point\',\''+data.id+'\',\'iconType\',\''+ico.id+'\');updateAnn(\'point\',\''+data.id+'\',\'iconEmoji\',\''+ico.e+'\');renderAnn();openDetail(\'point\',findAnn(\'point\',\''+data.id+'\'))">'+ico.e+'</div>';});
@@ -5442,7 +5444,7 @@ function openDetail(type,data){
     b+=F.replace('$1','简介（备注）').replace('$2','<textarea class="detail-form-textarea" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;min-height:50px;resize:vertical;" onchange="updateAnn(\'point\',\''+data.id+'\',\'description\',this.value)">'+esc(data.description||'')+'</textarea>')+
       imageHTML(type,data)+
       F.replace('$1','绘制者').replace('$2','<input class="detail-form-input" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;background:var(--surface);" value="'+esc(data.artist||'')+'" readonly>')+
-      '<div style="display:flex;gap:8px;margin-top:8px;"><button class="detail-btn danger" style="flex:1;padding:8px;border:none;border-radius:6px;background:#fee2e2;color:#dc2626;font-size:12px;cursor:pointer;" onclick="delAnn(\'point\',\''+data.id+'\')">🗑️ 删除</button><button class="detail-btn primary" style="flex:1;padding:8px;border:none;border-radius:6px;background:var(--accent);color:#fff;font-size:12px;cursor:pointer;" onclick="document.getElementById(\'detail-panel\').classList.remove(\'open\')">✓ 完成</button></div>';
+      '<div style="display:flex;gap:8px;margin-top:8px;"><button class="detail-btn danger" style="flex:1;padding:8px;border:none;border-radius:6px;background:#fee2e2;color:#dc2626;font-size:12px;cursor:pointer;" onclick="delAnn(\'point\',\''+data.id+'\')"><i data-lucide="trash-2" style="width:14px;height:14px"></i> 删除</button><button class="detail-btn primary" style="flex:1;padding:8px;border:none;border-radius:6px;background:var(--accent);color:#fff;font-size:12px;cursor:pointer;" onclick="document.getElementById(\'detail-panel\').classList.remove(\'open\')"> <i data-lucide="check" style="width:14px;height:14px"></i> 完成</button></div>';
   } else if (type==='line') {
     b=F.replace('$1','名称').replace('$2','<input class="detail-form-input" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;" value="'+esc(data.name||'')+'" onchange="updateAnn(\'line\',\''+data.id+'\',\'name\',this.value);renderAnn()">')+
       '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:12px;"><span>水平距离</span><b>'+(data.horizontalDistance||0).toFixed(2)+' m</b></div>'+
@@ -5456,7 +5458,7 @@ function openDetail(type,data){
       F.replace('$1','简介（备注）').replace('$2','<textarea class="detail-form-textarea" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;min-height:50px;resize:vertical;" onchange="updateAnn(\'line\',\''+data.id+'\',\'description\',this.value)">'+esc(data.description||'')+'</textarea>')+
       imageHTML(type,data)+
       F.replace('$1','绘制者').replace('$2','<input class="detail-form-input" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;background:var(--surface);" value="'+esc(data.artist||'')+'" readonly>')+
-      '<div style="display:flex;gap:8px;margin-top:8px;"><button class="detail-btn danger" style="flex:1;padding:8px;border:none;border-radius:6px;background:#fee2e2;color:#dc2626;font-size:12px;cursor:pointer;" onclick="delAnn(\'line\',\''+data.id+'\')">🗑️ 删除</button></div>';
+      '<div style="display:flex;gap:8px;margin-top:8px;"><button class="detail-btn danger" style="flex:1;padding:8px;border:none;border-radius:6px;background:#fee2e2;color:#dc2626;font-size:12px;cursor:pointer;" onclick="delAnn(\'line\',\''+data.id+'\')"><i data-lucide="trash-2" style="width:14px;height:14px"></i> 删除</button></div>';
   } else if (type==='polygon') {
     b=F.replace('$1','名称').replace('$2','<input class="detail-form-input" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;" value="'+esc(data.name||'')+'" onchange="updateAnn(\'polygon\',\''+data.id+'\',\'name\',this.value);renderAnn()">')+
       '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:12px;"><span>面积</span><b>'+(data.area||0).toFixed(2)+' m²</b></div>'+
@@ -5471,7 +5473,7 @@ function openDetail(type,data){
       imageHTML(type,data)+
       F.replace('$1','绘制者').replace('$2','<input class="detail-form-input" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;background:var(--surface);" value="'+esc(data.artist||'')+'" readonly>')+
       '<button style="width:100%;padding:8px;border:1px solid var(--panel-border);border-radius:6px;background:#fff;font-size:12px;cursor:pointer;margin-bottom:8px;" onclick="shareAnn(\''+data.id+'\',\''+esc(data.name||'')+'\')">📱 标记分享（微信扫码）</button>'+
-      '<div style="display:flex;gap:8px;"><button class="detail-btn danger" style="flex:1;padding:8px;border:none;border-radius:6px;background:#fee2e2;color:#dc2626;font-size:12px;cursor:pointer;" onclick="delAnn(\'polygon\',\''+data.id+'\')">🗑️ 删除</button></div>';
+      '<div style="display:flex;gap:8px;"><button class="detail-btn danger" style="flex:1;padding:8px;border:none;border-radius:6px;background:#fee2e2;color:#dc2626;font-size:12px;cursor:pointer;" onclick="delAnn(\'polygon\',\''+data.id+'\')"><i data-lucide="trash-2" style="width:14px;height:14px"></i> 删除</button></div>';
   } else if (type==='circle') {
     b=F.replace('$1','名称').replace('$2','<input class="detail-form-input" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;" value="'+esc(data.name||'')+'" onchange="updateAnn(\'circle\',\''+data.id+'\',\'name\',this.value);renderAnn()">')+
       F.replace('$1','圆心坐标').replace('$2','<div style="font-size:12px;padding:6px 8px;background:var(--surface);border-radius:6px;">'+(data.center?data.center[0].toFixed(6)+', '+data.center[1].toFixed(6):'—')+'</div>')+
@@ -5484,7 +5486,7 @@ function openDetail(type,data){
       F.replace('$1','简介（备注）').replace('$2','<textarea class="detail-form-textarea" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;min-height:50px;resize:vertical;" onchange="updateAnn(\'circle\',\''+data.id+'\',\'description\',this.value)">'+esc(data.description||'')+'</textarea>')+
       imageHTML(type,data)+
       F.replace('$1','绘制者').replace('$2','<input class="detail-form-input" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;background:var(--surface);" value="'+esc(data.artist||'')+'" readonly>')+
-      '<div style="display:flex;gap:8px;margin-top:8px;"><button class="detail-btn danger" style="flex:1;padding:8px;border:none;border-radius:6px;background:#fee2e2;color:#dc2626;font-size:12px;cursor:pointer;" onclick="delAnn(\'circle\',\''+data.id+'\')">🗑️ 删除</button><button class="detail-btn primary" style="flex:1;padding:8px;border:none;border-radius:6px;background:var(--accent);color:#fff;font-size:12px;cursor:pointer;" onclick="document.getElementById(\'detail-panel\').classList.remove(\'open\')">✓ 完成</button></div>';
+      '<div style="display:flex;gap:8px;margin-top:8px;"><button class="detail-btn danger" style="flex:1;padding:8px;border:none;border-radius:6px;background:#fee2e2;color:#dc2626;font-size:12px;cursor:pointer;" onclick="delAnn(\'circle\',\''+data.id+'\')"><i data-lucide="trash-2" style="width:14px;height:14px"></i> 删除</button><button class="detail-btn primary" style="flex:1;padding:8px;border:none;border-radius:6px;background:var(--accent);color:#fff;font-size:12px;cursor:pointer;" onclick="document.getElementById(\'detail-panel\').classList.remove(\'open\')"> <i data-lucide="check" style="width:14px;height:14px"></i> 完成</button></div>';
   }
   document.getElementById('detail-body').innerHTML=b;
   panel.classList.add('open');
@@ -5826,7 +5828,7 @@ function selectRoadSegment(segId) {
   var info = segData[segId];
   var infoEl = document.getElementById('seg-info');
   if (info && infoEl) {
-    infoEl.innerHTML = '<span>📍 <strong>' + info.name + '</strong></span>' +
+    infoEl.innerHTML = '<span><i data-lucide="map-pin" style="width:14px;height:14px"></i> <strong>' + info.name + '</strong></span>' +
       '<span>里程 ' + info.km + '</span>' +
       '<span>' + info.assets + '</span>' +
       '<span>上次巡检：' + info.last + '</span>';
