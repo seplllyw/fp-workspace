@@ -2286,21 +2286,31 @@ body {
 /* ===== Step 3: Visual Matching ===== */
 .match-layout { display: flex; flex-direction: column; gap: 14px; }
 
-/* Week timeline */
-.match-timeline { display: flex; gap: 4px; }
-.match-day-col { flex: 1; display: flex; flex-direction: column; gap: 2px; }
-.match-day-label { font-size: 10px; font-weight: 600; color: var(--text-secondary); text-align: center; padding: 4px 0; background: var(--surface); border-radius: 4px; }
-.match-day-label.active { background: var(--accent-subtle); color: var(--accent); }
-.match-day-slot { min-height: 56px; display: flex; flex-direction: column; gap: 1px; padding: 2px; }
-.match-task-block { padding: 5px 6px; border-radius: 3px; font-size: 10px; line-height: 1.3; cursor: default; position: relative; transition: var(--transition); }
-.match-task-block:hover { filter: brightness(0.95); transform: scale(1.02); z-index: 1; }
-.match-task-block .tb-asset { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.match-task-block .tb-time { opacity: 0.7; font-size: 9px; }
-.match-task-block .tb-device { font-size: 9px; opacity: 0.8; }
-.match-task-block.bridge-block { background: #ede9fe; border-left: 3px solid #8b5cf6; color: #5b21b6; }
-.match-task-block.slope-block { background: #fef3c7; border-left: 3px solid #f59e0b; color: #92400e; }
-.match-task-block.road-block { background: #dbeafe; border-left: 3px solid #3b82f6; color: #1e40af; }
-.match-task-block.safety-block { background: #fce7f3; border-left: 3px solid #ec4899; color: #9d174d; }
+/* ===== Device Swimlane Gantt Chart ===== */
+.gantt-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.gantt-table th { padding: 8px 10px; background: var(--surface); font-weight: 600; color: var(--text-secondary); font-size: 11px; text-align: center; border: 1px solid var(--panel-border); }
+.gantt-table th.active-col { background: var(--accent-subtle); color: var(--accent); }
+.gantt-table td { padding: 0; border: 1px solid var(--panel-border); vertical-align: top; }
+.gantt-device-cell { width: 110px; padding: 10px 10px !important; background: #fff; text-align: left; }
+.gantt-device-name { font-size: 13px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 4px; }
+.gantt-device-name i, .gantt-device-name svg { width: 16px; height: 16px; color: var(--text-secondary); }
+.gantt-device-batt { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.gantt-device-batt.high { color: #16a34a; }
+.gantt-device-batt.mid { color: #d97706; }
+.gantt-device-tasks { font-size: 10px; color: var(--accent); margin-top: 1px; }
+.gantt-day-cell { min-width: 140px; padding: 8px 6px !important; display: flex; flex-direction: column; gap: 4px; min-height: 56px; }
+.gantt-day-cell.idle { background: rgba(0,0,0,0.01); justify-content: center; align-items: center; }
+.gantt-idle-text { font-size: 10px; color: var(--text-secondary); }
+.gantt-task { padding: 7px 8px; border-radius: 4px; font-size: 11px; line-height: 1.4; }
+.gantt-task .gt-name { font-weight: 600; }
+.gantt-task .gt-time { font-size: 10px; opacity: 0.75; }
+.gantt-task .gt-route { font-size: 9px; opacity: 0.65; margin-top: 1px; }
+.gantt-task.bridge { background: #ede9fe; border-left: 3px solid #8b5cf6; color: #5b21b6; }
+.gantt-task.slope { background: #fef3c7; border-left: 3px solid #f59e0b; color: #92400e; }
+.gantt-task.road { background: #dbeafe; border-left: 3px solid #3b82f6; color: #1e40af; }
+.gantt-task.safety { background: #fce7f3; border-left: 3px solid #ec4899; color: #9d174d; }
+.gantt-summary { display: flex; align-items: center; gap: 14px; padding: 10px 14px; background: rgba(22,163,74,0.06); border-radius: var(--radius-sm); font-size: 12px; color: #166534; }
+.gantt-summary.warn { background: rgba(217,119,6,0.06); color: #92400e; }
 
 /* Device status row */
 .match-devices { display: flex; gap: 8px; }
@@ -3283,192 +3293,168 @@ body {
             </div>
           </div>
 
-          <!-- Step 3: 可视化匹配航线与设备 -->
+          <!-- Step 3: 设备泳道排期 -->
           <div class="sd-create-step">
-            <div class="sd-step-label">3. 匹配航线与设备 <span class="sd-step-count" id="match-count">已匹配 4 个资产</span><span style="font-size:11px;color:var(--text-secondary);font-weight:400;margin-left:8px">系统自动匹配，可手动调整</span></div>
+            <div class="sd-step-label">3. 匹配航线与设备 <span class="sd-step-count" id="match-count">已匹配 6 个资产</span><span style="font-size:11px;color:var(--text-secondary);font-weight:400;margin-left:8px">系统自动排期 · 按设备视图</span></div>
             <div class="sd-step-content">
               <div class="match-layout">
 
-                <!-- 周时间线可视化 -->
-                <div style="font-size:12px;font-weight:600;color:var(--text-primary)"><i data-lucide="calendar-days"></i> 本周任务排布</div>
-                <div class="match-timeline" id="match-timeline">
-                  <div class="match-day-col">
-                    <div class="match-day-label">周一 08/03</div>
-                    <div class="match-day-slot"></div>
-                  </div>
-                  <div class="match-day-col">
-                    <div class="match-day-label">周二 08/04</div>
-                    <div class="match-day-slot"></div>
-                  </div>
-                  <div class="match-day-col">
-                    <div class="match-day-label active">周三 08/05</div>
-                    <div class="match-day-slot">
-                      <div class="match-task-block bridge-block">
-                        <div class="tb-asset"><i data-lucide="landmark"></i> 望江大桥</div>
-                        <div class="tb-time">08:00-10:00</div>
-                        <div class="tb-device">M300 #01 · 望江大桥航线</div>
-                      </div>
-                      <div class="match-task-block safety-block">
-                        <div class="tb-asset"><i data-lucide="shield"></i> K120交安设施</div>
-                        <div class="tb-time">10:30-11:30</div>
-                        <div class="tb-device">M300 #01 · 交安巡检航线B</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="match-day-col">
-                    <div class="match-day-label active">周四 08/06</div>
-                    <div class="match-day-slot">
-                      <div class="match-task-block slope-block">
-                        <div class="tb-asset"><i data-lucide="mountain"></i> 边坡R12</div>
-                        <div class="tb-time">08:00-10:00</div>
-                        <div class="tb-device">M300 #03 · 边坡巡检航线</div>
-                      </div>
-                      <div class="match-task-block road-block">
-                        <div class="tb-asset"><i data-lucide="route"></i> K122路面</div>
-                        <div class="tb-time">09:00-10:00</div>
-                        <div class="tb-device">M300 #02 · 路面巡检航线C</div>
-                      </div>
-                      <div class="match-task-block bridge-block">
-                        <div class="tb-asset"><i data-lucide="building-2"></i> 城北高架桥</div>
-                        <div class="tb-time">14:00-16:00</div>
-                        <div class="tb-device">M300 #03 · 城北高架航线</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="match-day-col">
-                    <div class="match-day-label active">周五 08/07</div>
-                    <div class="match-day-slot">
-                      <div class="match-task-block bridge-block">
-                        <div class="tb-asset"><i data-lucide="building"></i> 滨江立交桥</div>
-                        <div class="tb-time">09:00-11:00</div>
-                        <div class="tb-device">M300 #04 · 滨江立交航线</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="match-day-col">
-                    <div class="match-day-label">周六 08/08</div>
-                    <div class="match-day-slot"></div>
-                  </div>
-                  <div class="match-day-col">
-                    <div class="match-day-label">周日 08/09</div>
-                    <div class="match-day-slot"></div>
-                  </div>
+                <!-- 设备泳道排期表 -->
+                <div style="font-size:12px;font-weight:600;color:var(--text-primary);display:flex;align-items:center;gap:6px;"><i data-lucide="calendar-days" style="width:14px;height:14px"></i> 本周排期（设备视图）</div>
+                <table class="gantt-table">
+                  <thead>
+                    <tr>
+                      <th style="text-align:left;width:110px">设备</th>
+                      <th class="active-col">周三 08/05</th>
+                      <th class="active-col">周四 08/06</th>
+                      <th class="active-col">周五 08/07</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="gantt-device-cell">
+                        <div class="gantt-device-name"><i data-lucide="plane"></i> M300 #01</div>
+                        <div class="gantt-device-batt high"><i data-lucide="battery-full" style="width:12px;height:12px"></i> 95% · 待命</div>
+                        <div class="gantt-device-tasks">2 个任务</div>
+                      </td>
+                      <td class="gantt-day-cell">
+                        <div class="gantt-task bridge">
+                          <div class="gt-name"><i data-lucide="landmark" style="width:12px;height:12px"></i> 望江大桥</div>
+                          <div class="gt-time">08:00 — 10:00 · 2h</div>
+                          <div class="gt-route">航线：望江大桥巡检航线</div>
+                        </div>
+                        <div class="gantt-task safety">
+                          <div class="gt-name"><i data-lucide="shield" style="width:12px;height:12px"></i> K120 交安设施</div>
+                          <div class="gt-time">10:30 — 11:30 · 1h</div>
+                          <div class="gt-route">航线：交安巡检航线B</div>
+                        </div>
+                      </td>
+                      <td class="gantt-day-cell idle"><span class="gantt-idle-text">— 空闲 —</span></td>
+                      <td class="gantt-day-cell idle"><span class="gantt-idle-text">— 空闲 —</span></td>
+                    </tr>
+                    <tr>
+                      <td class="gantt-device-cell">
+                        <div class="gantt-device-name"><i data-lucide="plane"></i> M300 #02</div>
+                        <div class="gantt-device-batt high"><i data-lucide="battery-full" style="width:12px;height:12px"></i> 92% · 待命</div>
+                        <div class="gantt-device-tasks">1 个任务</div>
+                      </td>
+                      <td class="gantt-day-cell idle"><span class="gantt-idle-text">— 空闲 —</span></td>
+                      <td class="gantt-day-cell">
+                        <div class="gantt-task road">
+                          <div class="gt-name"><i data-lucide="route" style="width:12px;height:12px"></i> K122 路面</div>
+                          <div class="gt-time">09:00 — 10:00 · 1h</div>
+                          <div class="gt-route">航线：路面巡检航线C</div>
+                        </div>
+                      </td>
+                      <td class="gantt-day-cell idle"><span class="gantt-idle-text">— 空闲 —</span></td>
+                    </tr>
+                    <tr>
+                      <td class="gantt-device-cell">
+                        <div class="gantt-device-name"><i data-lucide="plane"></i> M300 #03</div>
+                        <div class="gantt-device-batt mid"><i data-lucide="battery-medium" style="width:12px;height:12px"></i> 88% · 待命</div>
+                        <div class="gantt-device-tasks">2 个任务</div>
+                      </td>
+                      <td class="gantt-day-cell idle"><span class="gantt-idle-text">— 空闲 —</span></td>
+                      <td class="gantt-day-cell">
+                        <div class="gantt-task slope">
+                          <div class="gt-name"><i data-lucide="mountain" style="width:12px;height:12px"></i> 边坡 R12</div>
+                          <div class="gt-time">08:00 — 10:00 · 2h</div>
+                          <div class="gt-route">航线：边坡巡检航线</div>
+                        </div>
+                        <div style="height:4px"></div>
+                        <div class="gantt-task bridge">
+                          <div class="gt-name"><i data-lucide="building-2" style="width:12px;height:12px"></i> 城北高架桥</div>
+                          <div class="gt-time">14:00 — 16:00 · 2h</div>
+                          <div class="gt-route">航线：城北高架巡检航线</div>
+                        </div>
+                      </td>
+                      <td class="gantt-day-cell idle"><span class="gantt-idle-text">— 空闲 —</span></td>
+                    </tr>
+                    <tr>
+                      <td class="gantt-device-cell" style="border-bottom:none">
+                        <div class="gantt-device-name"><i data-lucide="plane"></i> M300 #04</div>
+                        <div class="gantt-device-batt mid"><i data-lucide="battery-warning" style="width:12px;height:12px"></i> 60% · 需充电</div>
+                        <div class="gantt-device-tasks">1 个任务</div>
+                      </td>
+                      <td class="gantt-day-cell idle"><span class="gantt-idle-text">— 空闲 —</span></td>
+                      <td class="gantt-day-cell idle"><span class="gantt-idle-text">— 空闲 —</span></td>
+                      <td class="gantt-day-cell" style="border-bottom:none">
+                        <div class="gantt-task bridge">
+                          <div class="gt-name"><i data-lucide="building" style="width:12px;height:12px"></i> 滨江立交桥</div>
+                          <div class="gt-time">09:00 — 11:00 · 2h</div>
+                          <div class="gt-route">航线：滨江立交巡检航线</div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- 排期摘要 -->
+                <div class="gantt-summary">
+                  <i data-lucide="check-circle" style="width:16px;height:16px"></i>
+                  <span><strong>无设备冲突</strong> — 4台设备执行6个任务，每台设备当天的任务时间段不重叠。</span>
+                </div>
+                <div style="font-size:11px;color:var(--text-secondary);padding:0 4px;">
+                  排期逻辑：系统优先匹配资产专属航线 → 就近分配空闲设备 → 错开同设备任务时间 → 电量低于30%设备自动排除。
+                  <strong>M300 #04 电量60%</strong>已标注，建议执行前充满。
                 </div>
 
-                <!-- 冲突提示 -->
-                <div class="match-conflict">
-                  <i data-lucide="alert-triangle" style="width:14px;height:14px"></i> <strong>周四上午时间重叠：</strong>边坡R12（08:00-10:00）与 K122路面（09:00-10:00）存在1小时重叠，但分配到不同设备（M300 #03、M300 #02），可并行执行。
-                </div>
-
-                <!-- 设备状态卡片 -->
-                <div style="font-size:12px;font-weight:600;color:var(--text-primary)"><i data-lucide="battery-full"></i> 匹配设备状态</div>
-                <div class="match-devices" id="match-devices">
-                  <div class="match-device-card assigned">
-                    <div class="match-device-icon ready"><i data-lucide="plane"></i></div>
-                    <div class="match-device-info">
-                      <div class="match-device-name">M300 #01</div>
-                      <div class="match-device-detail">待命中 · 覆盖半径内</div>
-                    </div>
-                    <span class="match-device-tasks">2 个任务</span>
-                    <div class="match-device-battery">
-                      <span class="battery-icon"><i data-lucide="battery-full"></i></span>
-                      <span class="battery-pct high">95%</span>
-                    </div>
-                  </div>
-                  <div class="match-device-card assigned">
-                    <div class="match-device-icon ready"><i data-lucide="plane"></i></div>
-                    <div class="match-device-info">
-                      <div class="match-device-name">M300 #03</div>
-                      <div class="match-device-detail">待命中 · 覆盖半径内</div>
-                    </div>
-                    <span class="match-device-tasks">2 个任务</span>
-                    <div class="match-device-battery">
-                      <span class="battery-icon"><i data-lucide="battery-full"></i></span>
-                      <span class="battery-pct mid">88%</span>
-                    </div>
-                  </div>
-                  <div class="match-device-card assigned">
-                    <div class="match-device-icon ready"><i data-lucide="plane"></i></div>
-                    <div class="match-device-info">
-                      <div class="match-device-name">M300 #02</div>
-                      <div class="match-device-detail">待命中 · 覆盖半径内</div>
-                    </div>
-                    <span class="match-device-tasks">1 个任务</span>
-                    <div class="match-device-battery">
-                      <span class="battery-icon"><i data-lucide="battery-full"></i></span>
-                      <span class="battery-pct high">92%</span>
-                    </div>
-                  </div>
-                  <div class="match-device-card assigned">
-                    <div class="match-device-icon warn"><i data-lucide="plane"></i></div>
-                    <div class="match-device-info">
-                      <div class="match-device-name">M300 #04</div>
-                      <div class="match-device-detail">待命中 · 覆盖半径内</div>
-                    </div>
-                    <span class="match-device-tasks">1 个任务</span>
-                    <div class="match-device-battery">
-                      <span class="battery-icon"><i data-lucide="battery-warning"></i></span>
-                      <span class="battery-pct mid">60%</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 详细匹配列表（可手动调整） -->
-                <div style="font-size:12px;font-weight:600;color:var(--text-primary)"><i data-lucide="link"></i> 匹配明细（可调整）</div>
+                <!-- 匹配明细 -->
+                <div style="font-size:12px;font-weight:600;color:var(--text-primary);display:flex;align-items:center;gap:6px;"><i data-lucide="link" style="width:14px;height:14px"></i> 匹配明细（可手动调整）</div>
                 <div class="match-detail-cards">
                   <div class="match-detail-row">
-                    <span class="md-asset"><i data-lucide="landmark"></i> 望江大桥</span>
+                    <span class="md-asset"><i data-lucide="landmark" style="width:14px;height:14px"></i> 望江大桥</span>
                     <span class="md-arrow">→</span>
                     <span class="md-select"><select class="v19-select"><option>望江大桥巡检航线</option></select></span>
                     <span class="md-arrow">→</span>
-                    <span class="md-select"><select class="v19-select"><option>M300 #01（95%电量·半径内）</option><option>M300 #03（88%电量）</option></select></span>
+                    <span class="md-select"><select class="v19-select"><option>M300 #01（95%·半径内）</option><option>M300 #03（88%）</option></select></span>
                     <span class="md-time">周三 08:00-10:00</span>
-                    <span class="md-ok"><i data-lucide="check"></i> 匹配成功</span>
+                    <span class="md-ok"><i data-lucide="check" style="width:12px;height:12px"></i> OK</span>
                   </div>
                   <div class="match-detail-row">
-                    <span class="md-asset"><i data-lucide="shield"></i> K120交安设施</span>
+                    <span class="md-asset"><i data-lucide="shield" style="width:14px;height:14px"></i> K120交安设施</span>
                     <span class="md-arrow">→</span>
                     <span class="md-select"><select class="v19-select"><option>交安巡检航线B</option></select></span>
                     <span class="md-arrow">→</span>
-                    <span class="md-select"><select class="v19-select"><option>M300 #01（95%电量·半径内）</option></select></span>
+                    <span class="md-select"><select class="v19-select"><option>M300 #01（95%·半径内）</option></select></span>
                     <span class="md-time">周三 10:30-11:30</span>
-                    <span class="md-ok"><i data-lucide="check"></i> 匹配成功</span>
+                    <span class="md-ok"><i data-lucide="check" style="width:12px;height:12px"></i> OK</span>
                   </div>
                   <div class="match-detail-row">
-                    <span class="md-asset"><i data-lucide="mountain"></i> 边坡R12</span>
+                    <span class="md-asset"><i data-lucide="mountain" style="width:14px;height:14px"></i> 边坡 R12</span>
                     <span class="md-arrow">→</span>
                     <span class="md-select"><select class="v19-select"><option>边坡巡检航线</option></select></span>
                     <span class="md-arrow">→</span>
-                    <span class="md-select"><select class="v19-select"><option>M300 #03（88%电量·半径内）</option><option>M300 #01（95%电量）</option></select></span>
+                    <span class="md-select"><select class="v19-select"><option>M300 #03（88%·半径内）</option><option>M300 #01（95%）</option></select></span>
                     <span class="md-time">周四 08:00-10:00</span>
-                    <span class="md-ok"><i data-lucide="check"></i> 匹配成功</span>
+                    <span class="md-ok"><i data-lucide="check" style="width:12px;height:12px"></i> OK</span>
                   </div>
                   <div class="match-detail-row">
-                    <span class="md-asset"><i data-lucide="route"></i> K122路面</span>
+                    <span class="md-asset"><i data-lucide="route" style="width:14px;height:14px"></i> K122路面</span>
                     <span class="md-arrow">→</span>
                     <span class="md-select"><select class="v19-select"><option>路面巡检航线C</option></select></span>
                     <span class="md-arrow">→</span>
-                    <span class="md-select"><select class="v19-select"><option>M300 #02（92%电量·半径内）</option></select></span>
+                    <span class="md-select"><select class="v19-select"><option>M300 #02（92%·半径内）</option></select></span>
                     <span class="md-time">周四 09:00-10:00</span>
-                    <span class="md-ok"><i data-lucide="check"></i> 匹配成功</span>
+                    <span class="md-ok"><i data-lucide="check" style="width:12px;height:12px"></i> OK</span>
                   </div>
                   <div class="match-detail-row">
-                    <span class="md-asset"><i data-lucide="building-2"></i> 城北高架桥</span>
+                    <span class="md-asset"><i data-lucide="building-2" style="width:14px;height:14px"></i> 城北高架桥</span>
                     <span class="md-arrow">→</span>
                     <span class="md-select"><select class="v19-select"><option>城北高架巡检航线</option></select></span>
                     <span class="md-arrow">→</span>
-                    <span class="md-select"><select class="v19-select"><option>M300 #03（88%电量·半径内）</option><option>M300 #04（60%电量）</option></select></span>
+                    <span class="md-select"><select class="v19-select"><option>M300 #03（88%·半径内）</option><option>M300 #04（60%）</option></select></span>
                     <span class="md-time">周四 14:00-16:00</span>
-                    <span class="md-ok"><i data-lucide="check"></i> 匹配成功</span>
+                    <span class="md-ok"><i data-lucide="check" style="width:12px;height:12px"></i> OK</span>
                   </div>
                   <div class="match-detail-row">
-                    <span class="md-asset"><i data-lucide="building"></i> 滨江立交桥</span>
+                    <span class="md-asset"><i data-lucide="building" style="width:14px;height:14px"></i> 滨江立交桥</span>
                     <span class="md-arrow">→</span>
                     <span class="md-select"><select class="v19-select"><option>滨江立交巡检航线</option></select></span>
                     <span class="md-arrow">→</span>
-                    <span class="md-select"><select class="v19-select"><option>M300 #04（60%电量·半径内）</option></select></span>
+                    <span class="md-select"><select class="v19-select"><option>M300 #04（60%·半径内）</option></select></span>
                     <span class="md-time">周五 09:00-11:00</span>
-                    <span class="md-ok"><i data-lucide="alert-triangle" style="width:14px;height:14px"></i> 电量偏低</span>
+                    <span class="md-ok"><i data-lucide="alert-triangle" style="width:12px;height:12px"></i> 电量偏低</span>
                   </div>
                 </div>
               </div>
