@@ -5,7 +5,10 @@
           <h2>资产管理</h2>
           <p>数据来源：资产数字平台 · 当前租户「某高速运营公司」· 组织「滨江管理处」— 可见 G50高速 K118-K125 段 6 个资产</p>
         </div>
-        <span class="am-sync-badge"><i data-lucide="refresh-cw" style="width:12px;height:12px"></i> 3分钟前同步</span>
+        <div class="am-header-right">
+          <button class="btn-primary" onclick="openAddAssetWizard()"><i data-lucide="plus" style="width:16px;height:16px"></i> 新建资产</button>
+          <span class="am-sync-badge"><i data-lucide="refresh-cw" style="width:12px;height:12px"></i> 3分钟前同步</span>
+        </div>
       </div>
 
       <!-- Tab + 搜索 -->
@@ -39,4 +42,37 @@
         <button class="am-dtab" data-dtab="structure" onclick="switchAmDetailTab('structure')">结构档案</button>
       </div>
       <div class="am-detail-body" id="am-detail-body"></div>
+    </div>
+
+    <!-- 新增资产向导 -->
+    <div class="am-wizard-overlay" id="am-wizard-overlay" onclick="if(event.target===this)closeAddAssetWizard()">
+      <div class="am-wizard-card" id="am-wizard-card">
+        <div class="am-wizard-header">
+          <h3 id="am-wizard-title">新建资产</h3>
+          <button class="btn-sm-text" onclick="closeAddAssetWizard()">取消</button>
+        </div>
+        <!-- Step 1: 选择模版 -->
+        <div class="am-wizard-body" id="am-wizard-step1">
+          <p class="am-wizard-hint">选择资产模版。模版由资产数字平台维护，当前租户可见以下模版。</p>
+          <div class="am-template-grid" id="am-template-grid"></div>
+        </div>
+        <!-- Step 2: 填写基本信息 -->
+        <div class="am-wizard-body" id="am-wizard-step2" style="display:none">
+          <p class="am-wizard-hint" id="am-wizard-step2-hint"></p>
+          <div class="am-form-grid">
+            <div class="am-form-group"><label>资产名称 <span style="color:#dc2626">*</span></label><input type="text" id="am-new-name" placeholder="如：望江大桥"></div>
+            <div class="am-form-group"><label>资产编码</label><input type="text" id="am-new-code" placeholder="自动生成或手动输入"></div>
+            <div class="am-form-group"><label>资产类型</label><input type="text" id="am-new-type" disabled></div>
+            <div class="am-form-group"><label>所属路线</label><input type="text" id="am-new-route" value="G50高速 · 昆石高速"></div>
+            <div class="am-form-group"><label>桩号范围</label><input type="text" id="am-new-stake" placeholder="如：K120+000 ~ K120+800"></div>
+            <div class="am-form-group"><label>全长</label><input type="text" id="am-new-length" placeholder="如：1.2km"></div>
+            <div class="am-form-group"><label>巡检周期</label><select id="am-new-cycle" class="v19-select" style="width:100%"><option>每周一次</option><option>每两周一次</option><option>每月一次</option></select></div>
+            <div class="am-form-group"><label>关联BIM模型</label><select id="am-new-model" class="v19-select" style="width:100%"><option value="">未关联</option></select></div>
+          </div>
+        </div>
+        <div class="am-wizard-footer" id="am-wizard-footer">
+          <button class="btn-secondary" onclick="closeAddAssetWizard()">取消</button>
+          <button class="btn-primary" id="am-wizard-next" onclick="amWizardNext()">下一步</button>
+        </div>
+      </div>
     </div>

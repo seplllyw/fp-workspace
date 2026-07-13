@@ -2064,6 +2064,31 @@ body {
 .am-st-children { padding-left: 16px; }
 .am-st-leaf { font-size: 12px; color: var(--text-secondary); }
 
+/* Asset wizard */
+.am-header-right { display: flex; align-items: center; gap: 10px; }
+.am-wizard-overlay { position: absolute; inset: 0; z-index: 200; background: rgba(0,0,0,0.35); display: none; align-items: center; justify-content: center; }
+.am-wizard-overlay.show { display: flex; }
+.am-wizard-card { background: #fff; border-radius: var(--radius); width: 560px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 12px 40px rgba(0,0,0,0.2); }
+.am-wizard-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--panel-border); flex-shrink: 0; }
+.am-wizard-header h3 { font-size: 16px; font-weight: 600; margin: 0; }
+.am-wizard-body { flex: 1; overflow-y: auto; padding: 16px 20px; }
+.am-wizard-hint { font-size: 12px; color: var(--text-secondary); margin: 0 0 14px; line-height: 1.5; }
+.am-wizard-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 20px; border-top: 1px solid var(--panel-border); flex-shrink: 0; }
+
+.am-template-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.am-template-card { border: 2px solid var(--panel-border); border-radius: var(--radius-sm); padding: 16px; cursor: pointer; transition: var(--transition); }
+.am-template-card:hover { border-color: var(--accent); background: var(--accent-subtle); }
+.am-template-card .amt-icon { font-size: 24px; margin-bottom: 8px; }
+.am-template-card .amt-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.am-template-card .amt-meta { font-size: 11px; color: var(--text-secondary); }
+
+.am-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.am-form-group { display: flex; flex-direction: column; gap: 4px; }
+.am-form-group label { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+.am-form-group input, .am-form-group select { padding: 8px 10px; border: 1px solid var(--panel-border); border-radius: var(--radius-sm); font-size: 13px; font-family: inherit; outline: none; }
+.am-form-group input:focus, .am-form-group select:focus { border-color: var(--accent); }
+.am-form-group input:disabled { background: var(--surface); color: var(--text-secondary); }
+
 /* ===== Flight Task / 断点续飞 ===== */
 .ft-module { padding: 20px 24px; height: 100%; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
 .ft-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
@@ -5260,6 +5285,81 @@ function onPageReady(pageId) {
     'asset-mgr': function() { if (typeof renderAmCards === 'function') renderAmCards(); },
   };
   if (initMap[pageId]) initMap[pageId]();
+}
+
+// ===== Add Asset Wizard =====
+var AM_TEMPLATES = [
+  {id:'tpl-bridge',name:'桥梁',icon:'landmark',desc:'钢索桥、预应力桥、钢结构桥等',fields:'编码/名称/桩号/全长/跨数/模型',levels:3},
+  {id:'tpl-slope',name:'边坡',icon:'mountain',desc:'公路边坡、防护边坡等',fields:'编码/名称/桩号/坡度/高度/防护类型',levels:2},
+  {id:'tpl-road',name:'路面',icon:'route',desc:'沥青路面、混凝土路面等',fields:'编码/名称/桩号/长度/层数/材料',levels:2},
+  {id:'tpl-safety',name:'交安设施',icon:'shield',desc:'护栏、标志牌、标线等',fields:'编码/名称/桩号/类型/长度/数量',levels:2},
+];
+// Simulated: only templates visible to current tenant+org
+var AM_VISIBLE_TEMPLATES = AM_TEMPLATES;
+var amWizardStep = 1;
+var amSelectedTpl = null;
+
+function openAddAssetWizard() {
+  amWizardStep = 1; amSelectedTpl = null;
+  document.getElementById('am-wizard-title').textContent = '新建资产';
+  document.getElementById('am-wizard-next').textContent = '下一步';
+  var grid = document.getElementById('am-template-grid');
+  grid.innerHTML = AM_VISIBLE_TEMPLATES.map(function(t) {
+    return '<div class="am-template-card" onclick="selectAmTemplate(\''+t.id+'\')">'+
+      '<div class="amt-icon"><i data-lucide="'+t.icon+'" style="width:24px;height:24px"></i></div>'+
+      '<div class="amt-name">'+t.name+'</div>'+
+      '<div class="amt-meta">'+t.desc+' · 结构'+t.levels+'层 · '+t.fields+'</div></div>';
+  }).join('');
+  if (window.lucide) lucide.createIcons();
+  document.getElementById('am-wizard-step1').style.display = '';
+  document.getElementById('am-wizard-step2').style.display = 'none';
+  document.getElementById('am-wizard-overlay').classList.add('show');
+}
+
+function closeAddAssetWizard() {
+  document.getElementById('am-wizard-overlay').classList.remove('show');
+  amWizardStep = 1; amSelectedTpl = null;
+}
+
+function selectAmTemplate(tplId) {
+  amSelectedTpl = AM_TEMPLATES.find(function(t) { return t.id === tplId; });
+  if (!amSelectedTpl) return;
+  document.getElementById('am-new-type').value = amSelectedTpl.name;
+  document.getElementById('am-wizard-step2-hint').textContent = '已选模版「'+amSelectedTpl.name+'」· 请填写资产基本信息。结构档案可在保存后在平台端维护。';
+  document.getElementById('am-wizard-step1').style.display = 'none';
+  document.getElementById('am-wizard-step2').style.display = '';
+  amWizardStep = 2;
+  document.getElementById('am-wizard-title').textContent = '新建资产 · '+amSelectedTpl.name;
+  document.getElementById('am-wizard-next').textContent = '保存';
+  if (window.lucide) lucide.createIcons();
+}
+
+function amWizardNext() {
+  if (amWizardStep === 1) { showNotice('请先选择一个资产模版'); return; }
+  var name = document.getElementById('am-new-name').value.trim();
+  if (!name) { showNotice('请填写资产名称'); return; }
+  saveNewAsset();
+}
+
+function saveNewAsset() {
+  var name = document.getElementById('am-new-name').value.trim();
+  var code = document.getElementById('am-new-code').value.trim() || ('G50-'+amSelectedTpl.id.replace('tpl-','').toUpperCase()+'-'+Date.now().toString(36).toUpperCase());
+  var stake = document.getElementById('am-new-stake').value.trim() || '—';
+  var length = document.getElementById('am-new-length').value.trim() || '—';
+  var cycle = document.getElementById('am-new-cycle').value;
+  var newAsset = {
+    id: 'new-'+Date.now(),
+    name: name, type: amSelectedTpl.id==='tpl-bridge'?'bridge':amSelectedTpl.id==='tpl-slope'?'slope':amSelectedTpl.id==='tpl-road'?'road':'safety',
+    icon: amSelectedTpl.icon, typeLabel: amSelectedTpl.name,
+    code: code, route: 'G50高速 · 昆石高速', stake: stake, length: length,
+    spans: null, modelId: null, cycle: cycle, lastCheck: '—',
+    keyBridge: false, defectCount: 0, defects: [],
+    structure: [{name:'待录入',children:[]}]
+  };
+  AM_ASSETS.push(newAsset);
+  closeAddAssetWizard();
+  renderAmCards();
+  showNotice('资产「'+name+'」已创建，状态：待平台审核同步');
 }
 
 </script>
