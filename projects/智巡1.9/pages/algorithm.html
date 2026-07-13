@@ -1,0 +1,55 @@
+<div class="v19-module">
+      <div class="v19-module-header">
+        <div class="v19-module-title">
+          <i data-lucide="cpu" style="width:22px;height:22px;color:#7c3aed"></i>
+          <div>
+            <h2>算法管理</h2>
+            <p>异步/实时/机载三类算法统一调用 · V1.9 P0</p>
+          </div>
+        </div>
+        <div class="v19-header-actions">
+          <select class="v19-select"><option>全部算法类型</option><option>实时算法</option><option>异步算法</option><option>机载算法</option></select>
+        </div>
+      </div>
+      <div class="v19-algo-grid">
+        <div class="v19-card algo-card">
+          <div class="v19-card-header">
+            <h3><i data-lucide="zap" style="width:16px;height:16px;color:#16a34a"></i> 实时算法</h3>
+            <span class="v19-badge success">分析当前直播画面</span>
+          </div>
+          <div class="v19-card-body">
+            <div class="v19-algo-list">
+              <div class="v19-algo-item"><div><strong>路面裂缝检测</strong><br><small>桥梁/公路场景 · 可见光</small></div><button class="btn-sm-primary">启动</button></div>
+              <div class="v19-algo-item"><div><strong>安全帽/反光衣识别</strong><br><small>在建工地场景 · 可见光</small></div><button class="btn-sm-primary">启动</button></div>
+              <div class="v19-algo-item"><div><strong>消防通道占用检测</strong><br><small>消防场景 · 可见光+红外</small></div><button class="btn-sm-primary">启动</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="v19-card algo-card">
+          <div class="v19-card-header">
+            <h3><i data-lucide="clock" style="width:16px;height:16px;color:#2563eb"></i> 异步算法</h3>
+            <span class="v19-badge accent">处理已录制视频</span>
+          </div>
+          <div class="v19-card-body">
+            <div class="v19-algo-list">
+              <div class="v19-algo-item"><div><strong>桥梁病害全面检测</strong><br><small>裂缝/锈蚀/支座位移 · 批量处理</small></div><button class="btn-sm-secondary">选择视频</button></div>
+              <div class="v19-algo-item"><div><strong>边坡变化分析</strong><br><small>滑坡裂缝/位移/植被变化</small></div><button class="btn-sm-secondary">选择视频</button></div>
+              <div class="v19-algo-item"><div><strong>园区异常检测</strong><br><small>围栏/入侵/违停 · 批量分析</small></div><button class="btn-sm-secondary">选择视频</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="v19-card algo-card">
+          <div class="v19-card-header">
+            <h3><i data-lucide="plane-landing" style="width:16px;height:16px;color:#d97706"></i> 机载算法</h3>
+            <span class="v19-badge warning">大疆妙算 · 前端识别</span>
+          </div>
+          <div class="v19-card-body">
+            <div class="v19-algo-list">
+              <div class="v19-algo-item"><div><strong>实时目标检测</strong><br><small>机载妙算 · ONNX模型</small></div><button class="btn-sm-primary">下发至机载</button></div>
+              <div class="v19-algo-item"><div><strong>机载裂缝识别</strong><br><small>TensorRT优化 · <100ms延迟</small></div><button class="btn-sm-primary">下发至机载</button></div>
+            </div>
+            <div class="v19-algo-note"><i data-lucide="info" style="width:12px;height:12px"></i> 机载算法通过大疆妙算生态对接接口下发，执行状态实时回传智巡端展示</div>
+          </div>
+        </div>
+      </div>
+    </div>

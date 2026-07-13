@@ -1,0 +1,42 @@
+<div class="am-module">
+      <!-- Header + 权限信息 -->
+      <div class="am-header">
+        <div class="am-header-left">
+          <h2>资产管理</h2>
+          <p>数据来源：资产数字平台 · 当前租户「某高速运营公司」· 组织「滨江管理处」— 可见 G50高速 K118-K125 段 6 个资产</p>
+        </div>
+        <span class="am-sync-badge"><i data-lucide="refresh-cw" style="width:12px;height:12px"></i> 3分钟前同步</span>
+      </div>
+
+      <!-- Tab + 搜索 -->
+      <div class="am-toolbar">
+        <div class="am-tabs" id="am-tabs">
+          <button class="am-tab active" data-type="all" onclick="switchAmTab('all')">全部 <span class="am-tab-num">6</span></button>
+          <button class="am-tab" data-type="bridge" onclick="switchAmTab('bridge')">桥梁 <span class="am-tab-num">3</span></button>
+          <button class="am-tab" data-type="slope" onclick="switchAmTab('slope')">边坡 <span class="am-tab-num">1</span></button>
+          <button class="am-tab" data-type="road" onclick="switchAmTab('road')">路面 <span class="am-tab-num">1</span></button>
+          <button class="am-tab" data-type="safety" onclick="switchAmTab('safety')">交安 <span class="am-tab-num">1</span></button>
+        </div>
+        <div class="am-search">
+          <i data-lucide="search" style="width:14px;height:14px;color:var(--text-secondary)"></i>
+          <input type="text" placeholder="搜索资产名称、编码、桩号…" oninput="filterAmCards()" id="am-search-input">
+        </div>
+      </div>
+
+      <!-- 卡片网格 -->
+      <div class="am-grid" id="am-grid"></div>
+    </div>
+
+    <!-- 资产详情面板 -->
+    <div class="am-detail-panel" id="am-detail">
+      <div class="am-detail-header">
+        <h3 id="am-detail-title">资产详情</h3>
+        <button class="btn-sm-text" onclick="closeAmDetail()">关闭</button>
+      </div>
+      <div class="am-detail-tabs">
+        <button class="am-dtab active" data-dtab="basic" onclick="switchAmDetailTab('basic')">基本信息</button>
+        <button class="am-dtab" data-dtab="defects" onclick="switchAmDetailTab('defects')">关联病害 <span class="am-dtab-badge" id="am-defect-count">3</span></button>
+        <button class="am-dtab" data-dtab="structure" onclick="switchAmDetailTab('structure')">结构档案</button>
+      </div>
+      <div class="am-detail-body" id="am-detail-body"></div>
+    </div>

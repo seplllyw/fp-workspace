@@ -1,0 +1,62 @@
+<div class="v19-module">
+      <div class="v19-module-header">
+        <div class="v19-module-title">
+          <i data-lucide="alert-triangle" style="width:22px;height:22px;color:#d97706"></i>
+          <div>
+            <h2>事件管理</h2>
+            <p>巡检异常统一收口 · 多维度统计 · 趋势分析 · V1.9 P0</p>
+          </div>
+        </div>
+        <div class="v19-header-actions">
+          <select class="v19-select"><option>全部类型</option><option>AI识别</option><option>人工上报</option><option>设备告警</option></select>
+          <select class="v19-select"><option>全部等级</option><option>严重</option><option>警告</option><option>提示</option></select>
+          <input type="date" class="v19-input" value="2026-08-01">
+        </div>
+      </div>
+      <div class="v19-event-grid">
+        <div class="v19-card" style="grid-column:span 2">
+          <div class="v19-card-header">
+            <h3><i data-lucide="list" style="width:16px;height:16px"></i> 事件列表</h3>
+            <span class="v19-badge warning">共24条</span>
+          </div>
+          <div class="v19-card-body" style="padding:0">
+            <table class="v19-table">
+              <thead><tr><th style="width:60px">等级</th><th>事件名称</th><th>类型</th><th>位置</th><th>关联资产</th><th>时间</th><th>操作</th></tr></thead>
+              <tbody>
+                <tr><td><span class="v19-level danger">严重</span></td><td><strong>AI识别：桥面裂缝</strong><br><small>裂缝宽度3mm，需立即处置</small></td><td>AI识别</td><td>望江大桥第3跨</td><td>望江大桥 A001</td><td>08-01 09:32</td><td><button class="btn-sm-text">详情</button><button class="btn-sm-text warn">关注</button></td></tr>
+                <tr><td><span class="v19-level warning">警告</span></td><td><strong>AI识别：护栏变形</strong><br><small>变形量15cm</small></td><td>AI识别</td><td>B区护栏段</td><td>交安设施 K120</td><td>08-01 08:15</td><td><button class="btn-sm-text">详情</button><button class="btn-sm-text warn">关注</button></td></tr>
+                <tr><td><span class="v19-level danger">严重</span></td><td><strong>紧急事件：边坡位移</strong><br><small>位移超阈值2.1mm/h</small></td><td>设备告警</td><td>边坡R12</td><td>边坡 R12</td><td>07-31 16:48</td><td><button class="btn-sm-text">详情</button><button class="btn-sm-text warn">已关注</button></td></tr>
+                <tr><td><span class="v19-level info">提示</span></td><td><strong>设备告警：低电量</strong><br><small>M300 #02 电量不足45%</small></td><td>设备告警</td><td>飞行区域B</td><td>M300 #02</td><td>07-31 14:20</td><td><button class="btn-sm-text">详情</button><button class="btn-sm-text warn">关注</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="v19-card">
+          <div class="v19-card-header">
+            <h3><i data-lucide="pie-chart" style="width:16px;height:16px"></i> 事件类型分布</h3>
+          </div>
+          <div class="v19-card-body">
+            <div class="v19-stat-row"><span>AI识别</span><div class="v19-bar-bg"><div class="v19-bar-fill warn" style="width:60%"></div></div><strong>15</strong></div>
+            <div class="v19-stat-row"><span>设备告警</span><div class="v19-bar-bg"><div class="v19-bar-fill" style="width:28%"></div></div><strong>7</strong></div>
+            <div class="v19-stat-row"><span>人工上报</span><div class="v19-bar-bg"><div class="v19-bar-fill" style="width:12%"></div></div><strong>2</strong></div>
+          </div>
+        </div>
+        <div class="v19-card">
+          <div class="v19-card-header">
+            <h3><i data-lucide="trending-up" style="width:16px;height:16px"></i> 趋势分析（近7天）</h3>
+          </div>
+          <div class="v19-card-body">
+            <div class="v19-trend-bars">
+              <div class="v19-trend-bar" style="height:40px" title="7/26: 3"><span>7/26</span></div>
+              <div class="v19-trend-bar" style="height:30px" title="7/27: 2"><span>7/27</span></div>
+              <div class="v19-trend-bar" style="height:60px" title="7/28: 5"><span>7/28</span></div>
+              <div class="v19-trend-bar" style="height:45px" title="7/29: 4"><span>7/29</span></div>
+              <div class="v19-trend-bar" style="height:55px" title="7/30: 4"><span>7/30</span></div>
+              <div class="v19-trend-bar warn" style="height:80px" title="7/31: 6"><span>7/31</span></div>
+              <div class="v19-trend-bar danger" style="height:90px" title="8/1: 8"><span>8/1</span></div>
+            </div>
+            <div class="v19-trend-summary">同比上周 <span style="color:#dc2626">↑33%</span> · 历史同类事件自动关联</div>
+          </div>
+        </div>
+      </div>
+    </div>

@@ -1,0 +1,46 @@
+<div class="v19-module">
+      <div class="v19-module-header">
+        <div class="v19-module-title">
+          <i data-lucide="cpu" style="width:22px;height:22px;color:#0891b2"></i>
+          <div>
+            <h2>设备管理</h2>
+            <p>固定摄像头 · 推流设备 · 地面站统一注册与状态监控 · V1.9 P1</p>
+          </div>
+        </div>
+        <div class="v19-header-actions">
+          <button class="btn-primary"><i data-lucide="plus" style="width:14px;height:14px"></i> 注册设备</button>
+        </div>
+      </div>
+      <div class="v19-device-grid">
+        <div class="v19-card">
+          <div class="v19-card-header">
+            <h3><i data-lucide="folder-tree" style="width:16px;height:16px"></i> 设备分类</h3>
+          </div>
+          <div class="v19-card-body">
+            <div class="v19-tree">
+              <div class="v19-tree-node leaf active"><i data-lucide="drone" style="width:14px;height:14px;color:#2563eb"></i> 无人机 <div class="v19-tree-count">4</div></div>
+              <div class="v19-tree-node leaf"><i data-lucide="video" style="width:14px;height:14px;color:#16a34a"></i> 固定摄像头 <div class="v19-tree-count">8</div></div>
+              <div class="v19-tree-node leaf"><i data-lucide="radio-tower" style="width:14px;height:14px;color:#d97706"></i> 推流设备 <div class="v19-tree-count">3</div></div>
+              <div class="v19-tree-node leaf"><i data-lucide="antenna" style="width:14px;height:14px;color:#7c3aed"></i> 地面站 <div class="v19-tree-count">2</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="v19-card" style="grid-column:span 2">
+          <div class="v19-card-header">
+            <h3><i data-lucide="list" style="width:16px;height:16px"></i> 设备列表</h3>
+          </div>
+          <div class="v19-card-body" style="padding:0">
+            <table class="v19-table">
+              <thead><tr><th>设备名称</th><th>类型</th><th>编号</th><th>位置</th><th>状态</th><th>推流配置</th><th>操作</th></tr></thead>
+              <tbody>
+                <tr><td><strong>M300 #01</strong></td><td>无人机</td><td>DJI-M300-001</td><td>主基站A</td><td><span class="v19-status-dot flying"></span> 飞行中</td><td>rtmp://live.fpv.com/d001</td><td><button class="btn-sm-text">详情</button></td></tr>
+                <tr><td><strong>M300 #03</strong></td><td>无人机</td><td>DJI-M300-003</td><td>主基站A · 2号机位</td><td><span class="v19-status-dot online"></span> 待命</td><td>rtmp://live.fpv.com/d003</td><td><button class="btn-sm-text">详情</button></td></tr>
+                <tr><td><strong>滨江段摄像头 #01</strong></td><td>固定摄像头</td><td>CAM-BJ-001</td><td>G50 K120+500</td><td><span class="v19-status-dot online"></span> 在线</td><td>rtsp://cam.fpv.com/bj001</td><td><button class="btn-sm-text">配置推流</button></td></tr>
+                <tr><td><strong>地面站-主基站A</strong></td><td>地面站</td><td>GS-MAIN-001</td><td>主基站A</td><td><span class="v19-status-dot online"></span> 在线</td><td>—</td><td><button class="btn-sm-text">详情</button></td></tr>
+                <tr><td><strong>Mavic3 #06</strong></td><td>无人机</td><td>DJI-MV3-006</td><td>基站B</td><td><span class="v19-status-dot offline"></span> 离线</td><td>—</td><td><button class="btn-sm-text">详情</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>

@@ -1,0 +1,68 @@
+<div class="v19-module">
+      <div class="v19-module-header">
+        <div class="v19-module-title">
+          <i data-lucide="users" style="width:22px;height:22px;color:#7c3aed"></i>
+          <div>
+            <h2>组织/人员管理</h2>
+            <p>多组织权限隔离 · 角色权限配置 · 邀请激活机制 · V1.9 P1</p>
+          </div>
+        </div>
+        <div class="v19-header-actions">
+          <button class="btn-primary"><i data-lucide="plus" style="width:14px;height:14px"></i> 创建组织</button>
+          <button class="btn-secondary"><i data-lucide="user-plus" style="width:14px;height:14px"></i> 邀请成员</button>
+        </div>
+      </div>
+      <div class="v19-org-grid">
+        <div class="v19-card" style="grid-row:span 2">
+          <div class="v19-card-header">
+            <h3><i data-lucide="building" style="width:16px;height:16px"></i> 组织架构</h3>
+          </div>
+          <div class="v19-card-body">
+            <div class="v19-tree">
+              <div class="v19-tree-node expand"><i data-lucide="chevron-down" style="width:12px;height:12px"></i> 浙江高速养护集团</div>
+              <div class="v19-tree-children">
+                <div class="v19-tree-node expand"><i data-lucide="chevron-down" style="width:12px;height:12px"></i> 杭州分公司</div>
+                <div class="v19-tree-children">
+                  <div class="v19-tree-node leaf active">项目部A（滨江段）<div class="v19-tree-count">12</div></div>
+                  <div class="v19-tree-node leaf">项目部B（萧山段）<div class="v19-tree-count">8</div></div>
+                </div>
+                <div class="v19-tree-node expand"><i data-lucide="chevron-right" style="width:12px;height:12px"></i> 宁波分公司</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="v19-card">
+          <div class="v19-card-header">
+            <h3><i data-lucide="shield-check" style="width:16px;height:16px"></i> 角色与权限配置</h3>
+          </div>
+          <div class="v19-card-body" style="padding:0">
+            <table class="v19-table">
+              <thead><tr><th>角色</th><th>地图管理</th><th>航线管理</th><th>智能调度</th><th>事件管理</th><th>工单管理</th><th>设备管理</th></tr></thead>
+              <tbody>
+                <tr><td><strong>管理员</strong></td><td>√</td><td>√</td><td>√</td><td>√</td><td>√</td><td>√</td></tr>
+                <tr><td><strong>巡检队长</strong></td><td>√</td><td>√</td><td>—</td><td>√</td><td>√</td><td>√</td></tr>
+                <tr><td><strong>飞手</strong></td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+                <tr><td><strong>养护员</strong></td><td>—</td><td>—</td><td>—</td><td>—</td><td>√</td><td>—</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="v19-card">
+          <div class="v19-card-header">
+            <h3><i data-lucide="contact" style="width:16px;height:16px"></i> 项目部A（滨江段）· 成员</h3>
+            <span class="v19-badge accent">12人</span>
+          </div>
+          <div class="v19-card-body" style="padding:0">
+            <table class="v19-table">
+              <thead><tr><th>姓名</th><th>角色</th><th>手机号</th><th>加入时间</th><th>状态</th></tr></thead>
+              <tbody>
+                <tr><td>张三</td><td>管理员</td><td>138****1234</td><td>2026-07-01</td><td><span class="v19-level done">已激活</span></td></tr>
+                <tr><td>李四</td><td>巡检队长</td><td>139****5678</td><td>2026-07-03</td><td><span class="v19-level done">已激活</span></td></tr>
+                <tr><td>王五</td><td>飞手</td><td>137****9012</td><td>2026-07-15</td><td><span class="v19-level done">已激活</span></td></tr>
+                <tr><td>赵六</td><td>飞手</td><td>136****3456</td><td>2026-08-01</td><td><span class="v19-level warning">待审核</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>

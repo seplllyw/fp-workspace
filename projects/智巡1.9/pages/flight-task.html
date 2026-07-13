@@ -1,0 +1,163 @@
+<div class="ft-module">
+
+      <!-- 统计 -->
+      <div class="ft-stats">
+        <div class="ft-stat-card">
+          <div class="ft-stat-num">1</div>
+          <div class="ft-stat-label">可续飞</div>
+        </div>
+        <div class="ft-stat-card">
+          <div class="ft-stat-num">2</div>
+          <div class="ft-stat-label">执行中</div>
+        </div>
+        <div class="ft-stat-card">
+          <div class="ft-stat-num">3</div>
+          <div class="ft-stat-label">今日完成</div>
+        </div>
+        <div class="ft-stat-card">
+          <div class="ft-stat-num">12</div>
+          <div class="ft-stat-label">本月累计续飞</div>
+        </div>
+      </div>
+
+      <!-- 可续飞任务 -->
+      <div class="ft-section">
+        <div class="ft-section-title">可续飞任务</div>
+        <div class="ft-card">
+          <div class="ft-card-body" style="padding:0">
+            <table class="v19-table">
+              <thead><tr><th>任务</th><th>设备</th><th>航线</th><th>中断原因</th><th>断点位置</th><th>进度</th><th>中断时间</th><th>操作</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>望江大桥巡检</strong></td>
+                  <td>M300 #01</td>
+                  <td>望江大桥航线 · 6航点</td>
+                  <td><span class="ft-tag warn">低电量</span><br><span class="ft-detail">72%→45%，低于返航阈值</span></td>
+                  <td>航点4<br><span class="ft-detail">GPS(30.268,120.123) · 高度80m</span></td>
+                  <td>
+                    <div class="ft-progress"><div class="ft-progress-bar" style="width:67%"></div></div>
+                    <span class="ft-detail">4/6航点 · 67%</span>
+                  </td>
+                  <td>08-05 08:47</td>
+                  <td><button class="btn-sm-primary" onclick="alert('续飞指令已下发至M300 #01。\n\n无人机从航点4(GPS 30.268,120.123)继续执行剩余2个航点。\n预计飞行15分钟。')">续飞</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 断点续飞流程 -->
+      <div class="ft-section">
+        <div class="ft-section-title">断点续飞流程</div>
+        <div class="ft-flow">
+          <div class="ft-flow-step">
+            <div class="ft-flow-num">1</div>
+            <div class="ft-flow-content">
+              <strong>飞行中断检测</strong>
+              <p>无人机执行航线中，飞控实时监测电量与信号。电量低于返航阈值或遥测信号连续丢失>3秒，触发中断保护，飞控自动悬停。</p>
+            </div>
+          </div>
+          <div class="ft-flow-arrow">|</div>
+          <div class="ft-flow-step">
+            <div class="ft-flow-num">2</div>
+            <div class="ft-flow-content">
+              <strong>自动记录断点</strong>
+              <p>飞控自动记录当前状态快照：GPS坐标、已飞航点序号(4/6)、剩余航线数据、机头朝向、高度(80m)、电量(45%)、时间戳。数据通过飞派云平台 V2.1 断点续飞接口持久化。</p>
+            </div>
+          </div>
+          <div class="ft-flow-arrow">|</div>
+          <div class="ft-flow-step">
+            <div class="ft-flow-num">3</div>
+            <div class="ft-flow-content">
+              <strong>返航</strong>
+              <p>飞手遥控器弹窗提示「电量不足，可断点续飞」，确认后无人机自动返航至起飞点。返航路径避开禁飞区，沿最短安全路径返回。</p>
+            </div>
+          </div>
+          <div class="ft-flow-arrow">|</div>
+          <div class="ft-flow-step">
+            <div class="ft-flow-num">4</div>
+            <div class="ft-flow-content">
+              <strong>恢复准备</strong>
+              <p>更换电池。飞派云平台检测到M300 #01重新上线，自动查询该设备的未完成任务，匹配到望江大桥巡检任务（断点：航点4，剩余2个航点）。</p>
+            </div>
+          </div>
+          <div class="ft-flow-arrow">|</div>
+          <div class="ft-flow-step">
+            <div class="ft-flow-num">5</div>
+            <div class="ft-flow-content">
+              <strong>续飞确认</strong>
+              <p>飞手重新起飞，遥控器弹窗「检测到未完成任务：望江大桥巡检，是否从航点4继续？」，确认后无人机自动导航至断点GPS(30.268,120.123)，恢复至原高度80m、原机头朝向。</p>
+            </div>
+          </div>
+          <div class="ft-flow-arrow">|</div>
+          <div class="ft-flow-step">
+            <div class="ft-flow-num">6</div>
+            <div class="ft-flow-content">
+              <strong>执行剩余航线</strong>
+              <p>从航点4继续执行至航点6(终点)。飞行过程与正常巡检一致：航线跟踪、AI实时识别、照片采集。支持再次中断并再次续飞。</p>
+            </div>
+          </div>
+          <div class="ft-flow-arrow">|</div>
+          <div class="ft-flow-step">
+            <div class="ft-flow-num">7</div>
+            <div class="ft-flow-content">
+              <strong>数据合并上报</strong>
+              <p>续飞完成后，系统将两次飞行数据合并为一次完整巡检记录：飞行时长47min(32+15)、航点数据拼接(1-4 + 5-6)、126张照片汇总、AI识别结果归集。合并后数据同步至资产数字平台。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 续飞记录 -->
+      <div class="ft-section">
+        <div class="ft-section-title">续飞记录</div>
+        <div class="ft-card">
+          <div class="ft-card-body" style="padding:0">
+            <table class="v19-table">
+              <thead><tr><th>任务</th><th>设备</th><th>中断原因</th><th>作业明细</th><th>总耗时</th><th>结果</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>望江大桥巡检</strong><br><span class="ft-detail">2026-08-05</span></td>
+                  <td>M300 #01</td>
+                  <td>低电量</td>
+                  <td>
+                    <div class="ft-job-line">#1 08:15-08:47 32min · 航点1→4 · 65% <span class="ft-tag warn sm">中断</span></div>
+                    <div class="ft-job-line">#2 09:05-09:20 15min · 航点5→6 · 35% <span class="ft-tag ok sm">续飞</span></div>
+                  </td>
+                  <td>47min</td>
+                  <td><span class="ft-tag ok">完成</span><br><span class="ft-detail">126张照片 · 3个事件</span></td>
+                </tr>
+                <tr>
+                  <td><strong>边坡R12隐患排查</strong><br><span class="ft-detail">2026-08-03</span></td>
+                  <td>M300 #02</td>
+                  <td>信号丢失</td>
+                  <td>
+                    <div class="ft-job-line">#1 10:10-10:28 18min · 航点1→3 · 50% <span class="ft-tag warn sm">中断</span></div>
+                    <div class="ft-job-line">#2 10:42-11:05 23min · 航点4→6 · 50% <span class="ft-tag ok sm">续飞</span></div>
+                  </td>
+                  <td>41min</td>
+                  <td><span class="ft-tag ok">完成</span><br><span class="ft-detail">89张照片 · 2个事件</span></td>
+                </tr>
+                <tr>
+                  <td><strong>城北高架桥巡检</strong><br><span class="ft-detail">2026-08-04</span></td>
+                  <td>M300 #03</td>
+                  <td>—</td>
+                  <td>
+                    <div class="ft-job-line">#1 14:10-14:55 45min · 航点1→8 · 100% <span class="ft-tag ok sm">完成</span></div>
+                  </td>
+                  <td>45min</td>
+                  <td><span class="ft-tag ok">完成</span><br><span class="ft-detail">210张照片 · 0个事件</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 数据说明 -->
+      <div class="ft-note">
+        <strong>数据来源</strong>：断点数据由飞派云平台 V2.1 断点续飞接口提供。飞行过程中每秒上报状态快照（GPS/航点/电量/高度/速度），中断时自动生成断点记录持久化。上层应用通过 API 查询断点并下发续飞指令。能力一次建设，智巡、卫瞳、消防多产品线复用。
+      </div>
+
+    </div>

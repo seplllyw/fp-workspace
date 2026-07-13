@@ -1,0 +1,687 @@
+<div class="sd-module">
+      <div class="sd-header">
+        <div class="sd-header-left">
+          <h2>智能调度</h2>
+          <p>基于资产巡检周期自动编排任务，匹配航线与设备，调度员审核后批量下发</p>
+        </div>
+        <div class="sd-header-right">
+          <button class="btn-primary" id="btn-create-plan" onclick="toggleCreatePlan()">创建计划</button>
+          <button class="btn-secondary" id="btn-batch-dispatch" onclick="batchDispatch()">批量下发</button>
+        </div>
+      </div>
+
+      <div class="sd-main">
+        <!-- 左侧：巡检计划列表 -->
+        <div class="sd-left">
+          <div class="sd-left-header">
+            <h3>巡检计划</h3>
+          </div>
+          <div class="sd-plan-list" id="plan-list">
+            <div class="sd-plan-card active" data-plan="P001" onclick="selectPlan('P001')">
+              <div class="sd-plan-card-top">
+                <span class="sd-plan-status executing">执行中</span>
+                <span class="sd-plan-source">资产平台自动生成</span>
+              </div>
+              <div class="sd-plan-name">G50滨江段 8月第1周</div>
+              <div class="sd-plan-meta">
+                <span>K118-K125</span>
+                <span>08/03-08/09</span>
+              </div>
+              <div class="sd-plan-stats">
+                <span class="sd-stat"><strong>12</strong> 任务</span>
+                <span class="sd-stat dispatched">8 已下发</span>
+                <span class="sd-stat done">3 完成</span>
+                <span class="sd-stat error">1 异常</span>
+              </div>
+              <div class="sd-plan-assets">望江大桥、城北高架桥、滨江立交桥、边坡R12</div>
+            </div>
+
+            <div class="sd-plan-card" data-plan="P002" onclick="selectPlan('P002')">
+              <div class="sd-plan-card-top">
+                <span class="sd-plan-status pending">待确认</span>
+                <span class="sd-plan-source">资产平台自动生成</span>
+              </div>
+              <div class="sd-plan-name">G50滨江段 8月第2周</div>
+              <div class="sd-plan-meta">
+                <span>K118-K125</span>
+                <span>08/10-08/16</span>
+              </div>
+              <div class="sd-plan-stats">
+                <span class="sd-stat"><strong>10</strong> 任务</span>
+                <span class="sd-stat pending">待确认</span>
+              </div>
+              <div class="sd-plan-assets">望江大桥、城北高架桥、滨江立交桥</div>
+            </div>
+
+            <div class="sd-plan-card" data-plan="P003" onclick="selectPlan('P003')">
+              <div class="sd-plan-card-top">
+                <span class="sd-plan-status pending">待确认</span>
+                <span class="sd-plan-source">资产平台自动生成</span>
+              </div>
+              <div class="sd-plan-name">萧山段 8月第1周</div>
+              <div class="sd-plan-meta">
+                <span>K125-K132</span>
+                <span>08/03-08/09</span>
+              </div>
+              <div class="sd-plan-stats">
+                <span class="sd-stat"><strong>8</strong> 任务</span>
+                <span class="sd-stat pending">待确认</span>
+              </div>
+              <div class="sd-plan-assets">萧山高架桥、钱塘江大桥</div>
+            </div>
+
+            <div class="sd-plan-card" data-plan="P004" onclick="selectPlan('P004')">
+              <div class="sd-plan-card-top">
+                <span class="sd-plan-status done">已完成</span>
+                <span class="sd-plan-source">资产平台自动生成</span>
+              </div>
+              <div class="sd-plan-name">G50滨江段 7月第4周</div>
+              <div class="sd-plan-meta">
+                <span>K118-K125</span>
+                <span>07/27-08/02</span>
+              </div>
+              <div class="sd-plan-stats">
+                <span class="sd-stat"><strong>12</strong> 任务</span>
+                <span class="sd-stat done">12 完成</span>
+              </div>
+              <div class="sd-plan-assets">望江大桥、城北高架桥、滨江立交桥</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧：任务+作业列表 -->
+        <div class="sd-right" id="sd-right-panel">
+          <div class="sd-plan-detail-header">
+            <div class="sd-plan-detail-info">
+              <h3 id="sd-detail-title">G50滨江段 8月第1周巡检计划</h3>
+              <div class="sd-plan-detail-meta">
+                <span>2026-08-03 ~ 2026-08-09</span>
+                <span>G50高速 K118-K125</span>
+                <span>数据来源：资产数字平台</span>
+              </div>
+            </div>
+            <div class="sd-plan-detail-actions">
+              <div class="sd-status-grid-inline">
+                <div class="sd-status-item"><span class="sd-dot pending"></span>待下发 <strong>3</strong></div>
+                <div class="sd-status-item"><span class="sd-dot flying"></span>飞行中 <strong>1</strong></div>
+                <div class="sd-status-item"><span class="sd-dot done"></span>已完成 <strong>7</strong></div>
+                <div class="sd-status-item"><span class="sd-dot error"></span>异常 <strong>1</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sd-task-list">
+            <!-- Task #1: 断点续飞场景 -->
+            <div class="sd-task-card">
+              <div class="sd-task-header" onclick="toggleTaskJobs(this)">
+                <div class="sd-task-header-left">
+                  <span class="sd-task-expand"><i data-lucide="chevron-down" style="width:14px;height:14px"></i></span>
+                  <strong>望江大桥例行巡检</strong>
+                  <span class="sd-task-asset-id">G50-BR-K120-001</span>
+                </div>
+                <div class="sd-task-header-right">
+                  <span class="sd-task-route">望江大桥航线</span>
+                  <span class="sd-task-device">M300 #01</span>
+                  <span class="sd-task-time">周三 08:00-10:00</span>
+                  <span class="sd-task-status-badge flying">执行中</span>
+                </div>
+              </div>
+              <div class="sd-job-list">
+                <div class="sd-job-item">
+                  <div class="sd-job-left">
+                    <strong>飞行作业 #1</strong>
+                    <span>08:15 起飞 · 飞行 32min · 航点 4/6 · 65%</span>
+                  </div>
+                  <div class="sd-job-right">
+                    <span class="sd-job-breakpoint">低电量中断 · GPS(30.268,120.123)</span>
+                  </div>
+                </div>
+                <div class="sd-job-item continued">
+                  <div class="sd-job-left">
+                    <strong>飞行作业 #2（续飞）</strong>
+                    <span>09:05 起飞 · 飞行 15min · 航点 2/2 · 100% · 完成</span>
+                  </div>
+                  <div class="sd-job-right">
+                    <span class="sd-job-events">AI识别：桥面裂缝3mm、护栏变形15cm → 3个事件</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Task #2 -->
+            <div class="sd-task-card">
+              <div class="sd-task-header" onclick="toggleTaskJobs(this)">
+                <div class="sd-task-header-left">
+                  <span class="sd-task-expand"><i data-lucide="chevron-right" style="width:14px;height:14px"></i></span>
+                  <strong>城北高架桥例行巡检</strong>
+                  <span class="sd-task-asset-id">G50-BR-K118-001</span>
+                </div>
+                <div class="sd-task-header-right">
+                  <span class="sd-task-route">城北高架航线</span>
+                  <span class="sd-task-device">M300 #03</span>
+                  <span class="sd-task-time">周四 14:00-16:00</span>
+                  <span class="sd-task-status-badge done">已完成</span>
+                </div>
+              </div>
+              <div class="sd-job-list" style="display:none">
+                <div class="sd-job-item">
+                  <div class="sd-job-left">
+                    <strong>飞行作业 #1</strong>
+                    <span>14:10 起飞 · 飞行 45min · 航点 8/8 · 100% · 完成</span>
+                  </div>
+                  <div class="sd-job-right">
+                    <span class="sd-job-events">AI识别：钢结构锈蚀 → 1个事件 · 已关联工单 WO-2026-0142</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Task #3 -->
+            <div class="sd-task-card">
+              <div class="sd-task-header" onclick="toggleTaskJobs(this)">
+                <div class="sd-task-header-left">
+                  <span class="sd-task-expand"><i data-lucide="chevron-right" style="width:14px;height:14px"></i></span>
+                  <strong>滨江立交桥例行巡检</strong>
+                  <span class="sd-task-asset-id">G50-BR-K122-001</span>
+                </div>
+                <div class="sd-task-header-right">
+                  <span class="sd-task-route">滨江立交航线</span>
+                  <span class="sd-task-device">M300 #04</span>
+                  <span class="sd-task-time">周五 09:00-11:00</span>
+                  <span class="sd-task-status-badge pending">待下发</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Task #4: 异常 -->
+            <div class="sd-task-card abnormal">
+              <div class="sd-task-header" onclick="toggleTaskJobs(this)">
+                <div class="sd-task-header-left">
+                  <span class="sd-task-expand"><i data-lucide="chevron-right" style="width:14px;height:14px"></i></span>
+                  <strong>边坡R12隐患排查</strong>
+                  <span class="sd-task-asset-id">G50-SL-K120-012</span>
+                </div>
+                <div class="sd-task-header-right">
+                  <span class="sd-task-route">边坡巡检航线</span>
+                  <span class="sd-task-device offline">M300 #03（离线）</span>
+                  <span class="sd-task-time">周四 14:00-16:00</span>
+                  <span class="sd-task-status-badge error">异常</span>
+                </div>
+              </div>
+              <div class="sd-job-list" style="display:none">
+                <div class="sd-job-item error">
+                  <div class="sd-job-left">
+                    <strong>飞行作业 #1</strong>
+                    <span>14:05 起飞 · 飞行 8min · 航点 1/6 · 17% · 设备离线中断</span>
+                  </div>
+                  <div class="sd-job-right">
+                    <span class="sd-job-event-link">已自动生成工单 WO-2026-0158</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tasks #5-#6: 已完成 -->
+            <div class="sd-task-card">
+              <div class="sd-task-header" onclick="toggleTaskJobs(this)">
+                <div class="sd-task-header-left">
+                  <span class="sd-task-expand"><i data-lucide="chevron-right" style="width:14px;height:14px"></i></span>
+                  <strong>K120交安设施巡检</strong>
+                  <span class="sd-task-asset-id">G50-TS-K120-001</span>
+                </div>
+                <div class="sd-task-header-right">
+                  <span class="sd-task-route">交安巡检航线B</span>
+                  <span class="sd-task-device">M300 #01</span>
+                  <span class="sd-task-time">周三 10:30-11:30</span>
+                  <span class="sd-task-status-badge done">已完成</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="sd-task-card">
+              <div class="sd-task-header" onclick="toggleTaskJobs(this)">
+                <div class="sd-task-header-left">
+                  <span class="sd-task-expand"><i data-lucide="chevron-right" style="width:14px;height:14px"></i></span>
+                  <strong>K122路面巡检</strong>
+                  <span class="sd-task-asset-id">G50-RD-K122-001</span>
+                </div>
+                <div class="sd-task-header-right">
+                  <span class="sd-task-route">路面巡检航线C</span>
+                  <span class="sd-task-device">M300 #02</span>
+                  <span class="sd-task-time">周四 09:00-10:00</span>
+                  <span class="sd-task-status-badge done">已完成</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="text-align:center;padding:10px;color:var(--text-secondary);font-size:12px">共12个任务，以上为部分示例</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 创建计划面板（默认隐藏） -->
+      <div class="sd-create-panel" id="create-plan-panel" style="display:none">
+        <div class="sd-create-header">
+          <h3>创建巡检计划</h3>
+          <button class="btn-sm-text" onclick="toggleCreatePlan()">取消</button>
+        </div>
+        <div class="sd-create-body">
+          <!-- Step 1: 可视化路段选择 -->
+          <div class="sd-create-step">
+            <div class="sd-step-label">1. 选择路段与周期 <span class="sd-step-count" id="seg-count">已选：滨江段</span></div>
+            <div class="sd-step-content">
+              <div class="road-selector">
+                <!-- 搜索框 -->
+                <div class="road-search-wrap">
+                  <i data-lucide="search" class="road-search-icon"></i>
+                  <input type="text" class="road-search-input" id="road-search-input" placeholder="搜索桩号、路段名、地名… 如 K120 / 滨江 / 大桥" oninput="filterRoadSegments(this.value)">
+                  <button class="road-search-clear" id="road-search-clear" onclick="clearRoadSearch()"><i data-lucide="x" style="width:12px;height:12px"></i></button>
+                </div>
+                <div class="road-search-hint">
+                  快捷筛选：<span onclick="filterRoadSegments('K118')">K118</span><span onclick="filterRoadSegments('K125')">K125</span><span onclick="filterRoadSegments('滨江')">滨江</span><span onclick="filterRoadSegments('萧山')">萧山</span><span onclick="filterRoadSegments('大桥')">大桥</span>
+                </div>
+                <!-- 路段卡片 + 连接线 -->
+                <div class="road-strip-wrap">
+                  <div class="road-connector" style="visibility:hidden"></div>
+                  <div class="road-strip" id="road-strip">
+                    <div class="road-segment binjiang selected" data-seg="binjiang" data-keywords="滨江 K118 K119 K120 K121 K122 K123 K124 K125 望江大桥 滨江立交 边坡 交安设施 路面 G50" onclick="selectRoadSegment('binjiang')">
+                      <div class="seg-body">
+                        <span class="seg-line"></span>
+                        <span class="seg-icon"><i data-lucide="landmark"></i></span>
+                        <span class="seg-name">滨江段</span>
+                        <span class="seg-range">K118 — K125</span>
+                        <span class="seg-asset-count">6 个资产</span>
+                        <span class="seg-check"><i data-lucide="check"></i></span>
+                      </div>
+                    </div>
+                    <div class="road-connector"></div>
+                    <div class="road-segment xiaoshan" data-seg="xiaoshan" data-keywords="萧山 K125 K126 K127 K128 K129 K130 K131 K132 萧山高架 钱塘江大桥 G50" onclick="selectRoadSegment('xiaoshan')">
+                      <div class="seg-body">
+                        <span class="seg-line"></span>
+                        <span class="seg-icon"><i data-lucide="building-2"></i></span>
+                        <span class="seg-name">萧山段</span>
+                        <span class="seg-range">K125 — K132</span>
+                        <span class="seg-asset-count">4 个资产</span>
+                        <span class="seg-check"><i data-lucide="check"></i></span>
+                      </div>
+                    </div>
+                    <div class="road-connector"></div>
+                    <div class="road-segment qiantang" data-seg="qiantang" data-keywords="钱塘 K132 K133 K134 K135 K136 K137 K138 K139 K140 G50" onclick="selectRoadSegment('qiantang')">
+                      <div class="seg-body">
+                        <span class="seg-line"></span>
+                        <span class="seg-icon"><i data-lucide="building"></i></span>
+                        <span class="seg-name">钱塘段</span>
+                        <span class="seg-range">K132 — K140</span>
+                        <span class="seg-asset-count">3 个资产</span>
+                        <span class="seg-check"><i data-lucide="check"></i></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="road-connector" style="visibility:hidden"></div>
+                </div>
+                <div class="road-km-markers">
+                  <span>K118</span><span>K122</span><span>K125</span><span>K128</span><span>K132</span><span>K136</span><span>K140</span>
+                </div>
+                <div class="road-no-result" id="road-no-result">未找到匹配的路段，试试 "K120" 或 "滨江"</div>
+                <div class="road-segment-info" id="seg-info">
+                  <span><i data-lucide="map-pin"></i> <strong>G50高速 滨江段</strong></span>
+                  <span>里程 7km</span>
+                  <span>6 个巡检资产</span>
+                  <span>上次巡检：2026-07-27</span>
+                </div>
+                <div class="sd-step-row">
+                  <select class="v19-select">
+                    <option>每周</option>
+                    <option>每两周</option>
+                    <option>每月</option>
+                  </select>
+                  <input type="date" class="v19-input" value="2026-08-03" style="width:130px">
+                  <span style="color:var(--text-secondary);font-size:13px">至</span>
+                  <input type="date" class="v19-input" value="2026-08-09" style="width:130px">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: 可视化资产卡片选择 -->
+          <div class="sd-create-step">
+            <div class="sd-step-label">2. 选择资产 <span class="sd-step-count" id="asset-count">已选 6 个</span><span style="font-size:11px;color:var(--text-secondary);font-weight:400;margin-left:8px">数据来源：资产数字平台</span></div>
+            <div class="sd-step-content">
+              <div class="asset-cards-grid" id="asset-cards-grid">
+                <div class="asset-card selected" data-asset="BR-K120" onclick="toggleAssetCard(this)">
+                  <span class="ac-check"><i data-lucide="check"></i></span>
+                  <div class="ac-icon-row">
+                    <div class="ac-icon bridge"><i data-lucide="landmark"></i></div>
+                    <div>
+                      <div class="ac-name">望江大桥</div>
+                      <div class="ac-id">G50-BR-K120-001</div>
+                    </div>
+                  </div>
+                  <div class="ac-tags">
+                    <span class="ac-tag type">钢索桥</span>
+                    <span class="ac-tag cycle-weekly">每周巡检</span>
+                  </div>
+                  <div class="ac-pos-bar">
+                    <span class="ac-pos-label">K120</span>
+                    <div class="ac-pos-line"><div class="ac-pos-dot bridge-dot" style="left:45%"></div></div>
+                    <span class="ac-pos-label">沿线</span>
+                  </div>
+                  <div class="ac-due"><span class="due-dot on-schedule"></span> 按周期正常 · 预计 08/06</div>
+                </div>
+
+                <div class="asset-card selected" data-asset="BR-K118" onclick="toggleAssetCard(this)">
+                  <span class="ac-check"><i data-lucide="check"></i></span>
+                  <div class="ac-icon-row">
+                    <div class="ac-icon bridge"><i data-lucide="building-2"></i></div>
+                    <div>
+                      <div class="ac-name">城北高架桥</div>
+                      <div class="ac-id">G50-BR-K118-001</div>
+                    </div>
+                  </div>
+                  <div class="ac-tags">
+                    <span class="ac-tag type">预应力桥</span>
+                    <span class="ac-tag cycle-biweekly">每两周巡检</span>
+                  </div>
+                  <div class="ac-pos-bar">
+                    <span class="ac-pos-label">K118</span>
+                    <div class="ac-pos-line"><div class="ac-pos-dot bridge-dot" style="left:8%"></div></div>
+                    <span class="ac-pos-label">沿线</span>
+                  </div>
+                  <div class="ac-due"><span class="due-dot on-schedule"></span> 按周期正常 · 预计 08/07</div>
+                </div>
+
+                <div class="asset-card selected" data-asset="BR-K122" onclick="toggleAssetCard(this)">
+                  <span class="ac-check"><i data-lucide="check"></i></span>
+                  <div class="ac-icon-row">
+                    <div class="ac-icon bridge"><i data-lucide="building"></i></div>
+                    <div>
+                      <div class="ac-name">滨江立交桥</div>
+                      <div class="ac-id">G50-BR-K122-001</div>
+                    </div>
+                  </div>
+                  <div class="ac-tags">
+                    <span class="ac-tag type">钢结构</span>
+                    <span class="ac-tag cycle-monthly">每月巡检</span>
+                  </div>
+                  <div class="ac-pos-bar">
+                    <span class="ac-pos-label">K122</span>
+                    <div class="ac-pos-line"><div class="ac-pos-dot bridge-dot" style="left:72%"></div></div>
+                    <span class="ac-pos-label">沿线</span>
+                  </div>
+                  <div class="ac-due overdue"><span class="due-dot overdue"></span> 上次8天前 · 预计 08/08</div>
+                </div>
+
+                <div class="asset-card selected" data-asset="SL-K120" onclick="toggleAssetCard(this)">
+                  <span class="ac-check"><i data-lucide="check"></i></span>
+                  <div class="ac-icon-row">
+                    <div class="ac-icon slope"><i data-lucide="mountain"></i></div>
+                    <div>
+                      <div class="ac-name">边坡 R12</div>
+                      <div class="ac-id">G50-SL-K120-012</div>
+                    </div>
+                  </div>
+                  <div class="ac-tags">
+                    <span class="ac-tag type">公路边坡</span>
+                    <span class="ac-tag cycle-weekly">每周巡检</span>
+                  </div>
+                  <div class="ac-pos-bar">
+                    <span class="ac-pos-label">K120</span>
+                    <div class="ac-pos-line"><div class="ac-pos-dot slope-dot" style="left:50%"></div></div>
+                    <span class="ac-pos-label">+200m</span>
+                  </div>
+                  <div class="ac-due"><span class="due-dot on-schedule"></span> 按周期正常 · 预计 08/07</div>
+                </div>
+
+                <div class="asset-card selected" data-asset="TS-K120" onclick="toggleAssetCard(this)">
+                  <span class="ac-check"><i data-lucide="check"></i></span>
+                  <div class="ac-icon-row">
+                    <div class="ac-icon safety"><i data-lucide="shield"></i></div>
+                    <div>
+                      <div class="ac-name">K120 交安设施</div>
+                      <div class="ac-id">G50-TS-K120-001</div>
+                    </div>
+                  </div>
+                  <div class="ac-tags">
+                    <span class="ac-tag type">护栏/标志牌</span>
+                    <span class="ac-tag cycle-monthly">每月巡检</span>
+                  </div>
+                  <div class="ac-pos-bar">
+                    <span class="ac-pos-label">K120</span>
+                    <div class="ac-pos-line"><div class="ac-pos-dot safety-dot" style="left:48%"></div></div>
+                    <span class="ac-pos-label">沿线</span>
+                  </div>
+                  <div class="ac-due"><span class="due-dot on-schedule"></span> 距上次巡检 28 天</div>
+                </div>
+
+                <div class="asset-card selected" data-asset="RD-K122" onclick="toggleAssetCard(this)">
+                  <span class="ac-check"><i data-lucide="check"></i></span>
+                  <div class="ac-icon-row">
+                    <div class="ac-icon road"><i data-lucide="route"></i></div>
+                    <div>
+                      <div class="ac-name">K122 路面</div>
+                      <div class="ac-id">G50-RD-K122-001</div>
+                    </div>
+                  </div>
+                  <div class="ac-tags">
+                    <span class="ac-tag type">沥青路面</span>
+                    <span class="ac-tag cycle-monthly">每月巡检</span>
+                  </div>
+                  <div class="ac-pos-bar">
+                    <span class="ac-pos-label">K122</span>
+                    <div class="ac-pos-line"><div class="ac-pos-dot road-dot" style="left:75%"></div></div>
+                    <span class="ac-pos-label">沿线</span>
+                  </div>
+                  <div class="ac-due"><span class="due-dot on-schedule"></span> 距上次巡检 25 天</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--text-secondary)">
+                <span style="cursor:pointer;color:var(--accent)" onclick="selectAllAssets()">全选</span>
+                <span style="cursor:pointer;color:var(--accent)" onclick="deselectAllAssets()">取消全选</span>
+                <span style="margin-left:auto">点击卡片选择/取消资产</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: 设备泳道排期 -->
+          <div class="sd-create-step">
+            <div class="sd-step-label">3. 匹配航线与设备 <span class="sd-step-count" id="match-count">已匹配 6 个资产</span><span style="font-size:11px;color:var(--text-secondary);font-weight:400;margin-left:8px">系统自动排期 · 按设备视图</span></div>
+            <div class="sd-step-content">
+              <div class="match-layout">
+
+                <!-- 设备泳道排期表 -->
+                <div style="font-size:12px;font-weight:600;color:var(--text-primary);display:flex;align-items:center;gap:6px;"><i data-lucide="calendar-days" style="width:14px;height:14px"></i> 本周排期（设备视图）</div>
+                <table class="gantt-table">
+                  <thead>
+                    <tr>
+                      <th style="text-align:left;width:110px">设备</th>
+                      <th class="active-col">周三 08/05</th>
+                      <th class="active-col">周四 08/06</th>
+                      <th class="active-col">周五 08/07</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="gantt-device-cell">
+                        <div class="gantt-device-name"><i data-lucide="plane"></i> M300 #01</div>
+                        <div class="gantt-device-batt high"><i data-lucide="battery-full" style="width:12px;height:12px"></i> 95% · 待命</div>
+                        <div class="gantt-device-tasks">2 个任务</div>
+                      </td>
+                      <td class="gantt-day-cell">
+                        <div class="gantt-task bridge">
+                          <div class="gt-name"><i data-lucide="landmark" style="width:12px;height:12px"></i> 望江大桥</div>
+                          <div class="gt-time">08:00 — 10:00 · 2h</div>
+                          <div class="gt-route">航线：望江大桥巡检航线</div>
+                        </div>
+                        <div class="gantt-task safety">
+                          <div class="gt-name"><i data-lucide="shield" style="width:12px;height:12px"></i> K120 交安设施</div>
+                          <div class="gt-time">10:30 — 11:30 · 1h</div>
+                          <div class="gt-route">航线：交安巡检航线B</div>
+                        </div>
+                      </td>
+                      <td class="gantt-day-cell idle"><span class="gantt-idle-text">— 空闲 —</span></td>
+                      <td class="gantt-day-cell idle"><span class="gantt-idle-text">— 空闲 —</span></td>
+                    </tr>
+                    <tr>
+                      <td class="gantt-device-cell">
+                        <div class="gantt-device-name"><i data-lucide="plane"></i> M300 #02</div>
+                        <div class="gantt-device-batt high"><i data-lucide="battery-full" style="width:12px;height:12px"></i> 92% · 待命</div>
+                        <div class="gantt-device-tasks">1 个任务</div>
+                      </td>
+                      <td class="gantt-day-cell idle"><span class="gantt-idle-text">— 空闲 —</span></td>
+                      <td class="gantt-day-cell">
+                        <div class="gantt-task road">
+                          <div class="gt-name"><i data-lucide="route" style="width:12px;height:12px"></i> K122 路面</div>
+                          <div class="gt-time">09:00 — 10:00 · 1h</div>
+                          <div class="gt-route">航线：路面巡检航线C</div>
+                        </div>
+                      </td>
+                      <td class="gantt-day-cell idle"><span class="gantt-idle-text">— 空闲 —</span></td>
+                    </tr>
+                    <tr>
+                      <td class="gantt-device-cell">
+                        <div class="gantt-device-name"><i data-lucide="plane"></i> M300 #03</div>
+                        <div class="gantt-device-batt mid"><i data-lucide="battery-medium" style="width:12px;height:12px"></i> 88% · 待命</div>
+                        <div class="gantt-device-tasks">2 个任务</div>
+                      </td>
+                      <td class="gantt-day-cell idle"><span class="gantt-idle-text">— 空闲 —</span></td>
+                      <td class="gantt-day-cell">
+                        <div class="gantt-task slope">
+                          <div class="gt-name"><i data-lucide="mountain" style="width:12px;height:12px"></i> 边坡 R12</div>
+                          <div class="gt-time">08:00 — 10:00 · 2h</div>
+                          <div class="gt-route">航线：边坡巡检航线</div>
+                        </div>
+                        <div style="height:4px"></div>
+                        <div class="gantt-task bridge">
+                          <div class="gt-name"><i data-lucide="building-2" style="width:12px;height:12px"></i> 城北高架桥</div>
+                          <div class="gt-time">14:00 — 16:00 · 2h</div>
+                          <div class="gt-route">航线：城北高架巡检航线</div>
+                        </div>
+                      </td>
+                      <td class="gantt-day-cell idle"><span class="gantt-idle-text">— 空闲 —</span></td>
+                    </tr>
+                    <tr>
+                      <td class="gantt-device-cell" style="border-bottom:none">
+                        <div class="gantt-device-name"><i data-lucide="plane"></i> M300 #04</div>
+                        <div class="gantt-device-batt mid"><i data-lucide="battery-warning" style="width:12px;height:12px"></i> 60% · 需充电</div>
+                        <div class="gantt-device-tasks">1 个任务</div>
+                      </td>
+                      <td class="gantt-day-cell idle"><span class="gantt-idle-text">— 空闲 —</span></td>
+                      <td class="gantt-day-cell idle"><span class="gantt-idle-text">— 空闲 —</span></td>
+                      <td class="gantt-day-cell" style="border-bottom:none">
+                        <div class="gantt-task bridge">
+                          <div class="gt-name"><i data-lucide="building" style="width:12px;height:12px"></i> 滨江立交桥</div>
+                          <div class="gt-time">09:00 — 11:00 · 2h</div>
+                          <div class="gt-route">航线：滨江立交巡检航线</div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <!-- 排期摘要 -->
+                <div class="gantt-summary">
+                  <i data-lucide="check-circle" style="width:16px;height:16px"></i>
+                  <span><strong>无设备冲突</strong> — 4台设备执行6个任务，每台设备当天的任务时间段不重叠。</span>
+                </div>
+                <div style="font-size:11px;color:var(--text-secondary);padding:0 4px;">
+                  排期逻辑：系统优先匹配资产专属航线 → 就近分配空闲设备 → 错开同设备任务时间 → 电量低于30%设备自动排除。
+                  <strong>M300 #04 电量60%</strong>已标注，建议执行前充满。
+                </div>
+
+                <!-- 匹配明细 -->
+                <div style="font-size:12px;font-weight:600;color:var(--text-primary);display:flex;align-items:center;gap:6px;"><i data-lucide="link" style="width:14px;height:14px"></i> 匹配明细（可手动调整）</div>
+                <div class="match-detail-cards">
+                  <div class="match-detail-row">
+                    <span class="md-asset"><i data-lucide="landmark" style="width:14px;height:14px"></i> 望江大桥</span>
+                    <span class="md-arrow">→</span>
+                    <span class="md-select"><select class="v19-select"><option>望江大桥巡检航线</option></select></span>
+                    <span class="md-arrow">→</span>
+                    <span class="md-select"><select class="v19-select"><option>M300 #01（95%·半径内）</option><option>M300 #03（88%）</option></select></span>
+                    <span class="md-time">周三 08:00-10:00</span>
+                    <span class="md-ok"><i data-lucide="check" style="width:12px;height:12px"></i> OK</span>
+                  </div>
+                  <div class="match-detail-row">
+                    <span class="md-asset"><i data-lucide="shield" style="width:14px;height:14px"></i> K120交安设施</span>
+                    <span class="md-arrow">→</span>
+                    <span class="md-select"><select class="v19-select"><option>交安巡检航线B</option></select></span>
+                    <span class="md-arrow">→</span>
+                    <span class="md-select"><select class="v19-select"><option>M300 #01（95%·半径内）</option></select></span>
+                    <span class="md-time">周三 10:30-11:30</span>
+                    <span class="md-ok"><i data-lucide="check" style="width:12px;height:12px"></i> OK</span>
+                  </div>
+                  <div class="match-detail-row">
+                    <span class="md-asset"><i data-lucide="mountain" style="width:14px;height:14px"></i> 边坡 R12</span>
+                    <span class="md-arrow">→</span>
+                    <span class="md-select"><select class="v19-select"><option>边坡巡检航线</option></select></span>
+                    <span class="md-arrow">→</span>
+                    <span class="md-select"><select class="v19-select"><option>M300 #03（88%·半径内）</option><option>M300 #01（95%）</option></select></span>
+                    <span class="md-time">周四 08:00-10:00</span>
+                    <span class="md-ok"><i data-lucide="check" style="width:12px;height:12px"></i> OK</span>
+                  </div>
+                  <div class="match-detail-row">
+                    <span class="md-asset"><i data-lucide="route" style="width:14px;height:14px"></i> K122路面</span>
+                    <span class="md-arrow">→</span>
+                    <span class="md-select"><select class="v19-select"><option>路面巡检航线C</option></select></span>
+                    <span class="md-arrow">→</span>
+                    <span class="md-select"><select class="v19-select"><option>M300 #02（92%·半径内）</option></select></span>
+                    <span class="md-time">周四 09:00-10:00</span>
+                    <span class="md-ok"><i data-lucide="check" style="width:12px;height:12px"></i> OK</span>
+                  </div>
+                  <div class="match-detail-row">
+                    <span class="md-asset"><i data-lucide="building-2" style="width:14px;height:14px"></i> 城北高架桥</span>
+                    <span class="md-arrow">→</span>
+                    <span class="md-select"><select class="v19-select"><option>城北高架巡检航线</option></select></span>
+                    <span class="md-arrow">→</span>
+                    <span class="md-select"><select class="v19-select"><option>M300 #03（88%·半径内）</option><option>M300 #04（60%）</option></select></span>
+                    <span class="md-time">周四 14:00-16:00</span>
+                    <span class="md-ok"><i data-lucide="check" style="width:12px;height:12px"></i> OK</span>
+                  </div>
+                  <div class="match-detail-row">
+                    <span class="md-asset"><i data-lucide="building" style="width:14px;height:14px"></i> 滨江立交桥</span>
+                    <span class="md-arrow">→</span>
+                    <span class="md-select"><select class="v19-select"><option>滨江立交巡检航线</option></select></span>
+                    <span class="md-arrow">→</span>
+                    <span class="md-select"><select class="v19-select"><option>M300 #04（60%·半径内）</option></select></span>
+                    <span class="md-time">周五 09:00-11:00</span>
+                    <span class="md-ok"><i data-lucide="alert-triangle" style="width:12px;height:12px"></i> 电量偏低</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 操作按钮 -->
+          <div class="sd-create-actions">
+            <span style="font-size:12px;color:var(--text-secondary)" id="create-summary">确认后将生成巡检计划，包含6个飞行任务，状态为"待确认"</span>
+            <div style="display:flex;gap:8px">
+              <button class="btn-secondary" onclick="toggleCreatePlan()">取消</button>
+              <button class="btn-primary" onclick="createPlan()">确认创建</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部：资源概览 -->
+      <div class="sd-bottom">
+        <div class="sd-bottom-item">
+          <span>无人机利用率</span>
+          <div class="sd-bottom-bar"><div class="sd-bottom-fill" style="width:78%"></div></div>
+          <strong>78%</strong>
+        </div>
+        <div class="sd-bottom-item">
+          <span>航线复用率</span>
+          <div class="sd-bottom-bar"><div class="sd-bottom-fill warn" style="width:65%"></div></div>
+          <strong>65%</strong>
+        </div>
+        <div class="sd-bottom-item">
+          <span>自动化覆盖率</span>
+          <div class="sd-bottom-bar"><div class="sd-bottom-fill" style="width:60%"></div></div>
+          <strong>60%</strong>
+        </div>
+        <div class="sd-bottom-item">
+          <span>数据同步</span>
+          <strong style="color:#16a34a">3分钟前</strong>
+          <span style="font-size:10px;color:var(--text-secondary)">资产平台 · 航线 · 设备</span>
+        </div>
+      </div>
+    </div>
