@@ -1708,6 +1708,11 @@ body {
 .asset-picker-card { background: #fff; border-radius: var(--radius); width: 420px; max-height: 480px; display: flex; flex-direction: column; box-shadow: 0 8px 32px rgba(0,0,0,0.18); overflow: hidden; }
 .asset-picker-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--panel-border); flex-shrink: 0; }
 .asset-picker-header h3 { font-size: 15px; font-weight: 600; margin: 0; }
+.asset-picker-tabs { display: flex; gap: 2px; padding: 8px 14px; border-bottom: 1px solid var(--panel-border); flex-shrink: 0; background: var(--surface); }
+.ap-tab { padding: 5px 12px; border: none; border-radius: 14px; background: transparent; color: var(--text-secondary); font-size: 12px; font-family: inherit; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.ap-tab:hover { background: rgba(0,0,0,0.06); color: var(--text-primary); }
+.ap-tab.active { background: var(--accent); color: #fff; }
+.ap-tab-count { font-size: 10px; opacity: 0.7; }
 .asset-picker-search { padding: 10px 18px; border-bottom: 1px solid var(--panel-border); flex-shrink: 0; }
 .asset-picker-search input { width: 100%; padding: 8px 12px; border: 1px solid var(--panel-border); border-radius: var(--radius-sm); font-size: 12px; font-family: inherit; outline: none; }
 .asset-picker-search input:focus { border-color: var(--accent); }
@@ -2650,6 +2655,13 @@ body {
         <div class="asset-picker-header">
           <h3 id="ap-title">选择关联资产</h3>
           <button class="btn-sm-text" onclick="hideAssetPicker()">取消</button>
+        </div>
+        <div class="asset-picker-tabs" id="ap-tabs">
+          <button class="ap-tab active" data-tab="all" onclick="switchAssetTab('all')">全部 <span class="ap-tab-count">6</span></button>
+          <button class="ap-tab" data-tab="bridge" onclick="switchAssetTab('bridge')">桥梁 <span class="ap-tab-count">3</span></button>
+          <button class="ap-tab" data-tab="slope" onclick="switchAssetTab('slope')">边坡 <span class="ap-tab-count">1</span></button>
+          <button class="ap-tab" data-tab="road" onclick="switchAssetTab('road')">路面 <span class="ap-tab-count">1</span></button>
+          <button class="ap-tab" data-tab="safety" onclick="switchAssetTab('safety')">交安 <span class="ap-tab-count">1</span></button>
         </div>
         <div class="asset-picker-search">
           <input type="text" id="ap-search" placeholder="搜索资产名称或编号…" oninput="filterAssetPicker()">
@@ -5671,17 +5683,23 @@ var ASSETS = [
   {id:'RD-K122-001', name:'K122 路面', type:'road', icon:'route', meta:'G50-RD-K122-001 · 沥青路面'},
 ];
 var apTarget = null; // {type, data}
+var apCurrentTab = 'all';
 
 function showAssetPicker(type, data) {
   apTarget = {type:type, data:data};
+  apCurrentTab = 'all';
   document.getElementById('ap-title').textContent = '关联资产 — ' + (data.name||'未命名');
   document.getElementById('ap-search').value = '';
+  // Reset tabs
+  document.querySelectorAll('#ap-tabs .ap-tab').forEach(function(t) { t.classList.remove('active'); });
+  var allTab = document.querySelector('#ap-tabs .ap-tab[data-tab="all"]');
+  if (allTab) allTab.classList.add('active');
   var linkedId = data.linkedAsset ? data.linkedAsset.id : null;
   var listEl = document.getElementById('ap-list');
   var html = '';
   ASSETS.forEach(function(a) {
     var isLinked = (linkedId === a.id);
-    html += '<div class="asset-picker-item'+(isLinked?' linked':'')+'" data-asset="'+a.id+'" onclick="selectAssetForPicker(\''+a.id+'\')">' +
+    html += '<div class="asset-picker-item'+(isLinked?' linked':'')+'" data-asset="'+a.id+'" data-type="'+a.type+'" onclick="selectAssetForPicker(\''+a.id+'\')">' +
       '<div class="ap-icon '+a.type+'"><i data-lucide="'+a.icon+'" style="width:14px;height:14px"></i></div>' +
       '<div class="ap-info"><div class="ap-name">'+a.name+'</div><div class="ap-meta">'+a.meta+'</div></div>' +
       '<div class="ap-check"><i data-lucide="check" style="width:14px;height:14px"></i></div>' +
@@ -5700,12 +5718,23 @@ function hideAssetPicker() {
   apTarget = null;
 }
 
+function switchAssetTab(tab) {
+  apCurrentTab = tab;
+  document.querySelectorAll('#ap-tabs .ap-tab').forEach(function(t) { t.classList.remove('active'); });
+  var tabEl = document.querySelector('#ap-tabs .ap-tab[data-tab="'+tab+'"]');
+  if (tabEl) tabEl.classList.add('active');
+  filterAssetPicker();
+}
+
 function filterAssetPicker() {
   var q = document.getElementById('ap-search').value.trim().toLowerCase();
   document.querySelectorAll('#ap-list .asset-picker-item').forEach(function(item) {
     var name = (item.querySelector('.ap-name')||{}).textContent||'';
     var meta = (item.querySelector('.ap-meta')||{}).textContent||'';
-    item.style.display = (!q || name.toLowerCase().indexOf(q)>=0 || meta.toLowerCase().indexOf(q)>=0) ? '' : 'none';
+    var type = item.getAttribute('data-type')||'';
+    var matchSearch = !q || name.toLowerCase().indexOf(q)>=0 || meta.toLowerCase().indexOf(q)>=0;
+    var matchTab = apCurrentTab === 'all' || type === apCurrentTab;
+    item.style.display = (matchSearch && matchTab) ? '' : 'none';
   });
 }
 
