@@ -1701,6 +1701,35 @@ body {
 }
 .ctx-item:hover { background: var(--surface-hover); }
 .ctx-item.danger { color: var(--danger); }
+
+/* ===== Asset Picker Modal ===== */
+.asset-picker-overlay { position: fixed; inset: 0; z-index: 20000; background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; }
+.asset-picker-overlay.show { display: flex; }
+.asset-picker-card { background: #fff; border-radius: var(--radius); width: 420px; max-height: 480px; display: flex; flex-direction: column; box-shadow: 0 8px 32px rgba(0,0,0,0.18); overflow: hidden; }
+.asset-picker-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--panel-border); flex-shrink: 0; }
+.asset-picker-header h3 { font-size: 15px; font-weight: 600; margin: 0; }
+.asset-picker-search { padding: 10px 18px; border-bottom: 1px solid var(--panel-border); flex-shrink: 0; }
+.asset-picker-search input { width: 100%; padding: 8px 12px; border: 1px solid var(--panel-border); border-radius: var(--radius-sm); font-size: 12px; font-family: inherit; outline: none; }
+.asset-picker-search input:focus { border-color: var(--accent); }
+.asset-picker-list { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+.asset-picker-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--panel-border); border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition); }
+.asset-picker-item:hover { border-color: var(--accent); background: var(--accent-subtle); }
+.asset-picker-item.linked { background: rgba(22,163,74,0.05); border-color: rgba(22,163,74,0.3); }
+.asset-picker-item .ap-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
+.asset-picker-item .ap-icon.bridge { background: #ede9fe; color: #7c3aed; }
+.asset-picker-item .ap-icon.slope { background: #fef3c7; color: #d97706; }
+.asset-picker-item .ap-icon.road { background: #dbeafe; color: #2563eb; }
+.asset-picker-item .ap-icon.safety { background: #fce7f3; color: #db2777; }
+.asset-picker-item .ap-info { flex: 1; min-width: 0; }
+.asset-picker-item .ap-name { font-size: 13px; font-weight: 600; }
+.asset-picker-item .ap-meta { font-size: 10px; color: var(--text-secondary); }
+.asset-picker-item .ap-check { color: #16a34a; display: none; }
+.asset-picker-item.linked .ap-check { display: flex; }
+.asset-picker-footer { padding: 12px 18px; border-top: 1px solid var(--panel-border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+.asset-picker-footer .ap-hint { font-size: 11px; color: var(--text-secondary); }
+
+/* Linked asset badge on annotation marker */
+.ann-linked-badge { position: absolute; top: -6px; right: -6px; width: 14px; height: 14px; border-radius: 50%; background: #16a34a; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 7px; color: #fff; }
 .ctx-divider {
   height: 1px;
   background: var(--panel-border);
@@ -2605,7 +2634,9 @@ body {
     </div>
 
     <!-- Right-click Context Menu -->
-    <div id="ctx-menu" style="display:none;position:absolute;z-index:10000;background:#fff;border:1px solid var(--panel-border);border-radius:8px;padding:4px;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,0.15);flex-direction:column;gap:1px;">
+    <div id="ctx-menu" style="display:none;position:absolute;z-index:10000;background:#fff;border:1px solid var(--panel-border);border-radius:8px;padding:4px;min-width:180px;box-shadow:0 8px 24px rgba(0,0,0,0.15);flex-direction:column;gap:1px;">
+      <div class="ctx-item" data-action="link-asset" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;font-size:12px;cursor:pointer;"><i data-lucide="link" style="width:14px;height:14px"></i> 关联资产</div>
+      <div class="ctx-item ctx-sep" style="height:1px;background:var(--panel-border);margin:3px 0;"></div>
       <div class="ctx-item" data-action="delete" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;font-size:12px;cursor:pointer;"><i data-lucide="trash-2" style="width:14px;height:14px"></i> 删除标注</div>
       <div class="ctx-item" data-action="fly-to" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;font-size:12px;cursor:pointer;"><i data-lucide="plane" style="width:14px;height:14px"></i> 选择设备飞向</div>
       <div class="ctx-item" data-action="return-all" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;font-size:12px;cursor:pointer;"><i data-lucide="home" style="width:14px;height:14px"></i> 全部返航</div>
@@ -2613,6 +2644,23 @@ body {
       <div class="ctx-item" data-action="convert-patrol" style="display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;font-size:12px;cursor:pointer;"><i data-lucide="shield" style="width:14px;height:14px"></i> 转换为巡逻区域</div>
     </div>
 
+    <!-- Asset Picker Modal -->
+    <div class="asset-picker-overlay" id="asset-picker-overlay" onclick="if(event.target===this)hideAssetPicker()">
+      <div class="asset-picker-card">
+        <div class="asset-picker-header">
+          <h3 id="ap-title">选择关联资产</h3>
+          <button class="btn-sm-text" onclick="hideAssetPicker()">取消</button>
+        </div>
+        <div class="asset-picker-search">
+          <input type="text" id="ap-search" placeholder="搜索资产名称或编号…" oninput="filterAssetPicker()">
+        </div>
+        <div class="asset-picker-list" id="ap-list"></div>
+        <div class="asset-picker-footer">
+          <span class="ap-hint" id="ap-hint">选择一个资产与标注关联，或点击"取消关联"移除</span>
+          <button class="btn-sm-primary" id="ap-unlink-btn" style="display:none;background:#fff;color:#dc2626;border:1px solid rgba(220,38,38,0.3)" onclick="unlinkAssetFromAnn()">取消关联</button>
+        </div>
+      </div>
+    </div>
 
     <div id="loading-indicator">
       <div class="loading-spin"></div> 加载视野数据中...
@@ -5306,7 +5354,7 @@ function handleDrawClick(e) {
     var id = annId('p');
     var p = {id:id, name:'标注点-'+annNext.point++, lat:e.latlng.lat, lng:e.latlng.lng,
       color:ANN_C[0], iconType:'pin', iconEmoji:'📍', fontSize:14,
-      description:'', imageUrl:'', artist:annArtist(), createdAt:new Date().toLocaleString('zh-CN')};
+      description:'', imageUrl:'', linkedAsset:null, artist:annArtist(), createdAt:new Date().toLocaleString('zh-CN')};
     MOCK.annotations.points.push(p);
     renderAnn(); selectAnn('point',p); cancelDraw();
     showNotice('点标注已创建：'+p.name); return;
@@ -5321,7 +5369,7 @@ function handleDrawClick(e) {
       var id = annId('c');
       var c = {id:id, name:'圆形-'+annNext.circle++, center:[circleCtr.lat,circleCtr.lng], radius:r,
         color:ANN_C[0], fontSize:14, transparentFill:false, fillOpacity:0.2,
-        description:'', imageUrl:'', artist:annArtist(), createdAt:new Date().toLocaleString('zh-CN'),
+        description:'', imageUrl:'', linkedAsset:null, artist:annArtist(), createdAt:new Date().toLocaleString('zh-CN'),
         area:Math.PI*r*r, circumference:2*Math.PI*r};
       MOCK.annotations.circles.push(c);
       drawLG.clearLayers(); circleCtr=null; drawPrev=null;
@@ -5347,7 +5395,7 @@ function handleDrawDblClick(e) {
   if (drawTool==='line') {
     var h=0; for (var i=1;i<drawPts.length;i++) h+=map.distance(drawPts[i-1],drawPts[i]);
     var id=annId('l'), l={id:id,name:'测线-'+annNext.line++,points:drawPts.slice(),
-      color:ANN_C[0],lineStyle:'solid',fontSize:14,description:'',imageUrl:'',artist:annArtist(),
+      color:ANN_C[0],lineStyle:'solid',fontSize:14,description:'',imageUrl:'',linkedAsset:null,artist:annArtist(),
       createdAt:new Date().toLocaleString('zh-CN'),horizontalDistance:h,linearDistance:map.distance(drawPts[0],drawPts[drawPts.length-1]),elevationDiff:(Math.random()*10).toFixed(1)};
     MOCK.annotations.lines.push(l);
     drawLG.clearLayers(); drawPts=[]; drawPrev=null;
@@ -5360,7 +5408,7 @@ function handleDrawDblClick(e) {
     var perim=0; for(var i=0;i<n;i++) perim+=map.distance(drawPts[i],drawPts[(i+1)%n]);
     var id=annId('g'), pg={id:id,name:'测区-'+annNext.polygon++,points:drawPts.slice(),
       color:ANN_C[0],lineStyle:'solid',fontSize:14,fillOpacity:0.2,
-      description:'',imageUrl:'',artist:annArtist(),createdAt:new Date().toLocaleString('zh-CN'),area:area,perimeter:perim};
+      description:'',imageUrl:'',linkedAsset:null,artist:annArtist(),createdAt:new Date().toLocaleString('zh-CN'),area:area,perimeter:perim};
     MOCK.annotations.polygons.push(pg);
     drawLG.clearLayers(); drawPts=[]; drawPrev=null;
     renderAnn(); selectAnn('polygon',pg); cancelDraw();
@@ -5384,11 +5432,12 @@ function renderAnn() {
   annLG.points.clearLayers(); annLG.lines.clearLayers(); annLG.polygons.clearLayers(); annLG.circles.clearLayers();
   // Points
   MOCK.annotations.points.forEach(function(p){
-    var icon = L.divIcon({className:'ann-marker',html:'<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:16px;">'+(p.iconEmoji||'📍')+'</div>',iconSize:[32,32],iconAnchor:[16,16],style:'background:'+(p.color||ANN_C[0])+';'});
+    var badgeHtml = p.linkedAsset ? '<div class="ann-linked-badge" style="position:absolute;top:-4px;right:-4px;">●</div>' : '';
+    var icon = L.divIcon({className:'ann-marker',html:'<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:16px;position:relative;">'+(p.iconEmoji||'📍')+badgeHtml+'</div>',iconSize:[32,32],iconAnchor:[16,16],style:'background:'+(p.color||ANN_C[0])+';'});
     var m = L.marker([p.lat,p.lng],{icon:icon}).addTo(annLG.points);
     m.on('click',function(){selectAnn('point',p)});
     m.on('contextmenu',function(ev){showCtx(ev,'point',p)});
-    m.on('mouseover',function(ev){showAnnTip(ev,p.name,'')});
+    m.on('mouseover',function(ev){showAnnTip(ev,p.name,p.linkedAsset?'🔗 '+p.linkedAsset.name:'');});
     m.on('mouseout',hideAnnTip);
     if(p.name) L.marker([p.lat,p.lng],{icon:L.divIcon({className:'',html:'<div style="font-size:'+(p.fontSize||14)+'px;font-weight:600;color:#1a1a1a;background:#fff;padding:2px 8px;border-radius:4px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.15);">'+p.name+'</div>',iconSize:[0,0],iconAnchor:[(p.name.length*4),-22]}),interactive:false}).addTo(annLG.points);
   });
@@ -5398,7 +5447,7 @@ function renderAnn() {
     var poly = L.polyline(l.points,{color:l.color||ANN_C[0],weight:3,dashArray:dash}).addTo(annLG.lines);
     poly.on('click',function(){selectAnn('line',l)});
     poly.on('contextmenu',function(ev){showCtx(ev,'line',l)});
-    poly.on('mouseover',function(ev){showAnnTip(ev,l.name,'水平距离:'+(l.horizontalDistance||0).toFixed(1)+'m')});
+    poly.on('mouseover',function(ev){showAnnTip(ev,l.name,'水平距离:'+(l.horizontalDistance||0).toFixed(1)+'m'+(l.linkedAsset?' · 🔗 '+l.linkedAsset.name:''))});
     poly.on('mouseout',hideAnnTip);
     for(var i=0;i<l.points.length-1;i++){
       var mid=L.latLng((l.points[i][0]+l.points[i+1][0])/2,(l.points[i][1]+l.points[i+1][1])/2);
@@ -5414,7 +5463,7 @@ function renderAnn() {
     var poly = L.polygon(pg.points,{color:pg.color||ANN_C[0],weight:3,dashArray:dash,fillColor:pg.color||ANN_C[0],fillOpacity:pg.fillOpacity||0.2}).addTo(annLG.polygons);
     poly.on('click',function(){selectAnn('polygon',pg)});
     poly.on('contextmenu',function(ev){showCtx(ev,'polygon',pg)});
-    poly.on('mouseover',function(ev){showAnnTip(ev,pg.name,'面积:'+(pg.area||0).toFixed(1)+'m²')});
+    poly.on('mouseover',function(ev){showAnnTip(ev,pg.name,'面积:'+(pg.area||0).toFixed(1)+'m²'+(pg.linkedAsset?' · 关联:'+pg.linkedAsset.name:''))});
     poly.on('mouseout',hideAnnTip);
     var c=poly.getBounds().getCenter();
     L.marker(c,{icon:L.divIcon({className:'',html:'<div style="font-size:'+(pg.fontSize||14)+'px;font-weight:700;color:#fff;background:rgba(0,0,0,0.7);padding:3px 10px;border-radius:4px;white-space:nowrap;">'+pg.name+'<br><span style="font-size:10px;opacity:0.8;">'+(pg.area||0).toFixed(0)+'m²</span></div>',iconSize:[0,0],iconAnchor:[40,16]}),interactive:false}).addTo(annLG.polygons);
@@ -5424,7 +5473,7 @@ function renderAnn() {
     var circle = L.circle(c.center,{radius:c.radius,color:c.color||ANN_C[0],weight:3,fillColor:c.transparentFill?'transparent':(c.color||ANN_C[0]),fillOpacity:c.transparentFill?0:(c.fillOpacity||0.2)}).addTo(annLG.circles);
     circle.on('click',function(){selectAnn('circle',c)});
     circle.on('contextmenu',function(ev){showCtx(ev,'circle',c)});
-    circle.on('mouseover',function(ev){showAnnTip(ev,c.name,'半径:'+(c.radius||0).toFixed(1)+'m')});
+    circle.on('mouseover',function(ev){showAnnTip(ev,c.name,'半径:'+(c.radius||0).toFixed(1)+'m'+(c.linkedAsset?' · 关联:'+c.linkedAsset.name:''))});
     circle.on('mouseout',hideAnnTip);
     L.marker(c.center,{icon:L.divIcon({className:'',html:'<div style="font-size:'+(c.fontSize||14)+'px;font-weight:700;color:#fff;background:rgba(0,0,0,0.7);padding:3px 10px;border-radius:4px;white-space:nowrap;">'+c.name+'<br><span style="font-size:10px;opacity:0.8;">r='+c.radius.toFixed(0)+'m</span></div>',iconSize:[0,0],iconAnchor:[30,14]}),interactive:false}).addTo(annLG.circles);
   });
@@ -5459,8 +5508,17 @@ function openDetail(type,data){
   colorHTML+='</div>';
 
   if (type==='point') {
-    b=F.replace('$1','名称').replace('$2','<input class="detail-form-input" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;" value="'+esc(data.name||'')+'" onchange="updateAnn(\'point\',\''+data.id+'\',\'name\',this.value);renderAnn()">')+
-      F.replace('$1','坐标').replace('$2','<div style="display:flex;gap:6px;"><input class="detail-form-input" style="flex:1;padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;" value="'+data.lat.toFixed(6)+'" onchange="updateAnn(\'point\',\''+data.id+'\',\'lat\',parseFloat(this.value));renderAnn()"><input class="detail-form-input" style="flex:1;padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;" value="'+data.lng.toFixed(6)+'" onchange="updateAnn(\'point\',\''+data.id+'\',\'lng\',parseFloat(this.value));renderAnn()"></div>')+
+    b=F.replace('$1','名称').replace('$2','<input class="detail-form-input" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;" value="'+esc(data.name||'')+'" onchange="updateAnn(\'point\',\''+data.id+'\',\'name\',this.value);renderAnn()">');
+    // Linked asset info
+    if (data.linkedAsset) {
+      b += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(22,163,74,0.06);border:1px solid rgba(22,163,74,0.2);border-radius:6px;margin-bottom:4px;">'+
+        '<span style="font-size:12px;display:flex;align-items:center;gap:6px;"><i data-lucide="link" style="width:14px;height:14px;color:#16a34a"></i> <strong>'+esc(data.linkedAsset.name)+'</strong><span style="font-size:10px;color:var(--text-secondary)">'+esc(data.linkedAsset.id||'')+'</span></span>'+
+        '<button style="padding:3px 8px;border:1px solid rgba(220,38,38,0.3);border-radius:4px;background:#fff;color:#dc2626;font-size:10px;cursor:pointer;" onclick="unlinkFromDetail(\'point\',\''+data.id+'\')">取消关联</button>'+
+      '</div>';
+    } else {
+      b += '<div style="padding:6px 10px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:11px;color:var(--text-secondary);cursor:pointer;" onclick="showAssetPicker(\'point\',findAnn(\'point\',\''+data.id+'\'))"><i data-lucide="link" style="width:12px;height:12px"></i> 关联资产 — 点击选择</div>';
+    }
+    b += F.replace('$1','坐标').replace('$2','<div style="display:flex;gap:6px;"><input class="detail-form-input" style="flex:1;padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;" value="'+data.lat.toFixed(6)+'" onchange="updateAnn(\'point\',\''+data.id+'\',\'lat\',parseFloat(this.value));renderAnn()"><input class="detail-form-input" style="flex:1;padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;" value="'+data.lng.toFixed(6)+'" onchange="updateAnn(\'point\',\''+data.id+'\',\'lng\',parseFloat(this.value));renderAnn()"></div>')+
       '<div style="font-size:11px;color:var(--accent);margin-bottom:8px;cursor:pointer;"><i data-lucide="map-pin" style="width:12px;height:12px"></i> '+toDMS(data.lat)+'  '+toDMS(data.lng)+' (度分秒)</div>'+
       colorHTML+
       '<div class="detail-form-label" style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-top:8px;">图标</div><div class="icon-picker" style="display:flex;gap:6px;flex-wrap:wrap;">';
@@ -5472,8 +5530,15 @@ function openDetail(type,data){
       F.replace('$1','绘制者').replace('$2','<input class="detail-form-input" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;background:var(--surface);" value="'+esc(data.artist||'')+'" readonly>')+
       '<div style="display:flex;gap:8px;margin-top:8px;"><button class="detail-btn danger" style="flex:1;padding:8px;border:none;border-radius:6px;background:#fee2e2;color:#dc2626;font-size:12px;cursor:pointer;" onclick="delAnn(\'point\',\''+data.id+'\')"><i data-lucide="trash-2" style="width:14px;height:14px"></i> 删除</button><button class="detail-btn primary" style="flex:1;padding:8px;border:none;border-radius:6px;background:var(--accent);color:#fff;font-size:12px;cursor:pointer;" onclick="document.getElementById(\'detail-panel\').classList.remove(\'open\')"> <i data-lucide="check" style="width:14px;height:14px"></i> 完成</button></div>';
   } else if (type==='line') {
-    b=F.replace('$1','名称').replace('$2','<input class="detail-form-input" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;" value="'+esc(data.name||'')+'" onchange="updateAnn(\'line\',\''+data.id+'\',\'name\',this.value);renderAnn()">')+
-      '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:12px;"><span>水平距离</span><b>'+(data.horizontalDistance||0).toFixed(2)+' m</b></div>'+
+    b=F.replace('$1','名称').replace('$2','<input class="detail-form-input" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;" value="'+esc(data.name||'')+'" onchange="updateAnn(\'line\',\''+data.id+'\',\'name\',this.value);renderAnn()">');
+    if (data.linkedAsset) {
+      b += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(22,163,74,0.06);border:1px solid rgba(22,163,74,0.2);border-radius:6px;margin-bottom:4px;">'+
+        '<span style="font-size:12px;display:flex;align-items:center;gap:6px;"><i data-lucide="link" style="width:14px;height:14px;color:#16a34a"></i> <strong>'+esc(data.linkedAsset.name)+'</strong></span>'+
+        '<button style="padding:3px 8px;border:1px solid rgba(220,38,38,0.3);border-radius:4px;background:#fff;color:#dc2626;font-size:10px;cursor:pointer;" onclick="unlinkFromDetail(\'line\',\''+data.id+'\')">取消关联</button></div>';
+    } else {
+      b += '<div style="padding:6px 10px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:11px;color:var(--text-secondary);cursor:pointer;" onclick="showAssetPicker(\'line\',findAnn(\'line\',\''+data.id+'\'))"><i data-lucide="link" style="width:12px;height:12px"></i> 关联资产 — 点击选择</div>';
+    }
+    b += '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:12px;"><span>水平距离</span><b>'+(data.horizontalDistance||0).toFixed(2)+' m</b></div>'+
       '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:12px;"><span>直线距离</span><b>'+(data.linearDistance||0).toFixed(2)+' m</b></div>'+
       '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:8px;font-size:12px;"><span>高度差</span><b>'+(data.elevationDiff||0)+' m</b></div>'+
       colorHTML+
@@ -5486,8 +5551,15 @@ function openDetail(type,data){
       F.replace('$1','绘制者').replace('$2','<input class="detail-form-input" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;background:var(--surface);" value="'+esc(data.artist||'')+'" readonly>')+
       '<div style="display:flex;gap:8px;margin-top:8px;"><button class="detail-btn danger" style="flex:1;padding:8px;border:none;border-radius:6px;background:#fee2e2;color:#dc2626;font-size:12px;cursor:pointer;" onclick="delAnn(\'line\',\''+data.id+'\')"><i data-lucide="trash-2" style="width:14px;height:14px"></i> 删除</button></div>';
   } else if (type==='polygon') {
-    b=F.replace('$1','名称').replace('$2','<input class="detail-form-input" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;" value="'+esc(data.name||'')+'" onchange="updateAnn(\'polygon\',\''+data.id+'\',\'name\',this.value);renderAnn()">')+
-      '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:12px;"><span>面积</span><b>'+(data.area||0).toFixed(2)+' m²</b></div>'+
+    b=F.replace('$1','名称').replace('$2','<input class="detail-form-input" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;" value="'+esc(data.name||'')+'" onchange="updateAnn(\'polygon\',\''+data.id+'\',\'name\',this.value);renderAnn()">');
+    if (data.linkedAsset) {
+      b += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(22,163,74,0.06);border:1px solid rgba(22,163,74,0.2);border-radius:6px;margin-bottom:4px;">'+
+        '<span style="font-size:12px;display:flex;align-items:center;gap:6px;"><i data-lucide="link" style="width:14px;height:14px;color:#16a34a"></i> <strong>'+esc(data.linkedAsset.name)+'</strong></span>'+
+        '<button style="padding:3px 8px;border:1px solid rgba(220,38,38,0.3);border-radius:4px;background:#fff;color:#dc2626;font-size:10px;cursor:pointer;" onclick="unlinkFromDetail(\'polygon\',\''+data.id+'\')">取消关联</button></div>';
+    } else {
+      b += '<div style="padding:6px 10px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:11px;color:var(--text-secondary);cursor:pointer;" onclick="showAssetPicker(\'polygon\',findAnn(\'polygon\',\''+data.id+'\'))"><i data-lucide="link" style="width:12px;height:12px"></i> 关联资产 — 点击选择</div>';
+    }
+    b += '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:12px;"><span>面积</span><b>'+(data.area||0).toFixed(2)+' m²</b></div>'+
       '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:8px;font-size:12px;"><span>周长</span><b>'+(data.perimeter||0).toFixed(2)+' m</b></div>'+
       colorHTML+
       '<div class="detail-form-label" style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-top:8px;">线段形态</div><div style="display:flex;gap:8px;">';
@@ -5501,8 +5573,15 @@ function openDetail(type,data){
       '<button style="width:100%;padding:8px;border:1px solid var(--panel-border);border-radius:6px;background:#fff;font-size:12px;cursor:pointer;margin-bottom:8px;" onclick="shareAnn(\''+data.id+'\',\''+esc(data.name||'')+'\')">📱 标记分享（微信扫码）</button>'+
       '<div style="display:flex;gap:8px;"><button class="detail-btn danger" style="flex:1;padding:8px;border:none;border-radius:6px;background:#fee2e2;color:#dc2626;font-size:12px;cursor:pointer;" onclick="delAnn(\'polygon\',\''+data.id+'\')"><i data-lucide="trash-2" style="width:14px;height:14px"></i> 删除</button></div>';
   } else if (type==='circle') {
-    b=F.replace('$1','名称').replace('$2','<input class="detail-form-input" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;" value="'+esc(data.name||'')+'" onchange="updateAnn(\'circle\',\''+data.id+'\',\'name\',this.value);renderAnn()">')+
-      F.replace('$1','圆心坐标').replace('$2','<div style="font-size:12px;padding:6px 8px;background:var(--surface);border-radius:6px;">'+(data.center?data.center[0].toFixed(6)+', '+data.center[1].toFixed(6):'—')+'</div>')+
+    b=F.replace('$1','名称').replace('$2','<input class="detail-form-input" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;" value="'+esc(data.name||'')+'" onchange="updateAnn(\'circle\',\''+data.id+'\',\'name\',this.value);renderAnn()">');
+    if (data.linkedAsset) {
+      b += '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(22,163,74,0.06);border:1px solid rgba(22,163,74,0.2);border-radius:6px;margin-bottom:4px;">'+
+        '<span style="font-size:12px;display:flex;align-items:center;gap:6px;"><i data-lucide="link" style="width:14px;height:14px;color:#16a34a"></i> <strong>'+esc(data.linkedAsset.name)+'</strong></span>'+
+        '<button style="padding:3px 8px;border:1px solid rgba(220,38,38,0.3);border-radius:4px;background:#fff;color:#dc2626;font-size:10px;cursor:pointer;" onclick="unlinkFromDetail(\'circle\',\''+data.id+'\')">取消关联</button></div>';
+    } else {
+      b += '<div style="padding:6px 10px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:11px;color:var(--text-secondary);cursor:pointer;" onclick="showAssetPicker(\'circle\',findAnn(\'circle\',\''+data.id+'\'))"><i data-lucide="link" style="width:12px;height:12px"></i> 关联资产 — 点击选择</div>';
+    }
+    b += F.replace('$1','圆心坐标').replace('$2','<div style="font-size:12px;padding:6px 8px;background:var(--surface);border-radius:6px;">'+(data.center?data.center[0].toFixed(6)+', '+data.center[1].toFixed(6):'—')+'</div>')+
       F.replace('$1','水平半径').replace('$2','<input class="detail-form-input" type="number" style="padding:8px;border:1px solid var(--panel-border);border-radius:6px;font-size:12px;width:100%;" value="'+(data.radius||0)+'" onchange="var v=parseFloat(this.value);updateAnn(\'circle\',\''+data.id+'\',\'radius\',v);updateAnn(\'circle\',\''+data.id+'\',\'area\',Math.PI*v*v);updateAnn(\'circle\',\''+data.id+'\',\'circumference\',2*Math.PI*v);renderAnn();openDetail(\'circle\',findAnn(\'circle\',\''+data.id+'\'))">')+
       '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:12px;"><span>面积</span><b>'+(data.area||0).toFixed(2)+' m²</b></div>'+
       '<div style="display:flex;justify-content:space-between;padding:6px 8px;background:var(--surface);border-radius:6px;margin-bottom:8px;font-size:12px;"><span>周长</span><b>'+(data.circumference||0).toFixed(2)+' m</b></div>'+
@@ -5558,11 +5637,11 @@ function showCtx(e,type,data){
   var items=menu.querySelectorAll('.ctx-item');
   items.forEach(function(it){it.style.display='none'});
   var acts=[];
-  if(type==='point')acts=['delete','fly-to','return-all'];
-  else if(type==='line')acts=['delete','convert-survey'];
-  else if(type==='polygon')acts=['delete','convert-survey','convert-patrol'];
-  else if(type==='circle')acts=['delete'];
-  items.forEach(function(it){if(acts.indexOf(it.dataset.action)>=0)it.style.display='flex'});
+  if(type==='point')acts=['link-asset','delete','fly-to','return-all'];
+  else if(type==='line')acts=['link-asset','delete','convert-survey'];
+  else if(type==='polygon')acts=['link-asset','delete','convert-survey','convert-patrol'];
+  else if(type==='circle')acts=['link-asset','delete'];
+  items.forEach(function(it){if(it.classList.contains('ctx-sep')){it.style.display='block'}else if(acts.indexOf(it.dataset.action)>=0)it.style.display='flex'});
   menu.style.display='flex';menu.style.left=e.originalEvent.clientX+'px';menu.style.top=e.originalEvent.clientY+'px';
   var r=menu.getBoundingClientRect();
   if(r.right>window.innerWidth)menu.style.left=(e.originalEvent.clientX-r.width)+'px';
@@ -5572,7 +5651,8 @@ function hideCtx(){document.getElementById('ctx-menu').style.display='none';ctxT
 document.getElementById('ctx-menu').addEventListener('click',function(e){
   var it=e.target.closest('.ctx-item');if(!it||!ctxTarget)return;
   var a=it.dataset.action,d=ctxTarget.data,t=ctxTarget.type;
-  if(a==='delete')delAnn(t,d.id);
+  if(a==='link-asset'){hideCtx();showAssetPicker(t,d);return;}
+  else if(a==='delete')delAnn(t,d.id);
   else if(a==='fly-to')showNotice('请选择目标设备（演示）');
   else if(a==='return-all')showNotice('全部返航指令已发送（演示）');
   else if(a==='convert-survey')showNotice('已转换为测区（演示）');
@@ -5580,6 +5660,79 @@ document.getElementById('ctx-menu').addEventListener('click',function(e){
   hideCtx();
 });
 document.addEventListener('click',function(e){if(!e.target.closest('#ctx-menu'))hideCtx()});
+
+// ===== Asset Picker & Link =====
+var ASSETS = [
+  {id:'BR-K120-001', name:'望江大桥', type:'bridge', icon:'landmark', meta:'G50-BR-K120-001 · 钢索桥'},
+  {id:'BR-K118-001', name:'城北高架桥', type:'bridge', icon:'building-2', meta:'G50-BR-K118-001 · 预应力桥'},
+  {id:'BR-K122-001', name:'滨江立交桥', type:'bridge', icon:'building', meta:'G50-BR-K122-001 · 钢结构'},
+  {id:'SL-K120-012', name:'边坡 R12', type:'slope', icon:'mountain', meta:'G50-SL-K120-012 · 公路边坡'},
+  {id:'TS-K120-001', name:'K120 交安设施', type:'safety', icon:'shield', meta:'G50-TS-K120-001 · 护栏/标志牌'},
+  {id:'RD-K122-001', name:'K122 路面', type:'road', icon:'route', meta:'G50-RD-K122-001 · 沥青路面'},
+];
+var apTarget = null; // {type, data}
+
+function showAssetPicker(type, data) {
+  apTarget = {type:type, data:data};
+  document.getElementById('ap-title').textContent = '关联资产 — ' + (data.name||'未命名');
+  document.getElementById('ap-search').value = '';
+  var linkedId = data.linkedAsset ? data.linkedAsset.id : null;
+  var listEl = document.getElementById('ap-list');
+  var html = '';
+  ASSETS.forEach(function(a) {
+    var isLinked = (linkedId === a.id);
+    html += '<div class="asset-picker-item'+(isLinked?' linked':'')+'" data-asset="'+a.id+'" onclick="selectAssetForPicker(\''+a.id+'\')">' +
+      '<div class="ap-icon '+a.type+'"><i data-lucide="'+a.icon+'" style="width:14px;height:14px"></i></div>' +
+      '<div class="ap-info"><div class="ap-name">'+a.name+'</div><div class="ap-meta">'+a.meta+'</div></div>' +
+      '<div class="ap-check"><i data-lucide="check" style="width:14px;height:14px"></i></div>' +
+    '</div>';
+  });
+  listEl.innerHTML = html;
+  if (window.lucide) lucide.createIcons();
+  var unlinkBtn = document.getElementById('ap-unlink-btn');
+  unlinkBtn.style.display = linkedId ? 'block' : 'none';
+  document.getElementById('ap-hint').textContent = linkedId ? '已关联，点击其他资产可更换' : '选择一个资产与标注关联';
+  document.getElementById('asset-picker-overlay').classList.add('show');
+}
+
+function hideAssetPicker() {
+  document.getElementById('asset-picker-overlay').classList.remove('show');
+  apTarget = null;
+}
+
+function filterAssetPicker() {
+  var q = document.getElementById('ap-search').value.trim().toLowerCase();
+  document.querySelectorAll('#ap-list .asset-picker-item').forEach(function(item) {
+    var name = (item.querySelector('.ap-name')||{}).textContent||'';
+    var meta = (item.querySelector('.ap-meta')||{}).textContent||'';
+    item.style.display = (!q || name.toLowerCase().indexOf(q)>=0 || meta.toLowerCase().indexOf(q)>=0) ? '' : 'none';
+  });
+}
+
+function selectAssetForPicker(assetId) {
+  var asset = ASSETS.find(function(a) { return a.id === assetId; });
+  if (!asset || !apTarget) return;
+  updateAnn(apTarget.type, apTarget.data.id, 'linkedAsset', {id:asset.id, name:asset.name, type:asset.type, icon:asset.icon});
+  hideAssetPicker();
+  renderAnn();
+  showNotice('已关联资产：' + asset.name);
+}
+
+function unlinkAssetFromAnn() {
+  if (!apTarget) return;
+  updateAnn(apTarget.type, apTarget.data.id, 'linkedAsset', null);
+  hideAssetPicker();
+  renderAnn();
+  showNotice('已取消资产关联');
+}
+
+function unlinkFromDetail(type, id) {
+  updateAnn(type, id, 'linkedAsset', null);
+  renderAnn();
+  var ann = findAnn(type, id);
+  if (ann) openDetail(type, ann);
+  showNotice('已取消资产关联');
+}
 
 // ===== Keyboard =====
 document.addEventListener('keydown',function(e){
